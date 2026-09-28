@@ -76,6 +76,7 @@ h1,h2,h3{margin:0; text-wrap:balance}
 main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .demobar{background:var(--orange); color:#1a1200; font-size:12.5px; font-weight:700; text-align:center; padding:7px 10px; display:flex; align-items:center; justify-content:center; gap:8px}
 .demobar button{background:rgba(0,0,0,0.18); border:0; color:inherit; font-weight:700; font-size:12px; padding:3px 9px; border-radius:20px}
+.offlinebar{background:var(--fill); color:var(--tx2); font-size:12px; font-weight:600; text-align:center; padding:6px 10px; display:flex; align-items:center; justify-content:center; gap:6px}
 
 /* ===== Tab bar ===== */
 .tabbar{
@@ -144,7 +145,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 
 /* ===== Big stat card ===== */
 .hero{position:relative; overflow:hidden; background:radial-gradient(120% 140% at 100% 0%, #2A2D35 0%, #14161A 46%, #0B0C0F 100%); color:#fff; border-radius:var(--r-lg); padding:20px 20px 18px; box-shadow:var(--shadow); margin-bottom:12px; isolation:isolate}
-.hero::before{content:''; position:absolute; inset:0; z-index:-1; background:radial-gradient(60% 90% at 105% -10%, rgba(10,132,255,0.35), transparent 60%)}
+.hero::before{content:''; position:absolute; inset:0; z-index:-1; background:radial-gradient(60% 90% at 105% -10%, var(--accent-glow, rgba(10,132,255,0.35)), transparent 60%)}
 .hero .lbl{color:rgba(255,255,255,0.62); font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px}
 .hero .big{font-size:38px; font-weight:800; letter-spacing:-0.025em; margin-top:3px; color:#fff}
 .hero .sub{color:rgba(255,255,255,0.6); font-size:13px; margin-top:5px}
@@ -184,6 +185,14 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
   width:100%; padding:11px 12px; border-radius:11px; border:0.5px solid var(--sep); background:var(--fill2); color:var(--tx);
 }
 .field textarea{resize:vertical; min-height:56px}
+.amtfield{margin:4px 0 16px; text-align:center}
+.amtfield label{justify-content:center; margin-bottom:2px}
+.amtwrap{display:flex; align-items:baseline; justify-content:center; gap:5px}
+.amtwrap .cur{font-size:20px; font-weight:700; color:var(--tx2)}
+.amtwrap input{width:auto; max-width:220px; border:0!important; background:transparent!important; padding:6px 2px!important; font-size:40px; font-weight:800; letter-spacing:-0.02em; text-align:center; color:var(--tx)}
+.amtfield.sm{background:var(--fill2); border-radius:var(--r-md); padding:8px 6px 10px; margin-bottom:0}
+.amtfield.sm .amtwrap input{font-size:24px; max-width:100%}
+.amtfield.sm .cur{font-size:15px}
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 .platrow{display:grid; grid-template-columns:1fr 90px 26px; gap:8px; align-items:center; margin-bottom:8px}
 .iconbtn{width:26px; height:26px; border-radius:50%; border:0; background:var(--fill); color:var(--tx2); font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0}
@@ -251,6 +260,8 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .confirm-msg{color:var(--tx2); font-size:14px; margin:8px 0 18px; line-height:1.4; white-space:pre-line}
 .confirm-actions{display:flex; flex-direction:column; gap:8px}
 .empty{padding:26px 14px; text-align:center; color:var(--tx2); font-size:13.5px}
+.emptybig{padding:38px 20px; text-align:center; color:var(--tx2); font-size:14px; line-height:1.5}
+.emptybig .ei{width:56px; height:56px; border-radius:16px; background:var(--fill); color:var(--tx3); display:flex; align-items:center; justify-content:center; margin:0 auto 14px}
 
 /* ===== Full-screen window (settings / onboarding / car detail) ===== */
 .fullscreen{position:fixed; inset:0; z-index:100; isolation:isolate; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
@@ -302,6 +313,16 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .opt b{display:block; font-size:15.5px; font-weight:700}
 .opt span.d{display:block; color:var(--tx2); font-size:12.5px; margin-top:1px}
 .carcard{background:var(--bg-grouped); border-radius:14px; padding:14px; box-shadow:var(--shadow); margin-bottom:10px}
+.garagecard{background:var(--bg-grouped); border-radius:var(--r-lg); box-shadow:var(--shadow); margin-bottom:12px; overflow:hidden; cursor:pointer}
+.garagebanner{position:relative; height:112px; background:linear-gradient(135deg,var(--fill2),var(--fill)); display:flex; align-items:center; justify-content:center; color:var(--tx3)}
+.garagebanner img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.garagebanner .gdot{position:absolute; top:10px; right:10px; width:11px; height:11px; border-radius:50%; border:2px solid rgba(255,255,255,0.85); box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.garagecard .gbody{padding:12px 14px 13px; display:flex; align-items:center; gap:10px}
+.themegrid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+.themetile{display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 4px; border-radius:var(--r-sm); border:1.5px solid var(--sep); background:var(--fill2); color:var(--tx)}
+.themetile.on{border-color:var(--tx); background:var(--fill)}
+.themetile .tswatch{width:26px; height:26px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08)}
+.themetile .tname{font-size:11.5px; font-weight:600}
 
 /* ===== Active shift ===== */
 .activecard{background:linear-gradient(135deg,#0B3D2E,#14161A); color:#fff; border-radius:18px; padding:18px; box-shadow:var(--shadow); margin-bottom:14px}
@@ -365,6 +386,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 
 <div id="app">
   <div id="demobar" class="demobar" hidden></div>
+  <div id="offlinebar" class="offlinebar" hidden></div>
   <div class="topbar">
     <div class="topbar-row">
       <div>
@@ -424,7 +446,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.3';
+const APP_VERSION='0.9.4';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -440,6 +462,7 @@ const DEV_INFO={
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.4', date:'29.09.2026 01:09', items:['Великий редизайн у дусі свіжого iOS: емодзі в списках, картках і меню замінено на власний набір чітких векторних іконок у кольорових значках','Списки змін і витрат тепер групуються за датою («Сьогодні», «Вчора», далі за датами), з іконкою категорії біля кожного запису','Картка чистого прибутку на дашборді отримала глибший градієнт і акуратну іконку','Плитки статистики на дашборді («Змін», «Прибуток/год», «Пробіг», «Прибуток/км») тепер з іконками','Кнопки «Почати зміну» й «Чи вигідне замовлення?» замінено на компактний рядок швидких дій, що гортається вбік, і додано швидкий доступ до витрати й заправки','Поле суми у формах витрати й заправки — велике, по центру, у стилі калькулятора, щоб було зручніше вводити на ходу','Картки авто в гаражі тепер із банером фото (чи іконкою пального/зарядки) зверху та кольоровою крапкою стану','Порожні екрани (немає авто, змін, витрат) отримали іконку й дружніший текст замість голого рядка']},
   {v:'0.9.3', date:'29.09.2026 00:55', items:['Кнопка закриття шторки більше не зникає під час прокрутки її вмісту — тепер вона завжди на місці зверху','Фон більше не «прокручується» разом із відкритою шторкою чи вікном — сторінка позаду тепер зафіксована, поки дивишся деталі','Виправлено рідкісне накладання шапки з ефектом скла на вікна поверх неї','Застосунок адаптовано під планшети й комп’ютери — на широкому екрані вміст тепер акуратно по центру у вигляді картки, а не розтягнутий на всю ширину','Кнопка «Назад» на iPhone 16 Pro Max та подібних — перевірена і виправлена позиція']},
   {v:'0.9.2', date:'29.09.2026 00:42', items:['Перший крок редизайну (кольори, типографіка, форма елементів): точніший системний зелений колір, чіткіші роздільники карток, більший і виразніший заголовок вгорі екрана, жирніші заголовки розділів, заокругленіші картки й кнопки в дусі свіжого iOS — далі редизайн продовжимо по екранах']},
   {v:'0.9.1', date:'29.09.2026 00:39', items:['Кнопка «Назад» вгорі екранів налаштувань та деталей — більше відступу зверху і більша область дотику, щоб було зручно натискати']},
@@ -555,7 +578,7 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, haptics:{master:true, swipe:true, delete:true, actions:true}},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[]},
     contacts:[],
     goals:{daily:0, weekly:0, monthly:0},
     reminders:[],
@@ -583,6 +606,9 @@ function load(){
     if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
     if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
     if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
+    if(DB.settings.themeId===undefined) DB.settings.themeId='';
+    if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
+    if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -995,7 +1021,8 @@ function renderDash(){
 
   if(!isDemo() && (DB.shifts.length>0 || DB.expenses.length>0)){
     const bdays=daysSinceBackup();
-    if(bdays===null || bdays>=30){
+    const bThreshold=+DB.settings.autoBackupDays||30;
+    if(bdays===null || bdays>=bThreshold){
       html+=`<div class="group" style="margin-top:10px;cursor:pointer" onclick="openBackupSheet()">
         <div class="row"><span class="dot" style="background:var(--orange)"></span><div class="rtitle"><b>${bdays===null?'Ще не робили резервну копію':'Резервна копія '+bdays+' дн. тому'}</b><div class="sub">Дані лише в цьому браузері — збережіть копію, щоб не втратити</div></div><span class="chev">›</span></div>
       </div>`;
@@ -1663,7 +1690,7 @@ function renderShifts(){
 let shiftSearchQ='';
 function shiftsListHtml(){
   const list=[...DB.shifts].sort((a,b)=>b.date.localeCompare(a.date)||String(b.id).localeCompare(String(a.id)));
-  if(!list.length) return `<div class="group"><div class="empty">Ще немає жодної завершеної зміни.</div></div>`;
+  if(!list.length) return `<div class="group"><div class="emptybig"><div class="ei">${icon('history',26)}</div>Ще немає жодної завершеної зміни.<br>Натисніть «+», щоб почати.</div></div>`;
   const q=shiftSearchQ.trim().toLowerCase();
   const filtered=!q?list:list.filter(s=>{
     const c=carById(s.carId);
@@ -2180,7 +2207,7 @@ function renderExpenses(){
     <button class="${PERIOD==='custom'?'on':''}" onclick="openCustomPeriod()">Період</button></div>`;
 
   if(!all.length){
-    html+=`<div class="group" style="margin-top:14px"><div class="empty">Витрат ще немає.<br>Пальне та зарядки записуються у вкладці «Авто».</div></div>`;
+    html+=`<div class="group" style="margin-top:14px"><div class="emptybig"><div class="ei">${icon('cart',26)}</div>Витрат ще немає.<br>Пальне та зарядки записуються у вкладці «Авто».</div></div>`;
     $('#main').innerHTML=html; return;
   }
 
@@ -2210,12 +2237,13 @@ function renderExpenses(){
   $('#main').innerHTML=html;
 }
 const EXPENSE_TEMPLATES=[
-  {name:'Мийка', cat:'onshift', amount:120},
-  {name:'Паркінг', cat:'onshift', amount:50},
-  {name:'Перекус', cat:'onshift', amount:60},
-  {name:'Штраф', cat:'fines', amount:0},
-  {name:'Дрібний ремонт', cat:'service', amount:0}
+  {name:'Мийка', cat:'onshift', amount:120, work:true, payment:'cash'},
+  {name:'Паркінг', cat:'onshift', amount:50, work:true, payment:'cash'},
+  {name:'Перекус', cat:'onshift', amount:60, work:true, payment:'cash'},
+  {name:'Штраф', cat:'fines', amount:0, work:true},
+  {name:'Дрібний ремонт', cat:'service', amount:0, work:true}
 ];
+function allExpenseTemplates(){ return [...EXPENSE_TEMPLATES, ...(DB.settings.customTemplates||[])]; }
 function openExpenseForm(){
   const activeIds=activeCars().map(c=>c.id);
   const lastCat = (DB.lastUsed && DB.lastUsed.expCategory) || EXP_CATS[0].id;
@@ -2223,9 +2251,14 @@ function openExpenseForm(){
   showSheet(`
     <h3>Нова витрата</h3>
     <div style="margin-top:14px">
-      <div class="field"><label>Швидко</label><div class="chipwrap">${EXPENSE_TEMPLATES.map((t,i)=>`<button type="button" class="chip" onclick="applyExpenseTemplate(${i})">${esc(t.name)}</button>`).join('')}</div></div>
+      <div class="field"><label>Швидко</label><div class="chipwrap" id="eTplWrap">${allExpenseTemplates().map((t,i)=>`<button type="button" class="chip" onclick="applyExpenseTemplate(${i})">${esc(t.name)}</button>`).join('')}<button type="button" class="chip" style="border-style:dashed" onclick="toggleSaveTpl()">+ Свій</button></div>
+        <div id="eTplSaveRow" hidden style="display:flex;gap:8px;margin-top:8px">
+          <input type="text" id="eTplName" placeholder="Назва шаблону" style="flex:1;padding:9px 10px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)">
+          <button type="button" class="btn primary" style="width:auto;padding:9px 14px" onclick="saveCurrentAsTemplate()">OK</button>
+        </div>
+      </div>
+      <div class="amtfield"><label>Сума</label><div class="amtwrap"><input type="number" inputmode="decimal" id="eAmount" placeholder="0" autofocus><span class="cur">₴</span></div></div>
       <div class="field"><label>Дата</label><input type="date" id="eDate" value="${today()}"></div>
-      <div class="field"><label>Сума, ₴</label><input type="number" inputmode="decimal" id="eAmount"></div>
       <div class="field"><label>Категорія <button type="button" class="infob" id="eCatInfo" onclick="showCatInfo()">i</button></label><select id="eCat" onchange="$('#eCatInfo').dataset.cat=this.value">${EXP_CATS.map(c=>`<option value="${c.id}" ${c.id===lastCat?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
       <div class="field"><label>Авто (необов'язково)</label><select id="eCar"><option value="">— загальна —</option>${activeCars().map(c=>`<option value="${c.id}" ${c.id===lastCarId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
       <div class="field"><label>Тип</label><div class="seg" id="eWorkSeg">
@@ -2240,10 +2273,24 @@ function openExpenseForm(){
   `);
   $('#eCatInfo').dataset.cat=lastCat;
   let work=true, payment='cash';
+  window.toggleSaveTpl=()=>{ const r=$('#eTplSaveRow'); if(!r) return; r.hidden=!r.hidden; if(!r.hidden) $('#eTplName').focus(); };
+  window.saveCurrentAsTemplate=()=>{
+    const name=$('#eTplName').value.trim();
+    if(!name){ alertSheet('Вкажіть назву','Придумайте коротку назву для шаблону.'); return; }
+    const amount=num($('#eAmount').value), cat=$('#eCat').value, carId=$('#eCar').value||'';
+    DB.settings.customTemplates=DB.settings.customTemplates||[];
+    DB.settings.customTemplates.push({name, cat, amount, work, payment, carId});
+    save();
+    $('#eTplSaveRow').hidden=true; $('#eTplName').value='';
+    $('#eTplWrap').innerHTML=allExpenseTemplates().map((t,i)=>`<button type="button" class="chip" onclick="applyExpenseTemplate(${i})">${esc(t.name)}</button>`).join('')+`<button type="button" class="chip" style="border-style:dashed" onclick="toggleSaveTpl()">+ Свій</button>`;
+  };
   window.applyExpenseTemplate=(i)=>{
-    const t=EXPENSE_TEMPLATES[i]; if(!t) return;
+    const t=allExpenseTemplates()[i]; if(!t) return;
     $('#eCat').value=t.cat; $('#eCatInfo').dataset.cat=t.cat;
     if(t.amount){ $('#eAmount').value=t.amount; } else { $('#eAmount').focus(); }
+    if(t.carId){ $('#eCar').value=t.carId; }
+    if(t.work!==undefined){ window.setWork(t.work); }
+    if(t.payment){ window.setPay(t.payment); }
     if(!$('#eNote').value) $('#eNote').value=t.name;
   };
   window.setWork=(v)=>{ work=v; $('#eWorkSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on', (i===0)===v)); };
@@ -2328,25 +2375,26 @@ function carRowHtml(c){
   const lastDays=carLastActivityDays(c);
   const y=DB.settings.yellowDays, r=DB.settings.redDays;
   const st = lastDays===Infinity ? '' : (lastDays<=y ? 'g' : (lastDays<=r ? 'y' : 'r'));
-  return `<div class="row" onclick="openCarDetail('${c.id}')" style="cursor:pointer">
-    <div class="caravatar" style="position:relative">${c.photo?`<img src="${c.photo}">`:'🚗'}${st?`<span class="dot ${st}" style="position:absolute;right:-2px;bottom:-2px;border:2px solid var(--bg-grouped)"></span>`:''}</div>
-    <div class="rtitle"><b>${esc(c.name)}${carDisplayPlate(c)?' · '+esc(carDisplayPlate(c)):''}</b><div class="sub">${FUEL_TYPES[c.fuelType]?.label||''} · ${Math.round(c.odo)} км${cons.value!==null?' · '+cons.value.toFixed(1)+' '+fuelUnit(c)+'/100км':''}</div></div>
-    <span class="chev">›</span>
+  const dotColor = st==='g' ? 'var(--green)' : st==='y' ? 'var(--orange)' : st==='r' ? 'var(--red)' : '';
+  return `<div class="garagecard" onclick="openCarDetail('${c.id}')">
+    <div class="garagebanner">${c.photo?`<img src="${c.photo}">`:icon(c.fuelType==='ev'?'bolt':'fuel',36)}${dotColor?`<span class="gdot" style="background:${dotColor}"></span>`:''}</div>
+    <div class="gbody">
+      <div class="rtitle"><b>${esc(c.name)}${carDisplayPlate(c)?' · '+esc(carDisplayPlate(c)):''}</b><div class="sub">${FUEL_TYPES[c.fuelType]?.label||''} · ${Math.round(c.odo)} км${cons.value!==null?' · '+cons.value.toFixed(1)+' '+fuelUnit(c)+'/100км':''}</div></div>
+      <span class="chev">›</span>
+    </div>
   </div>`;
 }
 function renderCars(){
   let html='';
   if(!DB.cars.length){
-    html=`<div class="group"><div class="empty">Ще немає жодного авто.<br>Натисніть «+», щоб додати перше.</div></div>`;
+    html=`<div class="group"><div class="emptybig"><div class="ei">${icon('fuel',26)}</div>Ще немає жодного авто.<br>Натисніть «+», щоб додати перше.</div></div>`;
   }else{
     const active=activeCars(), archived=archivedCars();
-    html=`<div class="section-label">Мій гараж <span style="font-weight:400">(${active.length}/5 активних)</span> ${(active.length+archived.length)>1?`<button type="button" class="infob" onclick="openCarCompareSheet()" style="font-size:11px;width:auto;height:22px;padding:0 8px;border-radius:9px">Порівняти</button>`:''}</div><div class="group">`;
-    html+= active.length ? active.map(carRowHtml).join('') : `<div class="empty">Немає активних авто</div>`;
-    html+=`</div>`;
+    html=`<div class="section-label">Мій гараж <span style="font-weight:400">(${active.length}/5 активних)</span> ${(active.length+archived.length)>1?`<button type="button" class="infob" onclick="openCarCompareSheet()" style="font-size:11px;width:auto;height:22px;padding:0 8px;border-radius:9px">Порівняти</button>`:''}</div>`;
+    html+= active.length ? active.map(carRowHtml).join('') : `<div class="group"><div class="empty">Немає активних авто</div></div>`;
     if(archived.length){
-      html+=`<div class="section-label">Архів <button type="button" class="infob" onclick="alertSheet('Архів авто','Авто, на яких більше не працюєте — продані, повернута оренда тощо. Історія заробітку й витрат по них зберігається без обмежень, просто вони не заважають у поточному гаражі.')">i</button></div><div class="group">`;
+      html+=`<div class="section-label">Архів <button type="button" class="infob" onclick="alertSheet('Архів авто','Авто, на яких більше не працюєте — продані, повернута оренда тощо. Історія заробітку й витрат по них зберігається без обмежень, просто вони не заважають у поточному гаражі.')">i</button></div>`;
       html+=archived.map(carRowHtml).join('');
-      html+=`</div>`;
     }
   }
   $('#main').innerHTML=html;
@@ -3114,8 +3162,8 @@ function openFuelForm(carId){
       <div class="field"><label>Дата</label><input type="date" id="fDate" value="${today()}"></div>
       <div class="field"><label>Одометр, км</label><input type="number" inputmode="decimal" id="fOdo" value="${c.odo||''}"></div>
       <div class="row2">
-        <div class="field"><label>${isEv?'Енергія, кВт·год':'Об’єм, '+fuelUnit(c)}</label><input type="number" inputmode="decimal" step="0.01" id="fAmount" oninput="updFuelPrice()"></div>
-        <div class="field"><label>Вартість, ₴</label><input type="number" inputmode="decimal" step="0.01" id="fCost" oninput="updFuelPrice()"></div>
+        <div class="amtfield sm"><label>${isEv?'кВт·год':fuelUnit(c)}</label><div class="amtwrap"><input type="number" inputmode="decimal" step="0.01" id="fAmount" placeholder="0" oninput="updFuelPrice()"></div></div>
+        <div class="amtfield sm"><label>Вартість</label><div class="amtwrap"><input type="number" inputmode="decimal" step="0.01" id="fCost" placeholder="0" oninput="updFuelPrice()"><span class="cur">₴</span></div></div>
       </div>
       <div class="sub" id="fPriceHint" style="margin:-6px 0 10px"></div>
       <div class="field"><label>${isEv?'Повна зарядка':'Повний бак'}</label><div class="seg" id="fFullSeg">
@@ -3276,15 +3324,42 @@ const ACCENT_PRESETS=[
   {id:'pink', label:'Рожевий', hex:'#FF2D55'},
   {id:'indigo', label:'Індиго', hex:'#5856D6'}
 ];
+const THEME_PRESETS=[
+  {id:'', label:'iOS 27', hex:'', d:'Типова системна тема'},
+  {id:'uklon', label:'Uklon', hex:'#1FAE6D', d:'Зелений акцент у стилі Uklon'},
+  {id:'ontaxi', label:'OnTaxi', hex:'#FF9F1C', d:'Помаранчевий акцент у стилі OnTaxi'},
+  {id:'glovo', label:'Glovo', hex:'#E8A400', d:'Жовтий акцент у стилі Glovo'},
+  {id:'bolt', label:'Bolt', hex:'#34D186', d:'Яскраво-зелений акцент у стилі Bolt'},
+  {id:'uber', label:'Uber', hex:'#1A1A1A', d:'Монохромний чорний акцент у стилі Uber'}
+];
+function hexToRgb(hex){
+  const h=(hex||'').replace('#','');
+  if(h.length!==6) return null;
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  if([r,g,b].some(isNaN)) return null;
+  return {r,g,b};
+}
 function applyAccent(){
   try{
     const c=(DB && DB.settings && DB.settings.accentColor) || '';
     if(c) document.documentElement.style.setProperty('--blue', c);
     else document.documentElement.style.removeProperty('--blue');
+    const rgb=hexToRgb(c||'#0A84FF');
+    if(rgb) document.documentElement.style.setProperty('--accent-glow', `rgba(${rgb.r},${rgb.g},${rgb.b},0.35)`);
+    else document.documentElement.style.removeProperty('--accent-glow');
   }catch(e){}
 }
 function setAccent(hex){
   DB.settings.accentColor=hex||'';
+  DB.settings.themeId='';
+  save();
+  applyAccent();
+  openSettings('appearance');
+}
+function setTheme(id){
+  const t=THEME_PRESETS.find(x=>x.id===id); if(!t) return;
+  DB.settings.themeId=id;
+  DB.settings.accentColor=t.hex||'';
   save();
   applyAccent();
   openSettings('appearance');
@@ -3462,9 +3537,18 @@ function renderSettingsAppearance(){
         <div class="seg" style="width:auto"><button class="${!DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=true;save();openSettings('appearance')">Так</button></div></div>
     </div>
     <div class="group" style="margin-top:10px;padding:12px 14px">
-      <div class="rtitle" style="margin-bottom:8px"><b>Акцентний колір</b><div class="sub">Колір кнопок і активних елементів</div></div>
+      <div class="rtitle" style="margin-bottom:8px"><b>Тема застосунку</b><div class="sub">Готовий набір кольорів у стилі платформи, з якою працюєте</div></div>
+      <div class="themegrid">
+        ${THEME_PRESETS.map(t=>`<button type="button" class="themetile ${((DB.settings.themeId||'')===t.id)?'on':''}" onclick="setTheme('${t.id}')">
+          <span class="tswatch" style="background:${t.hex||'#007AFF'}"></span>
+          <span class="tname">${esc(t.label)}</span>
+        </button>`).join('')}
+      </div>
+    </div>
+    <div class="group" style="margin-top:10px;padding:12px 14px">
+      <div class="rtitle" style="margin-bottom:8px"><b>Акцентний колір</b><div class="sub">Свій колір кнопок і активних елементів</div></div>
       <div style="display:flex;flex-wrap:wrap;gap:10px">
-        ${ACCENT_PRESETS.map(a=>`<button type="button" onclick="setAccent('${a.hex}')" title="${esc(a.label)}" style="width:32px;height:32px;border-radius:50%;border:${(DB.settings.accentColor||'')===a.hex?'3px solid var(--tx)':'1px solid var(--sep)'};background:${a.hex||'#007AFF'};padding:0"></button>`).join('')}
+        ${ACCENT_PRESETS.map(a=>`<button type="button" onclick="setAccent('${a.hex}')" title="${esc(a.label)}" style="width:32px;height:32px;border-radius:50%;border:${(!DB.settings.themeId && (DB.settings.accentColor||'')===a.hex)?'3px solid var(--tx)':'1px solid var(--sep)'};background:${a.hex||'#007AFF'};padding:0"></button>`).join('')}
       </div>
     </div>
     <div class="group" style="margin-top:10px;padding:12px 14px">
@@ -3566,11 +3650,18 @@ function renderSettingsData(){
   const body=`
     <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
     <div class="group">
+      <div class="row"><div class="icobadge" style="background:var(--green)">${icon('box',17)}</div><div class="rtitle"><b>Дані збережено на пристрої</b><div class="sub">Займають ${storageInfoLabel()} · синхронізації з хмарою немає</div></div></div>
+      <div class="row"><div class="rtitle"><b>Нагадувати про резервну копію</b><div class="sub">Якщо давно не зберігали — нагадаємо на дашборді</div></div>
+        <select style="max-width:110px" onchange="DB.settings.autoBackupDays=+this.value;save()">${[7,14,30,60].map(d=>`<option value="${d}" ${+DB.settings.autoBackupDays===d?'selected':''}>${d} дн.</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="group" style="margin-top:10px">
       <div class="row" onclick="openExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт для бухгалтера</b><div class="sub">Текст із доходами й витратами за період</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openCsvExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт у CSV (Excel/Таблиці)</b><div class="sub">Окремі файли змін і витрат за період</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openPdfReportSheet()" style="cursor:pointer"><div class="rtitle"><b>PDF-звіт</b><div class="sub">Друк або збереження як PDF за період</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openYearSummary()" style="cursor:pointer"><div class="rtitle"><b>Річний підсумок</b><div class="sub">Скільки заробили за ${new Date().getFullYear()} рік</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openBackupSheet()" style="cursor:pointer"><div class="rtitle"><b>Резервна копія даних</b><div class="sub">Зберегти всі дані в файл або текст, і відновити пізніше</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openCustomTemplatesSheet()" style="cursor:pointer"><div class="rtitle"><b>Мої шаблони витрат</b><div class="sub">${(DB.settings.customTemplates||[]).length} збережено — додаються у формі витрати</div></div><span class="chev">›</span></div>
       <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
     </div>
@@ -3897,21 +3988,62 @@ function openCsvExportSheet(){
 function buildPdfReportHtml(fromDate, toDate, label){
   const shifts=DB.shifts.filter(s=>s.date>=fromDate && s.date<=toDate).sort((a,b)=>a.date.localeCompare(b.date));
   const expenses=DB.expenses.filter(e=>e.date>=fromDate && e.date<=toDate).sort((a,b)=>a.date.localeCompare(b.date));
+  const fuel=DB.fuel.filter(f=>f.date>=fromDate && f.date<=toDate);
   const income=shifts.reduce((a,s)=>a+shiftIncome(s),0);
   const expTotal=expenses.reduce((a,e)=>a+num(e.amount),0);
   const profit=income-expTotal;
+  const hours=shifts.reduce((a,s)=>a+num(s.hours),0);
+  const km=shifts.reduce((a,s)=>a+num(s.km),0);
   const byCat={}; expenses.forEach(e=>{ byCat[e.category]=(byCat[e.category]||0)+num(e.amount); });
   const catRows=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const byPlat={}; shifts.forEach(s=>{ (s.entries||[]).forEach(e=>{ byPlat[e.platformId]=(byPlat[e.platformId]||0)+num(e.amount)+num(e.tips); }); });
+  const platRows=Object.entries(byPlat).sort((a,b)=>b[1]-a[1]);
+  const allCars=[...activeCars(), ...archivedCars()];
+  const byCar={};
+  allCars.forEach(c=>{ byCar[c.id]={inc:0,exp:0,km:0}; });
+  shifts.forEach(s=>{ if(byCar[s.carId]){ byCar[s.carId].inc+=shiftIncome(s); byCar[s.carId].km+=num(s.km); } });
+  expenses.forEach(e=>{ if(e.carId && byCar[e.carId]) byCar[e.carId].exp+=num(e.amount); });
+  const carRows=Object.entries(byCar).filter(([,v])=>v.inc>0||v.exp>0||v.km>0);
+  const days=Math.max(1, Math.round((new Date(toDate)-new Date(fromDate))/86400000)+1);
+  const fop=DB.profile.fop||'none';
+  let taxAmount=0, taxLabel='';
+  if(fop==='group2'){ taxAmount=num(DB.profile.taxGroup2Fixed)/30*days; taxLabel='Фіксований податок, 2 група · '+money(num(DB.profile.taxGroup2Fixed))+'/міс'; }
+  else if(fop==='group3'){ const rate=num(DB.profile.taxGroup3Rate)||5; taxAmount=income*rate/100; taxLabel='Єдиний податок, 3 група · '+rate+'% від доходу'; }
+  const esvAmount = fop!=='none' ? num(DB.profile.esvMonthly)/30*days : 0;
+
   let html=`<div class="preport">
     <h1>Звіт «Водій»</h1>
-    <div class="psub">${esc(label)} · сформовано ${fmtDate(today())}</div>
+    <div class="psub">${esc(label)} · ${fmtDate(fromDate)} — ${fmtDate(toDate)} · сформовано ${fmtDate(today())}${DB.profile.name?' · '+esc(DB.profile.name):''}</div>
     <div class="ptotals">
       <div class="ptile"><div class="l">Дохід</div><div class="v">${money(income)}</div></div>
       <div class="ptile"><div class="l">Витрати</div><div class="v">${money(expTotal)}</div></div>
       <div class="ptile"><div class="l">Чистими</div><div class="v">${money(profit)}</div></div>
+    </div>
+    <div class="ptotals">
+      <div class="ptile"><div class="l">Змін</div><div class="v">${shifts.length}</div></div>
+      <div class="ptile"><div class="l">Годин</div><div class="v">${Math.round(hours)}</div></div>
+      <div class="ptile"><div class="l">Пробіг</div><div class="v">${Math.round(km)} км</div></div>
+      <div class="ptile"><div class="l">₴ / год</div><div class="v">${hours?money(profit/hours):'—'}</div></div>
     </div>`;
+  if(fop!=='none'){
+    html+=`<h2>Орієнтовні податки за період</h2><table><tr><th></th><th>Сума</th></tr>
+      <tr><td>${esc(taxLabel)}</td><td>${money(taxAmount)}</td></tr>
+      ${esvAmount>0?`<tr><td>ЄСВ (${num(DB.profile.esvMonthly)}/міс, пропорційно)</td><td>${money(esvAmount)}</td></tr>`:''}
+      <tr><td><b>Разом до сплати</b></td><td><b>${money(taxAmount+esvAmount)}</b></td></tr>
+    </table><div class="psub">Орієнтовний розрахунок для планування, звіряйте з податковою чи бухгалтером.</div>`;
+  }
+  if(platRows.length){
+    html+=`<h2>Дохід по платформах</h2><table><tr><th>Платформа</th><th>Сума</th></tr>${platRows.map(([pid,v])=>`<tr><td>${esc(platById(pid)?platById(pid).name:'Без платформи')}</td><td>${money(v)}</td></tr>`).join('')}</table>`;
+  }
+  if(carRows.length>1){
+    html+=`<h2>По авто</h2><table><tr><th>Авто</th><th>Дохід</th><th>Витрати</th><th>Чистими</th><th>Пробіг</th></tr>${carRows.map(([cid,v])=>{ const c=carById(cid); return `<tr><td>${esc(c?c.name:'')}</td><td>${money(v.inc)}</td><td>${money(v.exp)}</td><td>${money(v.inc-v.exp)}</td><td>${Math.round(v.km)} км</td></tr>`; }).join('')}</table>`;
+  }
   if(catRows.length){
     html+=`<h2>Витрати по категоріях</h2><table><tr><th>Категорія</th><th>Сума</th></tr>${catRows.map(([cid,v])=>`<tr><td>${esc(catById(cid).name)}</td><td>${money(v)}</td></tr>`).join('')}</table>`;
+  }
+  if(fuel.length){
+    const fuelTotal=fuel.reduce((a,f)=>a+num(f.cost),0);
+    html+=`<h2>Пальне / зарядки (${fuel.length})</h2><div class="psub">Разом: ${money(fuelTotal)}</div>`;
   }
   html+=`<h2>Зміни (${shifts.length})</h2>`;
   html+= shifts.length ? `<table><tr><th>Дата</th><th>Авто</th><th>Платформи</th><th>Дохід</th></tr>${shifts.map(s=>{ const c=carById(s.carId); const plats=(s.entries||[]).map(e=>platById(e.platformId)?.name).filter(Boolean).join(', '); return `<tr><td>${fmtDate(s.date)}</td><td>${esc(c?c.name:'')}</td><td>${esc(plats)}</td><td>${money(shiftIncome(s))}</td></tr>`; }).join('')}</table>` : `<div class="psub">Немає змін за період</div>`;
@@ -4152,6 +4284,9 @@ function tryApplyBackup(text){
       if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
       if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
       if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
+      if(DB.settings.themeId===undefined) DB.settings.themeId='';
+      if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
+      if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
       if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
       if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
@@ -4396,11 +4531,34 @@ function wizFinish(){
 }
 
 /* ============ INIT ============ */
+function renderOfflinebar(){
+  const el=$('#offlinebar'); if(!el) return;
+  const online = typeof navigator==='undefined' || navigator.onLine!==false;
+  if(online){ el.hidden=true; return; }
+  el.hidden=false;
+  el.innerHTML=`${icon('info',14)} Немає інтернету — усі дані й далі зберігаються на цьому пристрої`;
+}
+function offlineInit(){
+  try{
+    window.addEventListener('online', renderOfflinebar);
+    window.addEventListener('offline', renderOfflinebar);
+  }catch(e){}
+  renderOfflinebar();
+}
+function storageInfoLabel(){
+  try{
+    const raw=localStorage.getItem(DB_KEY)||'';
+    const bytes=new Blob([raw]).size;
+    const kb=bytes/1024;
+    return kb<1024 ? Math.round(kb)+' КБ' : (kb/1024).toFixed(1)+' МБ';
+  }catch(e){ return '—'; }
+}
 function init(){
   applyTheme(getTheme());
   applyAccent();
   applyTextScale();
   renderDemobar();
+  offlineInit();
   setTab(TAB);
   swipeInit();
   dashSwipeInit();
