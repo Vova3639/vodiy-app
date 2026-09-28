@@ -1,4 +1,4 @@
-const CACHE = 'vodiy-v2';
+const CACHE = 'vodiy-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -31,17 +31,21 @@ self.addEventListener('fetch', (e) => {
 
   const isNav = e.request.mode === 'navigate' ||
     (e.request.headers.get('accept') || '').includes('text/html');
+  const isVersionCheck = e.request.url.indexOf('version.json') !== -1;
 
-  if (isNav) {
-    // Network-first for the page itself, so updates show up right away when online.
+  if (isNav || isVersionCheck) {
+    // Network-first (and never served stale from cache) for the page itself and the
+    // version check, so update detection and page updates always see the real latest.
     e.respondWith(
       fetch(e.request)
         .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, clone));
+          if (!isVersionCheck) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => c.put(e.request, clone));
+          }
           return res;
         })
-        .catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+        .catch(() => isVersionCheck ? Promise.reject() : caches.match(e.request).then((r) => r || caches.match('./index.html')))
     );
     return;
   }
