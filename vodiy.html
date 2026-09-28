@@ -1,5 +1,5 @@
 <title>Водій</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>
 :root{
   --bg:#F2F2F7; --bg-elev:#FFFFFF; --bg-grouped:#FFFFFF;
@@ -34,10 +34,12 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{ touch-action:manipulation }
 body{
   margin:0; background:var(--bg); color:var(--tx);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",Roboto,sans-serif;
   font-size:15px; line-height:1.35; -webkit-font-smoothing:antialiased;
+  touch-action:manipulation;
 }
 button,input,select,textarea{font-family:inherit; font-size:inherit; color:inherit}
 .tnum{font-variant-numeric:tabular-nums}
@@ -373,7 +375,7 @@ const DEV_INFO={
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
 const CHANGELOG=[
-  {v:'0.5', date:'28.09.2026 23:45', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором']},
+  {v:'0.5', date:'28.09.2026 23:36', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором','Вимкнено випадковий зум сторінки жестом «щипок» — розмір тексту тепер регулюється в Налаштуваннях → Вигляд']},
   {v:'0.4', date:'28.09.2026 23:13', items:['Свайп для видалення зміни чи витрати зі списку','Свайп між періодами на дашборді','Пошук і фільтри в історії витрат і змін','Тренд витрат на обслуговування по місяцях для кожного авто','Повтор останньої зміни та шаблони швидких витрат','Конверт на податки й ЄСВ, річний підсумок','Акцентний колір інтерфейсу','Експорт у CSV та PDF-звіт','Перевірка оновлень застосунку']},
   {v:'0.3', date:'28.09.2026 20:10', items:['Нагадування про сезонне перевзування шин','Орієнтовний розрахунок податків за групою ФОП і ЄСВ у точці беззбитковості','Сторінка про розробника, зв’язок і донат','Посилання на офіційні сайти платформ і сервісів','Порівняння платформ по ₴/год і ₴/км']},
   {v:'0.2', date:'28.09.2026 17:05', items:['Цілі по прибутку та особисті нагадування','Калькулятор «чи вигідне замовлення?»','Швидке додавання через кнопку «+» на будь-якій вкладці','Резервна копія даних (текст/файл)']},
@@ -433,7 +435,7 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1},
     contacts:[],
     goals:{daily:0, weekly:0, monthly:0},
     reminders:[],
@@ -447,13 +449,14 @@ function load(){
   try{
     const raw=localStorage.getItem(DB_KEY);
     DB=raw?JSON.parse(raw):defaultDB();
-    if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60};
+    if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1};
     if(DB.settings.doubleConfirm===undefined) DB.settings.doubleConfirm=false;
     if(DB.settings.showKopecks===undefined) DB.settings.showKopecks=false;
     if(DB.settings.accentColor===undefined) DB.settings.accentColor='';
     if(DB.settings.envelopeRate===undefined) DB.settings.envelopeRate=0;
     if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
     if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
+    if(DB.settings.textScale===undefined) DB.settings.textScale=1;
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -2946,6 +2949,19 @@ function setAccent(hex){
   applyAccent();
   openSettings();
 }
+const TEXT_SCALE_OPTS=[0.9,1,1.1,1.2,1.3];
+function applyTextScale(){
+  try{
+    const s=(DB && DB.settings && DB.settings.textScale) || 1;
+    document.body.style.zoom = s;
+  }catch(e){}
+}
+function setTextScale(v){
+  DB.settings.textScale=+v||1;
+  save();
+  applyTextScale();
+  openSettings();
+}
 
 /* ============ SETTINGS (fullscreen) ============ */
 function closeFullscreen(){
@@ -3015,6 +3031,12 @@ function openSettings(){
           <div class="rtitle" style="margin-bottom:8px"><b>Акцентний колір</b><div class="sub">Колір кнопок і активних елементів</div></div>
           <div style="display:flex;flex-wrap:wrap;gap:10px">
             ${ACCENT_PRESETS.map(a=>`<button type="button" onclick="setAccent('${a.hex}')" title="${esc(a.label)}" style="width:32px;height:32px;border-radius:50%;border:${(DB.settings.accentColor||'')===a.hex?'3px solid var(--tx)':'1px solid var(--sep)'};background:${a.hex||'#007AFF'};padding:0"></button>`).join('')}
+          </div>
+        </div>
+        <div class="group" style="margin-top:10px;padding:12px 14px">
+          <div class="rtitle" style="margin-bottom:8px"><b>Розмір тексту</b><div class="sub">Масштаб інтерфейсу. Жест «щипок» для зуму сторінки вимкнено навмисно — щоб не збільшувалось випадково під час роботи.</div></div>
+          <div class="seg">
+            ${TEXT_SCALE_OPTS.map(s=>`<button class="${(+DB.settings.textScale||1)===s?'on':''}" onclick="setTextScale(${s})">${Math.round(s*100)}%</button>`).join('')}
           </div>
         </div>
 
@@ -3609,11 +3631,12 @@ function tryApplyBackup(text){
       if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
       if(DB.profile.esvMonthly===undefined) DB.profile.esvMonthly=0;
       if(DB.activeShift===undefined) DB.activeShift=null;
-      if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60};
+      if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1};
       if(DB.settings.accentColor===undefined) DB.settings.accentColor='';
       if(DB.settings.envelopeRate===undefined) DB.settings.envelopeRate=0;
       if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
       if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
+      if(DB.settings.textScale===undefined) DB.settings.textScale=1;
       if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
       if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
@@ -3861,6 +3884,7 @@ function wizFinish(){
 function init(){
   applyTheme(getTheme());
   applyAccent();
+  applyTextScale();
   renderDemobar();
   setTab(TAB);
   swipeInit();
