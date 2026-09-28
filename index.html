@@ -66,7 +66,15 @@ button,input,select,textarea{font-family:inherit; font-size:inherit; color:inher
 h1,h2,h3{margin:0; text-wrap:balance}
 
 /* ===== App shell ===== */
-#app{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px)); min-height:100%}
+#app{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px)); min-height:100%; position:relative}
+.ptr-indicator{
+  position:fixed; left:50%; top:calc(52px + env(safe-area-inset-top,0px)); z-index:15;
+  width:30px; height:30px; border-radius:50%; background:var(--bg-elev); box-shadow:var(--shadow);
+  display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--tx2);
+  opacity:0; transform:translate(-50%,-20px); transition:opacity .15s ease; pointer-events:none;
+}
+.ptr-indicator.spin{ animation:ptrspin .6s linear infinite }
+@keyframes ptrspin{ to{ transform:translate(-50%,-20px) rotate(360deg) } }
 .topbar{
   position:sticky; top:0; z-index:20;
   background:var(--bar-bg); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -148,8 +156,8 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .barrow{padding:9px 14px}
 .barrow .bhead{display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px}
 .barrow .bhead b{font-weight:600}
-.barrow .btrack{height:7px; border-radius:4px; background:var(--fill); overflow:hidden}
-.barrow .bfill{height:100%; border-radius:4px}
+.btrack{height:7px; border-radius:4px; background:var(--fill); overflow:hidden}
+.bfill{height:100%; border-radius:4px; transition:width .25s var(--spring)}
 
 /* ===== Forms ===== */
 .field{margin-bottom:12px}
@@ -350,6 +358,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
       </div>
     </div>
   </div>
+  <div id="ptrIndicator" class="ptr-indicator" hidden>↓</div>
   <main id="main"></main>
 </div>
 
@@ -392,7 +401,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.6';
+const APP_VERSION='0.7';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -406,6 +415,7 @@ const DEV_INFO={
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
 const CHANGELOG=[
+  {v:'0.7', date:'29.09.2026 00:15', items:['Виправлено картку «Ціль» на дашборді — на iPhone вона налягала на плитки нижче; тепер завжди є відступ, а смужка прогресу відображається як слід','Пошук зміни чи витрати за датою, сумою, платформою чи категорією — у меню «⋯» вгорі','Потягнути дашборд вниз, щоб оновити дані — звичний жест iOS (pull-to-refresh)','Легка тактильна віброзідача на свайпі видалення та підтвердженні видалення','Особисті нагадування тепер групуються за терміновістю: прострочені, найближчі, пізніше, без дати, виконані']},
   {v:'0.6', date:'29.09.2026 00:01', items:['Налаштування переробили на розділи: замість однієї довгої сторінки — список категорій («Профіль і податки», «Вигляд», «Цілі», «Нагадування», «Платформи», «Бонуси», «Контакти», «Дані», «Про застосунок»), кожна відкривається окремо','Нова кнопка меню зверху справа (поруч із шестернею) — швидкий доступ до перевірки оновлень, інструкції встановлення, історії версій, демо-режиму й сторінки розробника','Виправлено накладання шапки застосунку на виріз камери на деяких пристроях','Виправлено «сховану» кнопку видалення, яку було трохи видно збоку в списках зі свайпом']},
   {v:'0.5', date:'28.09.2026 23:47', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором','Вимкнено випадковий зум сторінки жестом «щипок» — розмір тексту тепер регулюється в Налаштуваннях → Вигляд','Дотик на «Версія» в Налаштуваннях відкриває історію оновлень','Перевірка оновлень тепер пропонує «Оновити зараз» або «Оновити пізніше» (з підказкою, коли перевірить наступного разу)']},
   {v:'0.4', date:'28.09.2026 23:13', items:['Свайп для видалення зміни чи витрати зі списку','Свайп між періодами на дашборді','Пошук і фільтри в історії витрат і змін','Тренд витрат на обслуговування по місяцях для кожного авто','Повтор останньої зміни та шаблони швидких витрат','Конверт на податки й ЄСВ, річний підсумок','Акцентний колір інтерфейсу','Експорт у CSV та PDF-звіт','Перевірка оновлень застосунку']},
@@ -453,6 +463,14 @@ const DB_KEY='vodiy_db_v2';
 const DEMO_FLAG='vodiy_demo_active';
 const REAL_BACKUP='vodiy_db_real_backup';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function haptic(kind){
+  try{
+    if(!navigator.vibrate) return;
+    if(kind==='warn') navigator.vibrate([12,40,12]);
+    else if(kind==='success') navigator.vibrate([10,30,10,30,20]);
+    else navigator.vibrate(10);
+  }catch(e){}
+}
 const today=()=>toLocalISO(new Date());
 function toLocalISO(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
 
@@ -836,10 +854,10 @@ function renderDash(){
   if(goalVal>0){
     const pct=Math.max(0,Math.min(100, Math.round(profit/goalVal*100)));
     const reached=profit>=goalVal;
-    html+=`<div class="group" style="margin-top:10px"><div class="row" style="display:block;cursor:pointer" onclick="openSettings('goals')">
-      <div class="rtitle" style="display:flex;justify-content:space-between;margin-bottom:6px"><b>Ціль: ${money(goalVal)}${reached?' 🎉':''}</b><span class="sub">${pct}%</span></div>
+    html+=`<div class="group" style="margin:10px 0 14px"><div class="row" style="display:block;cursor:pointer" onclick="openSettings('goals')">
+      <div class="rtitle" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 10px;margin-bottom:8px"><b style="min-width:0">Ціль: ${money(goalVal)}${reached?' 🎉':''}</b><span class="sub" style="flex-shrink:0">${pct}%</span></div>
       <div class="btrack"><div class="bfill" style="width:${pct}%;background:${reached?'var(--green)':'var(--blue)'}"></div></div>
-      <div class="sub" style="margin-top:6px">${reached?'Ціль досягнута — ще '+money(profit-goalVal)+' зверху':'Залишилось заробити '+money(goalVal-profit)}</div>
+      <div class="sub" style="margin-top:8px">${reached?'Ціль досягнута — ще '+money(profit-goalVal)+' зверху':'Залишилось заробити '+money(goalVal-profit)}</div>
     </div></div>`;
   }
 
@@ -1296,6 +1314,7 @@ function swTouchEnd(e){
     const shouldOpen=finalX < -42;
     if(content) content.style.transform='';
     if(swOpenRow && swOpenRow!==swEl) swOpenRow.classList.remove('swopen');
+    if(shouldOpen && !swEl.classList.contains('swopen')) haptic();
     swEl.classList.toggle('swopen', shouldOpen);
     swOpenRow = shouldOpen ? swEl : null;
   }
@@ -1309,6 +1328,59 @@ function swClickGuard(e){
     e.preventDefault(); e.stopPropagation();
     swOpenRow.classList.remove('swopen'); swOpenRow=null;
   }
+}
+/* ===== Pull-to-refresh (dashboard) ===== */
+let ptrStartY=0, ptrPulling=false, ptrTriggered=false;
+function ptrInit(){
+  if(document.body.dataset.ptrBound) return;
+  document.body.dataset.ptrBound='1';
+  document.addEventListener('touchstart', ptrTouchStart, {passive:true});
+  document.addEventListener('touchmove', ptrTouchMove, {passive:false});
+  document.addEventListener('touchend', ptrTouchEnd, {passive:true});
+}
+function ptrTouchStart(e){
+  ptrPulling=false; ptrTriggered=false;
+  if(TAB!=='dash') return;
+  if((window.scrollY||document.documentElement.scrollTop||0) > 2) return;
+  if(e.target.closest('button,a,input,textarea,select,.seg,.chip,.swiperow')) return;
+  ptrStartY=e.touches[0].clientY;
+  ptrPulling=true;
+}
+function ptrTouchMove(e){
+  if(!ptrPulling) return;
+  const dy=e.touches[0].clientY-ptrStartY;
+  if(dy<=0) return;
+  if((window.scrollY||document.documentElement.scrollTop||0) > 2){ ptrPulling=false; ptrHide(); return; }
+  e.preventDefault();
+  const pull=Math.min(70, dy*0.5);
+  const ind=$('#ptrIndicator');
+  if(ind){
+    ind.hidden=false;
+    ind.style.opacity=String(Math.min(1, pull/45));
+    ind.style.transform=`translate(-50%, ${pull-20}px)`;
+    ind.textContent = pull>=50 ? '↑' : '↓';
+  }
+  if(pull>=50 && !ptrTriggered){ ptrTriggered=true; haptic(); }
+  else if(pull<50 && ptrTriggered){ ptrTriggered=false; }
+}
+function ptrTouchEnd(){
+  if(!ptrPulling) return;
+  ptrPulling=false;
+  const ind=$('#ptrIndicator');
+  if(ptrTriggered){
+    if(ind){ ind.textContent='⟳'; ind.classList.add('spin'); }
+    setTimeout(()=>{ render(); ptrHide(); }, 380);
+  }else{
+    ptrHide();
+  }
+}
+function ptrHide(){
+  const ind=$('#ptrIndicator');
+  if(!ind) return;
+  ind.style.opacity='0';
+  ind.style.transform='translate(-50%, -20px)';
+  ind.classList.remove('spin');
+  setTimeout(()=>{ if(ind) ind.hidden=true; }, 200);
 }
 /* ===== Swipe between dashboard periods ===== */
 const DASH_PERIOD_ORDER=['today','7d','month','year','all'];
@@ -2945,7 +3017,7 @@ function confirmDelete(title, msg, onConfirm, onCancel){
     onConfirm, onCancel
   });
 }
-function runDelete(){ closeSheet(); if(typeof window.__pendingDelete==='function'){ window.__pendingDelete(); window.__pendingDelete=null; } window.__pendingCancel=null; }
+function runDelete(){ haptic('warn'); closeSheet(); if(typeof window.__pendingDelete==='function'){ window.__pendingDelete(); window.__pendingDelete=null; } window.__pendingCancel=null; }
 function runCancel(){ closeSheet(); if(typeof window.__pendingCancel==='function'){ window.__pendingCancel(); } window.__pendingDelete=null; window.__pendingCancel=null; }
 
 /* ============ THEME ============ */
@@ -3009,10 +3081,46 @@ function closeFullscreen(){
 }
 const FOP_LABELS={none:'Немає ФОП', group2:'2 група', group3:'3 група'};
 const WORK_LABELS={taxi:'Таксі', delivery:'Доставка', both:'Таксі й доставка'};
+function openSearchSheet(){
+  showSheet(`
+    <h3>Пошук</h3>
+    <div style="margin-top:14px">
+      <input type="text" id="searchQ" placeholder="Дата, сума, платформа, категорія..." oninput="runSearch()" style="width:100%;padding:11px 13px;border-radius:11px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx);font-size:15px">
+    </div>
+    <div id="searchResults" style="margin-top:14px"></div>
+  `);
+  setTimeout(()=>{ const el=$('#searchQ'); if(el) el.focus(); }, 60);
+}
+function runSearch(){
+  const box=$('#searchResults');
+  const qEl=$('#searchQ');
+  if(!box || !qEl) return;
+  const q=qEl.value.trim().toLowerCase();
+  if(!q){ box.innerHTML=''; return; }
+  const shiftRows=[];
+  DB.shifts.forEach(s=>{
+    const c=carById(s.carId);
+    (s.entries||[]).forEach(en=>{
+      const p=platById(en.platformId);
+      const hay=[s.date, c?c.name:'', p?p.name:'', String(en.amount||''), String(en.tips||'')].join(' ').toLowerCase();
+      if(hay.includes(q)) shiftRows.push({type:'shift', id:s.id, date:s.date, label:(p?p.name:'Без платформи')+(c?' · '+c.name:''), amount:num(en.amount)+num(en.tips)});
+    });
+  });
+  const expRows=[];
+  DB.expenses.forEach(e=>{
+    const c=carById(e.carId); const cat=catById(e.category);
+    const hay=[e.date, cat?cat.name:'', c?c.name:'', String(e.amount||''), e.note||''].join(' ').toLowerCase();
+    if(hay.includes(q)) expRows.push({type:'expense', id:e.id, date:e.date, label:(cat?cat.name:'')+(e.note?' · '+e.note:''), amount:num(e.amount)});
+  });
+  const all=[...shiftRows, ...expRows].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,40);
+  if(!all.length){ box.innerHTML=`<div class="empty">Нічого не знайдено</div>`; return; }
+  box.innerHTML=`<div class="group">${all.map(r=>`<div class="row" style="cursor:pointer" onclick="closeSheet();${r.type==='shift'?`openShiftDetail('${r.id}')`:`openExpenseDetail('${r.id}')`}"><div class="rtitle"><b>${esc(r.label)}</b><div class="sub">${esc(fmtDate(r.date))} · ${r.type==='shift'?'зміна':'витрата'}</div></div><div class="rval tnum" style="color:${r.type==='shift'?'var(--green)':'var(--red)'}">${r.type==='shift'?'+':'-'}${money(r.amount)}</div></div>`).join('')}</div>`;
+}
 function openQuickMenu(){
   showSheet(`
     <h3>Швидкі дії</h3>
     <div class="group" style="margin-top:14px">
+      <div class="row" onclick="closeSheet();openSearchSheet()" style="cursor:pointer"><div class="rtitle"><b>🔎 Пошук зміни чи витрати</b></div><span class="chev">›</span></div>
       <div class="row" onclick="closeSheet();checkForUpdate(true)" style="cursor:pointer"><div class="rtitle"><b>🔄 Перевірити оновлення</b></div><span class="chev">›</span></div>
       <div class="row" onclick="closeSheet();openInstallGuide()" style="cursor:pointer"><div class="rtitle"><b>📲 Встановити застосунок</b></div><span class="chev">›</span></div>
       <div class="row" onclick="closeSheet();openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>🕘 Історія версій</b></div><span class="chev">›</span></div>
@@ -3152,12 +3260,20 @@ function renderSettingsGoals(){
   settingsPage('Цілі по прибутку', body);
 }
 function renderSettingsReminders(){
+  const rrow=r=>`<div class="row" onclick="openReminderForm('${r.id}')" style="cursor:pointer"><div class="rtitle"><b style="${r.done?'text-decoration:line-through;opacity:0.5':''}">${esc(r.text)}</b>${r.date?`<div class="sub">${dueBadge(daysUntil(r.date))}</div>`:''}</div><span class="chev">›</span></div>`;
+  const active=DB.reminders.filter(r=>!r.done);
+  const done=DB.reminders.filter(r=>r.done);
+  const overdue=active.filter(r=>r.date && daysUntil(r.date)<0).sort((a,b)=>a.date.localeCompare(b.date));
+  const soon=active.filter(r=>r.date && daysUntil(r.date)>=0 && daysUntil(r.date)<=3).sort((a,b)=>a.date.localeCompare(b.date));
+  const later=active.filter(r=>r.date && daysUntil(r.date)>3).sort((a,b)=>a.date.localeCompare(b.date));
+  const noDate=active.filter(r=>!r.date);
+  const groups=[
+    ['Прострочені', overdue], ['Найближчі (до 3 дн.)', soon], ['Пізніше', later], ['Без дати', noDate], ['Виконані', done]
+  ].filter(g=>g[1].length);
   const body=`
-    <div class="section-label">Особисті нагадування <button type="button" class="infob" onclick="alertSheet('Особисті нагадування','Прості нагадування собі — не про авто, а будь-що: подзвонити, оплатити, забрати. Показуються на дашборді, коли термін підходить або минув.')">i</button></div>
-    <div class="group">
-      ${DB.reminders.length ? [...DB.reminders].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(r=>`<div class="row" onclick="openReminderForm('${r.id}')" style="cursor:pointer"><div class="rtitle"><b style="${r.done?'text-decoration:line-through;opacity:0.5':''}">${esc(r.text)}</b>${r.date?`<div class="sub">${dueBadge(daysUntil(r.date))}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нагадувань</div>`}
-      <div class="row" onclick="openReminderForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нагадування</span></div>
-    </div>
+    <div class="section-label">Особисті нагадування <button type="button" class="infob" onclick="alertSheet('Особисті нагадування','Прості нагадування собі — не про авто, а будь-що: подзвонити, оплатити, забрати. Показуються на дашборді, коли термін підходить або минув. Групуються за терміновістю.')">i</button></div>
+    ${groups.length ? groups.map(([label,list])=>`<div class="section-label" style="margin-top:16px">${esc(label)}</div><div class="group">${list.map(rrow).join('')}</div>`).join('') : `<div class="group"><div class="empty">Ще немає нагадувань</div></div>`}
+    <div class="group" style="margin-top:16px"><div class="row" onclick="openReminderForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нагадування</span></div></div>
   `;
   settingsPage('Особисті нагадування', body);
 }
@@ -4028,6 +4144,7 @@ function init(){
   setTab(TAB);
   swipeInit();
   dashSwipeInit();
+  ptrInit();
   scheduleUpdateChecks();
   if(!DB.onboardingDone && !isDemo()) startWizard();
 }
