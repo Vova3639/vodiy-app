@@ -4,11 +4,12 @@
 :root{
   --bg:#F2F2F7; --bg-elev:#FFFFFF; --bg-grouped:#FFFFFF;
   --tx:#0C0C0E; --tx2:#6C6C70; --tx3:#AEAEB2;
-  --sep:rgba(60,60,67,0.29); --sep-op:rgba(60,60,67,0.12);
-  --blue:#007AFF; --green:#2FAE60; --red:#FF3B30; --orange:#FF9500; --purple:#AF52DE; --teal:#30B0C7;
+  --sep:rgba(60,60,67,0.32); --sep-op:rgba(60,60,67,0.13);
+  --blue:#007AFF; --green:#34C759; --red:#FF3B30; --orange:#FF9500; --purple:#AF52DE; --teal:#30B0C7;
   --fill:rgba(120,120,128,0.12); --fill2:rgba(120,120,128,0.08);
-  --shadow:0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  --shadow:0 1px 3px rgba(0,0,0,0.05), 0 10px 28px rgba(0,0,0,0.06);
   --bar-bg:rgba(255,255,255,0.72);
+  --r-lg:20px; --r-md:14px; --r-sm:10px;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
@@ -16,9 +17,9 @@
     --bg:#000000; --bg-elev:#1C1C1E; --bg-grouped:#1C1C1E;
     --tx:#F5F5F7; --tx2:#98989D; --tx3:#636366;
     --sep:rgba(84,84,88,0.6); --sep-op:rgba(84,84,88,0.32);
-    --blue:#0A84FF; --green:#32D74B; --red:#FF453A; --orange:#FF9F0A; --purple:#BF5AF2; --teal:#40C8E0;
+    --blue:#0A84FF; --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --purple:#BF5AF2; --teal:#40C8E0;
     --fill:rgba(120,120,128,0.24); --fill2:rgba(120,120,128,0.16);
-    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.4);
+    --shadow:0 1px 3px rgba(0,0,0,0.32), 0 10px 28px rgba(0,0,0,0.42);
     --bar-bg:rgba(28,28,30,0.72);
     color-scheme:dark;
   }
@@ -27,9 +28,9 @@
   --bg:#000000; --bg-elev:#1C1C1E; --bg-grouped:#1C1C1E;
   --tx:#F5F5F7; --tx2:#98989D; --tx3:#636366;
   --sep:rgba(84,84,88,0.6); --sep-op:rgba(84,84,88,0.32);
-  --blue:#0A84FF; --green:#32D74B; --red:#FF453A; --orange:#FF9F0A; --purple:#BF5AF2; --teal:#40C8E0;
+  --blue:#0A84FF; --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --purple:#BF5AF2; --teal:#40C8E0;
   --fill:rgba(120,120,128,0.24); --fill2:rgba(120,120,128,0.16);
-  --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.4);
+  --shadow:0 1px 3px rgba(0,0,0,0.32), 0 10px 28px rgba(0,0,0,0.42);
   --bar-bg:rgba(28,28,30,0.72);
   color-scheme:dark;
 }
@@ -63,7 +64,7 @@ h1,h2,h3{margin:0; text-wrap:balance}
 }
 .topbar-row{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
 .topbar .eyebrow{font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:1px}
-.topbar h1{font-size:30px; font-weight:800; letter-spacing:-0.02em}
+.topbar h1{font-size:34px; font-weight:800; letter-spacing:-0.022em; line-height:1.1}
 main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .demobar{background:var(--orange); color:#1a1200; font-size:12.5px; font-weight:700; text-align:center; padding:7px 10px; display:flex; align-items:center; justify-content:center; gap:8px}
 .demobar button{background:rgba(0,0,0,0.18); border:0; color:inherit; font-weight:700; font-size:12px; padding:3px 9px; border-radius:20px}
@@ -106,7 +107,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 @media (min-width:420px){ .tabgrid{grid-template-columns:repeat(5,1fr)} }
 
 /* ===== Grouped list / cards ===== */
-.section-label{font-size:12.5px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:0.03em; margin:20px 4px 6px; display:flex; align-items:center; justify-content:space-between}
+.section-label{font-size:12.5px; font-weight:700; color:var(--tx2); text-transform:uppercase; letter-spacing:0.045em; margin:22px 4px 7px; display:flex; align-items:center; justify-content:space-between}
 .section-label:first-child{margin-top:2px}
 .group{background:var(--bg-grouped); border-radius:14px; overflow:hidden; box-shadow:var(--shadow)}
 .row{display:flex; align-items:center; gap:10px; padding:12px 14px; border-top:0.5px solid var(--sep-op)}
@@ -170,7 +171,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .ctacard:first-child{border-top:0}
 .ctacard .rtitle{flex:1; min-width:140px}
 
-.btn{display:block; width:100%; text-align:center; padding:13px; border-radius:13px; border:0; font-weight:600; font-size:15.5px}
+.btn{display:block; width:100%; text-align:center; padding:13px; border-radius:var(--r-md); border:0; font-weight:600; font-size:15.5px}
 .btn.primary{background:var(--blue); color:#fff}
 .btn.ghost{background:var(--fill); color:var(--tx)}
 .btn.danger{background:var(--red); color:#fff}
@@ -226,12 +227,13 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .fullscreen{position:fixed; inset:0; z-index:60; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch}
 .fstop{
   position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:8px;
-  padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;
+  padding:calc(16px + env(safe-area-inset-top,0px)) 8px 14px;
   background:var(--bar-bg); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
   border-bottom:0.5px solid var(--sep);
 }
 .fstop h2{font-size:17px; font-weight:700}
-.fstop .fsbtn{background:none; border:0; color:var(--blue); font-size:15.5px; font-weight:600; padding:6px 2px; min-width:56px}
+.fstop .fsbtn{background:none; border:0; color:var(--blue); font-size:15.5px; font-weight:600; padding:11px 8px; min-width:60px; min-height:44px; display:flex; align-items:center; border-radius:10px}
+.fstop .fsbtn.right{justify-content:flex-end}
 .fstop .fsbtn.right{text-align:right}
 .fsbody{max-width:600px; margin:0 auto; padding:14px 16px calc(30px + env(safe-area-inset-bottom,0px))}
 
@@ -324,7 +326,7 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 @keyframes fsin{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)}}
 @keyframes fsout{from{opacity:1; transform:translateY(0)} to{opacity:0; transform:translateY(14px)}}
 /* Rounder "continuous corner" feel for iOS-26-style depth */
-.group,.hero,.tile,.activecard,.opt,.carcard{ border-radius:18px }
+.group,.hero,.tile,.activecard,.opt,.carcard,.tabtile,.ctacard{ border-radius:var(--r-lg) }
 .overlay .sheet{ border-radius:22px 22px 0 0 }
 .overlay.center .sheet{ border-radius:20px }
 .hero,.activecard{ box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08) }
@@ -393,7 +395,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.8';
+const APP_VERSION='0.9.2';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -405,8 +407,13 @@ const DEV_INFO={
 };
 /* Версії: бампаємо APP_VERSION і додаємо запис у CHANGELOG лише для «нормальних» оновлень
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
-   і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
+   і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'.
+   Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
+   реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.2', date:'29.09.2026 00:42', items:['Перший крок редизайну (кольори, типографіка, форма елементів): точніший системний зелений колір, чіткіші роздільники карток, більший і виразніший заголовок вгорі екрана, жирніші заголовки розділів, заокругленіші картки й кнопки в дусі свіжого iOS — далі редизайн продовжимо по екранах']},
+  {v:'0.9.1', date:'29.09.2026 00:39', items:['Кнопка «Назад» вгорі екранів налаштувань та деталей — більше відступу зверху і більша область дотику, щоб було зручно натискати']},
+  {v:'0.9', date:'29.09.2026 00:30', items:['Свайп від краю екрана назад — для телефонів без рамки і без кнопки «Назад»: працює лише там, де справді є куди повертатись','Тактильний відгук тепер можна вимкнути повністю або окремо для свайпів, видалення чи важливих дій — у Налаштуваннях → Вигляд','Порівняння прибутку цього тижня з минулим прямо під сумою на дашборді','Таймер активної зміни на дашборді тепер оновлюється наживо й пульсує зеленим, поки зміна триває','Кольорова крапка стану біля кожного авто у гаражі — зелена/жовта/червона залежно від того, як давно були записи','Попередження, якщо витрати на обслуговування за цей місяць помітно вищі за звичайні','Довге натискання на кнопку «+» на будь-якій вкладці відкриває швидке меню додавання (зміна, витрата, заправка, нагадування)']},
   {v:'0.8', date:'29.09.2026 00:18', items:['Розділи картки авто (Огляд, Заправки/Зарядки, Обслуговування, Фінанси, Заробіток, Історія, Вішліст) тепер відображаються сіткою з іконками замість смужки, яку треба було гортати вбік — усі розділи видно одразу, без свайпу']},
   {v:'0.7', date:'29.09.2026 00:15', items:['Виправлено картку «Ціль» на дашборді — на iPhone вона налягала на плитки нижче; тепер завжди є відступ, а смужка прогресу відображається як слід','Пошук зміни чи витрати за датою, сумою, платформою чи категорією — у меню «⋯» вгорі','Потягнути дашборд вниз, щоб оновити дані — звичний жест iOS (pull-to-refresh)','Легка тактильна віброзідача на свайпі видалення та підтвердженні видалення','Особисті нагадування тепер групуються за терміновістю: прострочені, найближчі, пізніше, без дати, виконані']},
   {v:'0.6', date:'29.09.2026 00:01', items:['Налаштування переробили на розділи: замість однієї довгої сторінки — список категорій («Профіль і податки», «Вигляд», «Цілі», «Нагадування», «Платформи», «Бонуси», «Контакти», «Дані», «Про застосунок»), кожна відкривається окремо','Нова кнопка меню зверху справа (поруч із шестернею) — швидкий доступ до перевірки оновлень, інструкції встановлення, історії версій, демо-режиму й сторінки розробника','Виправлено накладання шапки застосунку на виріз камери на деяких пристроях','Виправлено «сховану» кнопку видалення, яку було трохи видно збоку в списках зі свайпом']},
@@ -606,7 +613,23 @@ function setTab(t){
   render();
   manageTimerLoop();
 }
+let fabPressTimer=null, fabLongPressed=false;
+function fabInit(){
+  const fab=$('#fab');
+  if(!fab || fab.dataset.lpBound) return;
+  fab.dataset.lpBound='1';
+  const start=()=>{ fabLongPressed=false; fabPressTimer=setTimeout(()=>{ fabLongPressed=true; haptic('action'); openQuickAddSheet(); }, 480); };
+  const cancel=()=>{ if(fabPressTimer){ clearTimeout(fabPressTimer); fabPressTimer=null; } };
+  fab.addEventListener('touchstart', start, {passive:true});
+  fab.addEventListener('touchend', cancel, {passive:true});
+  fab.addEventListener('touchmove', cancel, {passive:true});
+  fab.addEventListener('touchcancel', cancel, {passive:true});
+  fab.addEventListener('mousedown', start);
+  fab.addEventListener('mouseup', cancel);
+  fab.addEventListener('mouseleave', cancel);
+}
 function onFab(){
+  if(fabLongPressed){ fabLongPressed=false; return; }
   if(TAB==='shifts'){ if(DB.activeShift) openCheckinForm(); else openStartShiftForm(); }
   else if(TAB==='expenses') openExpenseForm();
   else if(TAB==='cars') openCarForm();
@@ -2564,7 +2587,12 @@ function carServiceTrendHtml(c){
   svcExp.forEach(e=>{ const k=e.date.slice(0,7); if(k in byMonth) byMonth[k]+=num(e.amount); });
   const max=Math.max(1,...Object.values(byMonth));
   const total6=Object.values(byMonth).reduce((a,b)=>a+b,0);
+  const curKey=months[months.length-1].key, curVal=byMonth[curKey]||0;
+  const priorVals=months.slice(0,-1).map(m=>byMonth[m.key]).filter(v=>v>0);
+  const priorAvg=priorVals.length ? priorVals.reduce((a,b)=>a+b,0)/priorVals.length : 0;
+  const anomaly = priorVals.length>=2 && curVal > priorAvg*1.6 && curVal-priorAvg>300;
   return `<div class="section-label">Витрати на обслуговування по місяцях</div>
+  ${anomaly?`<div class="group" style="margin-bottom:10px"><div class="row"><span class="dot r"></span><div class="rtitle"><b>Цей місяць дорожчий за звичайне</b><div class="sub">${money(curVal)} проти середніх ${money(priorAvg)} — можливо, щось зламалось або відремонтовано дорожче, ніж зазвичай</div></div></div></div>`:''}
   <div class="group" style="padding:12px 14px">
     ${months.map(m=>{ const v=byMonth[m.key]; const pct=Math.round(v/max*100); return `<div class="barrow"><div class="bhead"><span style="text-transform:capitalize">${esc(m.label)}</span><b class="tnum">${money(v)}</b></div><div class="btrack"><div class="bfill" style="width:${pct}%;background:var(--red)"></div></div></div>`; }).join('')}
     <div class="sub" style="margin-top:8px">Разом за 6 міс.: ${money(total6)}</div>
@@ -4269,6 +4297,7 @@ function init(){
   dashSwipeInit();
   ptrInit();
   edgeBackInit();
+  fabInit();
   scheduleUpdateChecks();
   if(!DB.onboardingDone && !isDemo()) startWizard();
 }
