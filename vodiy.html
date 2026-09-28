@@ -375,7 +375,7 @@ const DEV_INFO={
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
 const CHANGELOG=[
-  {v:'0.5', date:'28.09.2026 23:36', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором','Вимкнено випадковий зум сторінки жестом «щипок» — розмір тексту тепер регулюється в Налаштуваннях → Вигляд']},
+  {v:'0.5', date:'28.09.2026 23:47', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором','Вимкнено випадковий зум сторінки жестом «щипок» — розмір тексту тепер регулюється в Налаштуваннях → Вигляд','Дотик на «Версія» в Налаштуваннях відкриває історію оновлень','Перевірка оновлень тепер пропонує «Оновити зараз» або «Оновити пізніше» (з підказкою, коли перевірить наступного разу)']},
   {v:'0.4', date:'28.09.2026 23:13', items:['Свайп для видалення зміни чи витрати зі списку','Свайп між періодами на дашборді','Пошук і фільтри в історії витрат і змін','Тренд витрат на обслуговування по місяцях для кожного авто','Повтор останньої зміни та шаблони швидких витрат','Конверт на податки й ЄСВ, річний підсумок','Акцентний колір інтерфейсу','Експорт у CSV та PDF-звіт','Перевірка оновлень застосунку']},
   {v:'0.3', date:'28.09.2026 20:10', items:['Нагадування про сезонне перевзування шин','Орієнтовний розрахунок податків за групою ФОП і ЄСВ у точці беззбитковості','Сторінка про розробника, зв’язок і донат','Посилання на офіційні сайти платформ і сервісів','Порівняння платформ по ₴/год і ₴/км']},
   {v:'0.2', date:'28.09.2026 17:05', items:['Цілі по прибутку та особисті нагадування','Калькулятор «чи вигідне замовлення?»','Швидке додавання через кнопку «+» на будь-якій вкладці','Резервна копія даних (текст/файл)']},
@@ -804,7 +804,7 @@ function renderDash(){
   if(goalVal>0){
     const pct=Math.max(0,Math.min(100, Math.round(profit/goalVal*100)));
     const reached=profit>=goalVal;
-    html+=`<div class="group" style="margin-top:10px"><div class="row" style="display:block;cursor:pointer" onclick="openSettings()">
+    html+=`<div class="group" style="margin-top:10px"><div class="row" style="display:block;cursor:pointer" onclick="openSettings('goals')">
       <div class="rtitle" style="display:flex;justify-content:space-between;margin-bottom:6px"><b>Ціль: ${money(goalVal)}${reached?' 🎉':''}</b><span class="sub">${pct}%</span></div>
       <div class="btrack"><div class="bfill" style="width:${pct}%;background:${reached?'var(--green)':'var(--blue)'}"></div></div>
       <div class="sub" style="margin-top:6px">${reached?'Ціль досягнута — ще '+money(profit-goalVal)+' зверху':'Залишилось заробити '+money(goalVal-profit)}</div>
@@ -850,7 +850,7 @@ function renderDash(){
     });
     html+=`</div>`;
     if(sortedR.length>upcomingR.length){
-      html+=`<div class="group" style="margin-top:6px"><button class="btn add" style="padding:10px 14px" onclick="openSettings()">Усі нагадування (${sortedR.length})</button></div>`;
+      html+=`<div class="group" style="margin-top:6px"><button class="btn add" style="padding:10px 14px" onclick="openSettings('reminders')">Усі нагадування (${sortedR.length})</button></div>`;
     }
   }
 
@@ -970,7 +970,7 @@ function openTaxCalc(){
   let html=`<h3>Податки й ЄСВ</h3>`;
   if(fop==='none'){
     html+=`<div class="group"><div class="empty">У Профілі не вказано ФОП. Оберіть групу в Налаштуваннях → Профіль, щоб побачити орієнтовний розрахунок податку.</div></div>
-      <div class="group" style="margin-top:10px"><div class="row" onclick="closeSheet();openSettings()" style="cursor:pointer"><div class="rtitle"><b>Перейти в Налаштування</b></div><span class="chev">›</span></div></div>`;
+      <div class="group" style="margin-top:10px"><div class="row" onclick="closeSheet();openSettings('profile')" style="cursor:pointer"><div class="rtitle"><b>Перейти в Налаштування</b></div><span class="chev">›</span></div></div>`;
   }else{
     html+=`<div class="seg" style="margin:12px 0">${periods.map(p=>`<button class="${PERIOD===p[0]?'on':''}" onclick="PERIOD='${p[0]}';openTaxCalc()">${p[1]}</button>`).join('')}
       <button class="${PERIOD==='custom'?'on':''}" onclick="openCustomPeriod()">Період</button></div>`;
@@ -1206,7 +1206,7 @@ function renderStatusBlock(){
   if(!DB.platforms.length && !DB.cars.length) html+=`<div class="empty">Ще немає платформ чи авто</div>`;
   html+=`</div>
   <div class="group" style="margin-top:10px">
-    <div class="row" onclick="openSettings()" style="cursor:pointer"><div class="rtitle"><b>Пороги: жовтий ${y} дн. · червоний ${r} дн.</b><div class="sub">Змінити в налаштуваннях</div></div><span class="chev">›</span></div>
+    <div class="row" onclick="openSettings('appearance')" style="cursor:pointer"><div class="rtitle"><b>Пороги: жовтий ${y} дн. · червоний ${r} дн.</b><div class="sub">Змінити в налаштуваннях</div></div><span class="chev">›</span></div>
   </div>`;
   return html;
 }
@@ -2301,7 +2301,7 @@ function confirmCrop(){
   window.removeEventListener('pointerup', cropDragEnd);
   closeSheet();
   if(target==='car'){ const c=carById(targetId); if(c){ c.photo=dataUrl; save(); } renderCarDetail(targetId); }
-  else if(target==='profile'){ DB.profile.photo=dataUrl; save(); openSettings(); }
+  else if(target==='profile'){ DB.profile.photo=dataUrl; save(); openSettings(SETTINGS_TAB); }
 }
 function carFuelHtml(c){
   const logs=DB.fuel.filter(f=>f.carId===c.id).sort((a,b)=>b.odo-a.odo);
@@ -2947,7 +2947,7 @@ function setAccent(hex){
   DB.settings.accentColor=hex||'';
   save();
   applyAccent();
-  openSettings();
+  openSettings('appearance');
 }
 const TEXT_SCALE_OPTS=[0.9,1,1.1,1.2,1.3];
 function applyTextScale(){
@@ -2960,7 +2960,7 @@ function setTextScale(v){
   DB.settings.textScale=+v||1;
   save();
   applyTextScale();
-  openSettings();
+  openSettings('appearance');
 }
 
 /* ============ SETTINGS (fullscreen) ============ */
@@ -2977,9 +2977,28 @@ function closeFullscreen(){
 }
 const FOP_LABELS={none:'Немає ФОП', group2:'2 група', group3:'3 група'};
 const WORK_LABELS={taxi:'Таксі', delivery:'Доставка', both:'Таксі й доставка'};
-function openSettings(){
-  const theme=getTheme();
-  const themeLabels={system:'Системна',light:'Світла',dark:'Темна'};
+let SETTINGS_TAB=null;
+function openSettings(tab){
+  SETTINGS_TAB = tab || null;
+  renderSettingsCurrent();
+}
+function renderSettingsCurrent(){
+  const pages={ profile:renderSettingsProfile, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, data:renderSettingsData, about:renderSettingsAbout };
+  if(SETTINGS_TAB && pages[SETTINGS_TAB]) pages[SETTINGS_TAB]();
+  else renderSettingsRoot();
+}
+function settingsPage(title, bodyHtml){
+  $('#modalRoot').innerHTML=`
+    <div class="fullscreen">
+      <div class="fstop">
+        <button class="fsbtn" onclick="openSettings()">‹ Назад</button>
+        <h2>${esc(title)}</h2>
+        <span style="min-width:56px"></span>
+      </div>
+      <div class="fsbody">${bodyHtml}</div>
+    </div>`;
+}
+function renderSettingsRoot(){
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
@@ -2988,128 +3007,182 @@ function openSettings(){
         <button class="fsbtn right" onclick="closeFullscreen()">Готово</button>
       </div>
       <div class="fsbody">
-
-        <div class="section-label">Профіль <button type="button" class="infob" onclick="alertSheet('Профіль','Ці налаштування впливають лише на підказки в застосунку. Їх можна міняти будь-коли — нічого зі старих записів не зникне.')">i</button></div>
-        <div class="caravatar-lg" onclick="pickProfilePhoto()" style="cursor:pointer">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
-        <div style="text-align:center;margin-bottom:14px"><button type="button" class="btn add" style="width:auto;display:inline-block;padding:8px 14px" onclick="pickProfilePhoto()">${DB.profile.photo?'Змінити фото':'Додати фото профілю'}</button></div>
+        <div class="caravatar-lg" onclick="pickProfilePhoto()" style="cursor:pointer;margin-top:4px">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
         <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="onProfilePhotoChosen(this)">
-        <div class="group"><div class="row"><div class="rtitle"><b>Де працюєте <button type="button" class="infob" onclick="alertSheet('Де працюєте','Визначає, які розділи й підказки показувати першими — таксі, доставку чи обидва. Впливає лише на зручність, не обмежує, які платформи можна додати.')">i</button></b></div></div></div>
-        <div class="seg" style="margin-top:8px;margin-bottom:14px">
-          ${[['taxi','Таксі'],['delivery','Доставка'],['both','Обидва']].map(w=>`<button class="${DB.profile.workType===w[0]?'on':''}" onclick="DB.profile.workType='${w[0]}';save();openSettings()">${w[1]}</button>`).join('')}
-        </div>
-        <div class="group"><div class="row"><div class="rtitle"><b>ФОП <button type="button" class="infob" onclick="alertSheet('ФОП','«Немає» — оплата зазвичай надходить на особисту картку. «2 група» — фіксований податок щомісяця незалежно від доходу, є ліміт річного доходу. «3 група» — податок як відсоток від доходу (зазвичай 5%, або 3%+ПДВ), вищий ліміт. За деталями краще звернутись до бухгалтера.')">i</button></b></div></div></div>
-        <div class="seg" style="margin-top:8px">
-          ${[['none','Немає'],['group2','2 група'],['group3','3 група']].map(w=>`<button class="${DB.profile.fop===w[0]?'on':''}" onclick="DB.profile.fop='${w[0]}';save();openSettings()">${w[1]}</button>`).join('')}
-        </div>
-
-        ${DB.profile.fop!=='none'?`<div class="section-label">Податки й ЄСВ <button type="button" class="infob" onclick="alertSheet('Податки й ЄСВ','Вкажіть суми, щоб застосунок міг орієнтовно порахувати податкове навантаження й врахувати його в точці беззбитковості. Це не бухгалтерська консультація — суми й ставки перевіряйте самостійно.')">i</button></div>
-        <div class="group">
-          ${DB.profile.fop==='group2'?`<div class="row"><div class="rtitle"><b>Фіксований податок</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2Fixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2Fixed=num(this.value)||0;save()"></div>`:''}
-          ${DB.profile.fop==='group3'?`<div class="row"><div class="rtitle"><b>Ставка податку</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3Rate||''}" placeholder="5" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3Rate=num(this.value)||5;save()"></div>`:''}
-          <div class="row"><div class="rtitle"><b>ЄСВ</b><div class="sub">грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.esvMonthly||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.esvMonthly=num(this.value)||0;save()"></div>
-          <div class="row" onclick="openTaxCalc()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">🧮 Порахувати податки за період</span><span class="chev">›</span></div>
-        </div>` : ''}
-
-        <div class="section-label">Конверт на податки <button type="button" class="infob" onclick="alertSheet('Конверт на податки','Візуальна копілка: застосунок відкладає вказаний відсоток від кожної гривні доходу «на майбутнє» — податки, ремонт, чорний день. Це не окремий банківський рахунок, просто підрахунок у застосунку.')">i</button></div>
-        <div class="group">
-          <div class="row"><div class="rtitle"><b>Відкладати</b><div class="sub">% від доходу, 0 — вимкнено</div></div><input type="number" inputmode="decimal" value="${DB.settings.envelopeRate||''}" placeholder="0" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.envelopeRate=num(this.value)||0;save();openSettings()"></div>
-          ${num(DB.settings.envelopeRate)>0?`<div class="row" onclick="openEnvelopeSheet()" style="cursor:pointer"><div class="rtitle"><b>У конверті зараз</b></div><div class="rval tnum" style="color:var(--orange)">${money(envelopeBalance())}</div><span class="chev">›</span></div>`:''}
-        </div>
-
-        <div class="section-label">Вигляд <button type="button" class="infob" onclick="alertSheet('Вигляд','Тема, показ копійок у сумах та подвійне підтвердження перед видаленням — суто про те, як застосунок виглядає й поводиться на екрані.')">i</button></div>
-        <div class="group"><div class="row"><div class="rtitle"><b>Тема</b></div></div></div>
-        <div class="seg" style="margin-top:8px">
-          ${['system','light','dark'].map(m=>`<button class="${theme===m?'on':''}" onclick="applyTheme('${m}');openSettings()">${themeLabels[m]}</button>`).join('')}
+        <div class="group" style="margin-top:14px">
+          <div class="row" onclick="openSettings('profile')" style="cursor:pointer"><div class="rtitle"><b>👤 Профіль і податки</b><div class="sub">${esc(WORK_LABELS[DB.profile.workType]||'')} · ФОП: ${esc(FOP_LABELS[DB.profile.fop]||'')}</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('appearance')" style="cursor:pointer"><div class="rtitle"><b>🎨 Вигляд</b><div class="sub">Тема, акцентний колір, розмір тексту</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('goals')" style="cursor:pointer"><div class="rtitle"><b>🎯 Цілі по прибутку</b></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('reminders')" style="cursor:pointer"><div class="rtitle"><b>⏰ Особисті нагадування</b>${DB.reminders.length?`<div class="sub">${DB.reminders.length}</div>`:''}</div><span class="chev">›</span></div>
         </div>
         <div class="group" style="margin-top:10px">
-          <div class="row"><div class="rtitle"><b>Показувати копійки</b><div class="sub">${DB.settings.showKopecks?'129,50 ₴':'130 ₴'} — приклад</div></div>
-            <div class="seg" style="width:auto"><button class="${!DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=false;save();openSettings()">Ні</button><button class="${DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=true;save();openSettings()">Так</button></div></div>
-          <div class="row"><div class="rtitle"><b>Подвійне підтвердження</b><div class="sub">Питати двічі перед видаленням</div></div>
-            <div class="seg" style="width:auto"><button class="${!DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=false;save();openSettings()">Ні</button><button class="${DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=true;save();openSettings()">Так</button></div></div>
-        </div>
-        <div class="group" style="margin-top:10px;padding:12px 14px">
-          <div class="rtitle" style="margin-bottom:8px"><b>Акцентний колір</b><div class="sub">Колір кнопок і активних елементів</div></div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px">
-            ${ACCENT_PRESETS.map(a=>`<button type="button" onclick="setAccent('${a.hex}')" title="${esc(a.label)}" style="width:32px;height:32px;border-radius:50%;border:${(DB.settings.accentColor||'')===a.hex?'3px solid var(--tx)':'1px solid var(--sep)'};background:${a.hex||'#007AFF'};padding:0"></button>`).join('')}
-          </div>
-        </div>
-        <div class="group" style="margin-top:10px;padding:12px 14px">
-          <div class="rtitle" style="margin-bottom:8px"><b>Розмір тексту</b><div class="sub">Масштаб інтерфейсу. Жест «щипок» для зуму сторінки вимкнено навмисно — щоб не збільшувалось випадково під час роботи.</div></div>
-          <div class="seg">
-            ${TEXT_SCALE_OPTS.map(s=>`<button class="${(+DB.settings.textScale||1)===s?'on':''}" onclick="setTextScale(${s})">${Math.round(s*100)}%</button>`).join('')}
-          </div>
-        </div>
-
-        <div class="section-label">Статус актуальності даних <button type="button" class="infob" onclick="alertSheet('Статус актуальності даних','Якщо давно не додавали записів по авто (заправка, обслуговування), картка авто підсвічується жовтим чи червоним — щоб не забути оновити дані.')">i</button></div>
-        <div class="group">
-          <div class="row"><div class="rtitle"><b>Жовтий після</b><div class="sub">записи вважаються застарілими, днів</div></div>
-            <input type="number" value="${DB.settings.yellowDays}" style="width:56px;text-align:center;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.yellowDays=num(this.value)||1;save()"></div>
-          <div class="row"><div class="rtitle"><b>Червоний після</b><div class="sub">записи давно не оновлювались, днів</div></div>
-            <input type="number" value="${DB.settings.redDays}" style="width:56px;text-align:center;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.redDays=num(this.value)||1;save()"></div>
-        </div>
-
-        <div class="section-label">Цілі по прибутку <button type="button" class="infob" onclick="alertSheet('Цілі по прибутку','Задайте бажаний чистий прибуток за день, тиждень і місяць. На дашборді, коли обрано відповідний період, з’явиться смужка прогресу до мети. Залиште 0, щоб не показувати ціль для цього періоду.')">i</button></div>
-        <div class="group">
-          <div class="row"><div class="rtitle"><b>За день</b></div><input type="number" inputmode="numeric" value="${DB.goals.daily||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.daily=num(this.value)||0;save()"></div>
-          <div class="row"><div class="rtitle"><b>За тиждень</b></div><input type="number" inputmode="numeric" value="${DB.goals.weekly||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.weekly=num(this.value)||0;save()"></div>
-          <div class="row"><div class="rtitle"><b>За місяць</b></div><input type="number" inputmode="numeric" value="${DB.goals.monthly||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.monthly=num(this.value)||0;save()"></div>
-        </div>
-
-        <div class="section-label">Особисті нагадування <button type="button" class="infob" onclick="alertSheet('Особисті нагадування','Прості нагадування собі — не про авто, а будь-що: подзвонити, оплатити, забрати. Показуються на дашборді, коли термін підходить або минув.')">i</button></div>
-        <div class="group">
-          ${DB.reminders.length ? [...DB.reminders].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(r=>`<div class="row" onclick="openReminderForm('${r.id}')" style="cursor:pointer"><div class="rtitle"><b style="${r.done?'text-decoration:line-through;opacity:0.5':''}">${esc(r.text)}</b>${r.date?`<div class="sub">${dueBadge(daysUntil(r.date))}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нагадувань</div>`}
-          <div class="row" onclick="openReminderForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нагадування</span></div>
-        </div>
-
-        <div class="section-label">Платформи <button type="button" class="infob" onclick="alertSheet('Платформи та комісія','Вкажіть комісію платформи у відсотках — тоді при завершенні зміни можна вводити «брудний» дохід і кількість замовлень, а застосунок сам порахує чисту суму. Якщо комісію не знаєте чи не хочете рахувати — просто вводьте чистий дохід, як і раніше.')">i</button></div>
-        <div class="group">
-          ${DB.platforms.map(p=>{ const master=PLATFORM_MASTER.find(m=>m.id===p.id)||{}; const purl=p.url||master.url; return `<div class="row"><span class="dot" style="background:${p.group==='taxi'?'var(--blue)':'var(--teal)'}"></span><div class="rtitle"><b>${esc(p.name)}</b><div class="sub">${p.group==='taxi'?'таксі':'доставка'}${purl?` · <a href="${esc(purl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--blue)">сайт →</a>`:''}</div></div>
-            <div style="display:flex;align-items:center;gap:6px"><input type="number" inputmode="decimal" value="${p.commissionPct||''}" placeholder="0" style="width:52px;text-align:center;padding:7px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="setPlatCommission('${p.id}',this.value)"><span class="sub">% ком.</span><button class="iconbtn" onclick="requestDeletePlatform('${p.id}')">✕</button></div></div>`; }).join('')}
-          <div class="row" onclick="openPlatformForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати платформу</span></div>
-        </div>
-
-        <div class="section-label">Бонуси за реєстрацію <button type="button" class="infob" onclick="alertSheet('Бонуси за реєстрацію','Реферальні посилання на платформи й сервіси, якими сам користуюсь. Перехід і реєстрація за ними — за бажанням, і зазвичай дає бонус і вам.')">i</button></div>
-        <div class="group">
-          ${PLATFORM_MASTER.filter(m=>m.url).map(m=>refCardHtml(m.name, m.url, m.refNote, m.refCode)).join('')}
-          ${(DB.referralLinks||[]).map(r=>refCardHtml(r.name, r.url, r.note, r.code)).join('')}
-        </div>
-
-        <div class="section-label">Контакти майстрів і СТО <button type="button" class="infob" onclick="alertSheet('Контакти майстрів і СТО','Зберігайте, хто обслуговує ваші авто — майстер, СТО, шиномонтаж. Коли відмічаєте роботу виконаною у вкладці «Обслуговування» авто, можна одразу вказати, хто її зробив — це збережеться в історії авто.')">i</button></div>
-        <div class="group">
-          ${DB.contacts.length ? DB.contacts.map(ct=>`<div class="row" onclick="openContactForm('${ct.id}')" style="cursor:pointer"><div class="rtitle"><b>${esc(ct.name)}</b><div class="sub">${[ct.specialty,ct.phone].filter(Boolean).map(esc).join(' · ')}</div></div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає контактів</div>`}
-          <div class="row" onclick="openContactForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати контакт</span></div>
-        </div>
-
-        <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
-        <div class="group">
-          <div class="row" onclick="openExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт для бухгалтера</b><div class="sub">Текст із доходами й витратами за період</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openCsvExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт у CSV (Excel/Таблиці)</b><div class="sub">Окремі файли змін і витрат за період</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openPdfReportSheet()" style="cursor:pointer"><div class="rtitle"><b>PDF-звіт</b><div class="sub">Друк або збереження як PDF за період</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openYearSummary()" style="cursor:pointer"><div class="rtitle"><b>Річний підсумок</b><div class="sub">Скільки заробили за ${new Date().getFullYear()} рік</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openBackupSheet()" style="cursor:pointer"><div class="rtitle"><b>Резервна копія даних</b><div class="sub">Зберегти всі дані в файл або текст, і відновити пізніше</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('platforms')" style="cursor:pointer"><div class="rtitle"><b>🚕 Платформи</b><div class="sub">${DB.platforms.length} підключено</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('referrals')" style="cursor:pointer"><div class="rtitle"><b>🎁 Бонуси за реєстрацію</b></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('contacts')" style="cursor:pointer"><div class="rtitle"><b>🔧 Контакти майстрів і СТО</b>${DB.contacts.length?`<div class="sub">${DB.contacts.length}</div>`:''}</div><span class="chev">›</span></div>
         </div>
         <div class="group" style="margin-top:10px">
-          <div class="row" onclick="requestClearAll()" style="cursor:pointer"><div class="rtitle"><b style="color:var(--red)">Очистити всі дані</b><div class="sub">Незворотно видаляє все з цього телефону</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('data')" style="cursor:pointer"><div class="rtitle"><b>📦 Дані й звітність</b><div class="sub">Експорт, резервна копія, демо-режим</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('about')" style="cursor:pointer"><div class="rtitle"><b>ℹ️ Про застосунок</b><div class="sub">Версія ${esc(APP_VERSION)}${UPDATE_AVAILABLE?' · є оновлення 🎉':''}</div></div><span class="chev">›</span></div>
         </div>
-
-        <div class="section-label">Про застосунок</div>
-        <div class="group">
-          <div class="row"><div class="rtitle"><b>Версія</b></div><div class="rval">${APP_VERSION}${UPDATE_AVAILABLE?' <span style="color:var(--blue)">→ '+esc(UPDATE_AVAILABLE)+' є</span>':''}</div></div>
-          <div class="row"><div class="rtitle"><b>Де живуть дані</b><div class="sub">Лише в пам'яті цього браузера. Хмарної синхронізації ще немає — не очищайте дані сайту.</div></div></div>
-          <div class="row" onclick="openInstallGuide()" style="cursor:pointer"><div class="rtitle"><b>📲 Встановити на головний екран</b><div class="sub">Щоб відкривався як окремий застосунок</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openDeveloperPage()" style="cursor:pointer"><div class="rtitle"><b>Про розробника</b><div class="sub">Контакт, ідеї та баги, донат, історія версій</div></div><span class="chev">›</span></div>
-        </div>
-        <div class="group" style="margin-top:10px">
-          <div class="row" onclick="checkForUpdate(true)" style="cursor:pointer"><div class="rtitle"><b>🔄 Перевірити оновлення</b><div class="sub">Зараз же перевірити, чи є нова версія</div></div><span class="chev">›</span></div>
-          <div class="row"><div class="rtitle"><b>Автоперевірка оновлень</b><div class="sub">Як часто застосунок сам перевіряє наявність нової версії</div></div>
-            <select style="max-width:110px" onchange="setUpdateCheckMinutes(this.value)">${UPDATE_CHECK_OPTS.map(o=>`<option value="${o[0]}" ${+DB.settings.updateCheckMinutes===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>
-          </div>
-        </div>
-
       </div>
     </div>`;
+}
+function renderSettingsProfile(){
+  const body=`
+    <div class="section-label">Профіль <button type="button" class="infob" onclick="alertSheet('Профіль','Ці налаштування впливають лише на підказки в застосунку. Їх можна міняти будь-коли — нічого зі старих записів не зникне.')">i</button></div>
+    <div class="caravatar-lg" onclick="pickProfilePhoto()" style="cursor:pointer">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
+    <div style="text-align:center;margin-bottom:14px"><button type="button" class="btn add" style="width:auto;display:inline-block;padding:8px 14px" onclick="pickProfilePhoto()">${DB.profile.photo?'Змінити фото':'Додати фото профілю'}</button></div>
+    <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="onProfilePhotoChosen(this)">
+    <div class="group"><div class="row"><div class="rtitle"><b>Де працюєте <button type="button" class="infob" onclick="alertSheet('Де працюєте','Визначає, які розділи й підказки показувати першими — таксі, доставку чи обидва. Впливає лише на зручність, не обмежує, які платформи можна додати.')">i</button></b></div></div></div>
+    <div class="seg" style="margin-top:8px;margin-bottom:14px">
+      ${[['taxi','Таксі'],['delivery','Доставка'],['both','Обидва']].map(w=>`<button class="${DB.profile.workType===w[0]?'on':''}" onclick="DB.profile.workType='${w[0]}';save();openSettings('profile')">${w[1]}</button>`).join('')}
+    </div>
+    <div class="group"><div class="row"><div class="rtitle"><b>ФОП <button type="button" class="infob" onclick="alertSheet('ФОП','«Немає» — оплата зазвичай надходить на особисту картку. «2 група» — фіксований податок щомісяця незалежно від доходу, є ліміт річного доходу. «3 група» — податок як відсоток від доходу (зазвичай 5%, або 3%+ПДВ), вищий ліміт. За деталями краще звернутись до бухгалтера.')">i</button></b></div></div></div>
+    <div class="seg" style="margin-top:8px">
+      ${[['none','Немає'],['group2','2 група'],['group3','3 група']].map(w=>`<button class="${DB.profile.fop===w[0]?'on':''}" onclick="DB.profile.fop='${w[0]}';save();openSettings('profile')">${w[1]}</button>`).join('')}
+    </div>
+
+    ${DB.profile.fop!=='none'?`<div class="section-label">Податки й ЄСВ <button type="button" class="infob" onclick="alertSheet('Податки й ЄСВ','Вкажіть суми, щоб застосунок міг орієнтовно порахувати податкове навантаження й врахувати його в точці беззбитковості. Це не бухгалтерська консультація — суми й ставки перевіряйте самостійно.')">i</button></div>
+    <div class="group">
+      ${DB.profile.fop==='group2'?`<div class="row"><div class="rtitle"><b>Фіксований податок</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2Fixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2Fixed=num(this.value)||0;save()"></div>`:''}
+      ${DB.profile.fop==='group3'?`<div class="row"><div class="rtitle"><b>Ставка податку</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3Rate||''}" placeholder="5" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3Rate=num(this.value)||5;save()"></div>`:''}
+      <div class="row"><div class="rtitle"><b>ЄСВ</b><div class="sub">грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.esvMonthly||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.esvMonthly=num(this.value)||0;save()"></div>
+      <div class="row" onclick="openTaxCalc()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">🧮 Порахувати податки за період</span><span class="chev">›</span></div>
+    </div>` : ''}
+
+    <div class="section-label">Конверт на податки <button type="button" class="infob" onclick="alertSheet('Конверт на податки','Візуальна копілка: застосунок відкладає вказаний відсоток від кожної гривні доходу «на майбутнє» — податки, ремонт, чорний день. Це не окремий банківський рахунок, просто підрахунок у застосунку.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Відкладати</b><div class="sub">% від доходу, 0 — вимкнено</div></div><input type="number" inputmode="decimal" value="${DB.settings.envelopeRate||''}" placeholder="0" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.envelopeRate=num(this.value)||0;save();openSettings('profile')"></div>
+      ${num(DB.settings.envelopeRate)>0?`<div class="row" onclick="openEnvelopeSheet()" style="cursor:pointer"><div class="rtitle"><b>У конверті зараз</b></div><div class="rval tnum" style="color:var(--orange)">${money(envelopeBalance())}</div><span class="chev">›</span></div>`:''}
+    </div>
+  `;
+  settingsPage('Профіль і податки', body);
+}
+function renderSettingsAppearance(){
+  const theme=getTheme();
+  const themeLabels={system:'Системна',light:'Світла',dark:'Темна'};
+  const body=`
+    <div class="section-label">Вигляд <button type="button" class="infob" onclick="alertSheet('Вигляд','Тема, показ копійок у сумах та подвійне підтвердження перед видаленням — суто про те, як застосунок виглядає й поводиться на екрані.')">i</button></div>
+    <div class="group"><div class="row"><div class="rtitle"><b>Тема</b></div></div></div>
+    <div class="seg" style="margin-top:8px">
+      ${['system','light','dark'].map(m=>`<button class="${theme===m?'on':''}" onclick="applyTheme('${m}');openSettings('appearance')">${themeLabels[m]}</button>`).join('')}
+    </div>
+    <div class="group" style="margin-top:10px">
+      <div class="row"><div class="rtitle"><b>Показувати копійки</b><div class="sub">${DB.settings.showKopecks?'129,50 ₴':'130 ₴'} — приклад</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=true;save();openSettings('appearance')">Так</button></div></div>
+      <div class="row"><div class="rtitle"><b>Подвійне підтвердження</b><div class="sub">Питати двічі перед видаленням</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=true;save();openSettings('appearance')">Так</button></div></div>
+    </div>
+    <div class="group" style="margin-top:10px;padding:12px 14px">
+      <div class="rtitle" style="margin-bottom:8px"><b>Акцентний колір</b><div class="sub">Колір кнопок і активних елементів</div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        ${ACCENT_PRESETS.map(a=>`<button type="button" onclick="setAccent('${a.hex}')" title="${esc(a.label)}" style="width:32px;height:32px;border-radius:50%;border:${(DB.settings.accentColor||'')===a.hex?'3px solid var(--tx)':'1px solid var(--sep)'};background:${a.hex||'#007AFF'};padding:0"></button>`).join('')}
+      </div>
+    </div>
+    <div class="group" style="margin-top:10px;padding:12px 14px">
+      <div class="rtitle" style="margin-bottom:8px"><b>Розмір тексту</b><div class="sub">Масштаб інтерфейсу. Жест «щипок» для зуму сторінки вимкнено навмисно — щоб не збільшувалось випадково під час роботи.</div></div>
+      <div class="seg">
+        ${TEXT_SCALE_OPTS.map(s=>`<button class="${(+DB.settings.textScale||1)===s?'on':''}" onclick="setTextScale(${s})">${Math.round(s*100)}%</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="section-label">Статус актуальності даних <button type="button" class="infob" onclick="alertSheet('Статус актуальності даних','Якщо давно не додавали записів по авто (заправка, обслуговування), картка авто підсвічується жовтим чи червоним — щоб не забути оновити дані.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Жовтий після</b><div class="sub">записи вважаються застарілими, днів</div></div>
+        <input type="number" value="${DB.settings.yellowDays}" style="width:56px;text-align:center;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.yellowDays=num(this.value)||1;save()"></div>
+      <div class="row"><div class="rtitle"><b>Червоний після</b><div class="sub">записи давно не оновлювались, днів</div></div>
+        <input type="number" value="${DB.settings.redDays}" style="width:56px;text-align:center;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.redDays=num(this.value)||1;save()"></div>
+    </div>
+  `;
+  settingsPage('Вигляд', body);
+}
+function renderSettingsGoals(){
+  const body=`
+    <div class="section-label">Цілі по прибутку <button type="button" class="infob" onclick="alertSheet('Цілі по прибутку','Задайте бажаний чистий прибуток за день, тиждень і місяць. На дашборді, коли обрано відповідний період, з’явиться смужка прогресу до мети. Залиште 0, щоб не показувати ціль для цього періоду.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>За день</b></div><input type="number" inputmode="numeric" value="${DB.goals.daily||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.daily=num(this.value)||0;save()"></div>
+      <div class="row"><div class="rtitle"><b>За тиждень</b></div><input type="number" inputmode="numeric" value="${DB.goals.weekly||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.weekly=num(this.value)||0;save()"></div>
+      <div class="row"><div class="rtitle"><b>За місяць</b></div><input type="number" inputmode="numeric" value="${DB.goals.monthly||''}" placeholder="0" style="width:80px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.goals.monthly=num(this.value)||0;save()"></div>
+    </div>
+  `;
+  settingsPage('Цілі по прибутку', body);
+}
+function renderSettingsReminders(){
+  const body=`
+    <div class="section-label">Особисті нагадування <button type="button" class="infob" onclick="alertSheet('Особисті нагадування','Прості нагадування собі — не про авто, а будь-що: подзвонити, оплатити, забрати. Показуються на дашборді, коли термін підходить або минув.')">i</button></div>
+    <div class="group">
+      ${DB.reminders.length ? [...DB.reminders].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(r=>`<div class="row" onclick="openReminderForm('${r.id}')" style="cursor:pointer"><div class="rtitle"><b style="${r.done?'text-decoration:line-through;opacity:0.5':''}">${esc(r.text)}</b>${r.date?`<div class="sub">${dueBadge(daysUntil(r.date))}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нагадувань</div>`}
+      <div class="row" onclick="openReminderForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нагадування</span></div>
+    </div>
+  `;
+  settingsPage('Особисті нагадування', body);
+}
+function renderSettingsPlatforms(){
+  const body=`
+    <div class="section-label">Платформи <button type="button" class="infob" onclick="alertSheet('Платформи та комісія','Вкажіть комісію платформи у відсотках — тоді при завершенні зміни можна вводити «брудний» дохід і кількість замовлень, а застосунок сам порахує чисту суму. Якщо комісію не знаєте чи не хочете рахувати — просто вводьте чистий дохід, як і раніше.')">i</button></div>
+    <div class="group">
+      ${DB.platforms.map(p=>{ const master=PLATFORM_MASTER.find(m=>m.id===p.id)||{}; const purl=p.url||master.url; return `<div class="row"><span class="dot" style="background:${p.group==='taxi'?'var(--blue)':'var(--teal)'}"></span><div class="rtitle"><b>${esc(p.name)}</b><div class="sub">${p.group==='taxi'?'таксі':'доставка'}${purl?` · <a href="${esc(purl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--blue)">сайт →</a>`:''}</div></div>
+        <div style="display:flex;align-items:center;gap:6px"><input type="number" inputmode="decimal" value="${p.commissionPct||''}" placeholder="0" style="width:52px;text-align:center;padding:7px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="setPlatCommission('${p.id}',this.value)"><span class="sub">% ком.</span><button class="iconbtn" onclick="requestDeletePlatform('${p.id}')">✕</button></div></div>`; }).join('')}
+      <div class="row" onclick="openPlatformForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати платформу</span></div>
+    </div>
+  `;
+  settingsPage('Платформи', body);
+}
+function renderSettingsReferrals(){
+  const body=`
+    <div class="section-label">Бонуси за реєстрацію <button type="button" class="infob" onclick="alertSheet('Бонуси за реєстрацію','Реферальні посилання на платформи й сервіси, якими сам користуюсь. Перехід і реєстрація за ними — за бажанням, і зазвичай дає бонус і вам.')">i</button></div>
+    <div class="group">
+      ${PLATFORM_MASTER.filter(m=>m.url).map(m=>refCardHtml(m.name, m.url, m.refNote, m.refCode)).join('')}
+      ${(DB.referralLinks||[]).map(r=>refCardHtml(r.name, r.url, r.note, r.code)).join('')}
+    </div>
+  `;
+  settingsPage('Бонуси за реєстрацію', body);
+}
+function renderSettingsContacts(){
+  const body=`
+    <div class="section-label">Контакти майстрів і СТО <button type="button" class="infob" onclick="alertSheet('Контакти майстрів і СТО','Зберігайте, хто обслуговує ваші авто — майстер, СТО, шиномонтаж. Коли відмічаєте роботу виконаною у вкладці «Обслуговування» авто, можна одразу вказати, хто її зробив — це збережеться в історії авто.')">i</button></div>
+    <div class="group">
+      ${DB.contacts.length ? DB.contacts.map(ct=>`<div class="row" onclick="openContactForm('${ct.id}')" style="cursor:pointer"><div class="rtitle"><b>${esc(ct.name)}</b><div class="sub">${[ct.specialty,ct.phone].filter(Boolean).map(esc).join(' · ')}</div></div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає контактів</div>`}
+      <div class="row" onclick="openContactForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати контакт</span></div>
+    </div>
+  `;
+  settingsPage('Контакти майстрів і СТО', body);
+}
+function renderSettingsData(){
+  const body=`
+    <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
+    <div class="group">
+      <div class="row" onclick="openExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт для бухгалтера</b><div class="sub">Текст із доходами й витратами за період</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openCsvExportSheet()" style="cursor:pointer"><div class="rtitle"><b>Експорт у CSV (Excel/Таблиці)</b><div class="sub">Окремі файли змін і витрат за період</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openPdfReportSheet()" style="cursor:pointer"><div class="rtitle"><b>PDF-звіт</b><div class="sub">Друк або збереження як PDF за період</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openYearSummary()" style="cursor:pointer"><div class="rtitle"><b>Річний підсумок</b><div class="sub">Скільки заробили за ${new Date().getFullYear()} рік</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openBackupSheet()" style="cursor:pointer"><div class="rtitle"><b>Резервна копія даних</b><div class="sub">Зберегти всі дані в файл або текст, і відновити пізніше</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
+    </div>
+    <div class="group" style="margin-top:10px">
+      <div class="row" onclick="requestClearAll()" style="cursor:pointer"><div class="rtitle"><b style="color:var(--red)">Очистити всі дані</b><div class="sub">Незворотно видаляє все з цього телефону</div></div><span class="chev">›</span></div>
+    </div>
+  `;
+  settingsPage('Дані й звітність', body);
+}
+function renderSettingsAbout(){
+  const body=`
+    <div class="section-label">Про застосунок</div>
+    <div class="group">
+      <div class="row" onclick="openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>Версія</b><div class="sub">Історія оновлень</div></div><div class="rval">${APP_VERSION}${UPDATE_AVAILABLE?' <span style="color:var(--blue)">→ '+esc(UPDATE_AVAILABLE)+' є</span>':''}</div><span class="chev">›</span></div>
+      <div class="row"><div class="rtitle"><b>Де живуть дані</b><div class="sub">Лише в пам'яті цього браузера. Хмарної синхронізації ще немає — не очищайте дані сайту.</div></div></div>
+      <div class="row" onclick="openInstallGuide()" style="cursor:pointer"><div class="rtitle"><b>📲 Встановити на головний екран</b><div class="sub">Щоб відкривався як окремий застосунок</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openDeveloperPage()" style="cursor:pointer"><div class="rtitle"><b>Про розробника</b><div class="sub">Контакт, ідеї та баги, донат, історія версій</div></div><span class="chev">›</span></div>
+    </div>
+    <div class="group" style="margin-top:10px">
+      <div class="row" onclick="checkForUpdate(true)" style="cursor:pointer"><div class="rtitle"><b>🔄 Перевірити оновлення</b><div class="sub">Зараз же перевірити, чи є нова версія</div></div><span class="chev">›</span></div>
+      <div class="row"><div class="rtitle"><b>Автоперевірка оновлень</b><div class="sub">Як часто застосунок сам перевіряє наявність нової версії</div></div>
+        <select style="max-width:110px" onchange="setUpdateCheckMinutes(this.value)">${UPDATE_CHECK_OPTS.map(o=>`<option value="${o[0]}" ${+DB.settings.updateCheckMinutes===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>
+      </div>
+    </div>
+  `;
+  settingsPage('Про застосунок', body);
 }
 function copyCode(text, el){
   const label = el ? el.textContent : '';
@@ -3156,7 +3229,7 @@ function openDeveloperPage(){
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
-        <button class="fsbtn" onclick="openSettings()">‹ Назад</button>
+        <button class="fsbtn" onclick="openSettings('about')">‹ Назад</button>
         <h2>Про розробника</h2>
         <span style="min-width:56px"></span>
       </div>
@@ -3184,11 +3257,17 @@ function openDeveloperPage(){
 
         <div class="section-label">Історія версій</div>
         <div class="group" style="padding:12px 14px">
-          ${CHANGELOG.map(c=>`<div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:2px">v${esc(c.v)}${c.date?` <span style="font-weight:400;color:var(--tx2);font-size:12px">· ${esc(c.date)}</span>`:''}</div><ul style="margin:4px 0 0;padding-left:18px;color:var(--tx2);font-size:13px;line-height:1.6">${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}
+          ${changelogHtml()}
         </div>
 
       </div>
     </div>`;
+}
+function changelogHtml(){
+  return CHANGELOG.map(c=>`<div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:2px">v${esc(c.v)}${c.date?` <span style="font-weight:400;color:var(--tx2);font-size:12px">· ${esc(c.date)}</span>`:''}</div><ul style="margin:4px 0 0;padding-left:18px;color:var(--tx2);font-size:13px;line-height:1.6">${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
+}
+function openChangelogSheet(){
+  showSheet(`<h3>Історія версій</h3><div style="margin-top:12px">${changelogHtml()}</div>`);
 }
 function openPlatformForm(){
   showSheet(`
@@ -3204,15 +3283,15 @@ function openPlatformForm(){
   window.savePlatform=()=>{
     const name=$('#pName').value.trim();
     if(!name){ alertSheet('Вкажіть назву','Дайте платформі коротку назву.'); return; }
-    DB.platforms.push({ id:uid(), name, group:pgroup }); save(); closeSheet(); openSettings();
+    DB.platforms.push({ id:uid(), name, group:pgroup }); save(); closeSheet(); openSettings('platforms');
   };
 }
 function setPlatCommission(id,val){ const p=platById(id); if(!p) return; p.commissionPct=num(val)||0; save(); }
 function requestDeletePlatform(id){
   const p=platById(id); if(!p) return;
   confirmDelete(`Видалити «${p.name}»?`, 'Старі зміни з цією платформою залишаться в історії, але додавати нові записи для неї буде не можна.', ()=>{
-    DB.platforms=DB.platforms.filter(x=>x.id!==id); save(); openSettings();
-  }, ()=>openSettings());
+    DB.platforms=DB.platforms.filter(x=>x.id!==id); save(); openSettings('platforms');
+  }, ()=>openSettings('platforms'));
 }
 function contactById(id){ return DB.contacts.find(x=>x.id===id); }
 function openContactForm(id){
@@ -3235,13 +3314,13 @@ function saveContact(id){
   const data={ name, phone:$('#ctPhone').value.trim(), specialty:$('#ctSpec').value.trim(), note:$('#ctNote').value.trim() };
   if(id){ const ct=contactById(id); if(ct) Object.assign(ct, data); }
   else DB.contacts.push({ id:uid(), ...data });
-  save(); closeSheet(); openSettings();
+  save(); closeSheet(); openSettings('contacts');
 }
 function requestDeleteContact(id){
   const ct=contactById(id); if(!ct) return;
   confirmDelete(`Видалити «${ct.name}»?`, 'Записи в історії обслуговування, де вже вказано цей контакт, не зміняться — видалиться лише сам контакт зі списку.', ()=>{
-    DB.contacts=DB.contacts.filter(x=>x.id!==id); save(); closeSheet(); openSettings();
-  }, ()=>openSettings());
+    DB.contacts=DB.contacts.filter(x=>x.id!==id); save(); closeSheet(); openSettings('contacts');
+  }, ()=>openSettings('contacts'));
 }
 function reminderById(id){ return DB.reminders.find(x=>x.id===id); }
 function openReminderForm(id){
@@ -3264,24 +3343,24 @@ function saveReminder(id){
   const data={ text, date:$('#rmDate').value||'', done: !!window.__rmDone };
   if(id){ const r=reminderById(id); if(r) Object.assign(r, data); }
   else DB.reminders.push({ id:uid(), ...data });
-  save(); closeSheet(); openSettings();
+  save(); closeSheet(); openSettings('reminders');
 }
 function requestDeleteReminder(id){
   const r=reminderById(id); if(!r) return;
   confirmDelete(`Видалити нагадування?`, `«${r.text}» буде видалено зі списку.`, ()=>{
-    DB.reminders=DB.reminders.filter(x=>x.id!==id); save(); closeSheet(); openSettings();
-  }, ()=>openSettings());
+    DB.reminders=DB.reminders.filter(x=>x.id!==id); save(); closeSheet(); openSettings('reminders');
+  }, ()=>openSettings('reminders'));
 }
 function requestClearAll(){
   confirmDelete('Очистити всі дані?', 'Усі зміни, витрати, заправки й авто буде видалено з цього телефону назавжди. Доведеться пройти налаштування заново.', ()=>{
     try{ localStorage.removeItem(DEMO_FLAG); localStorage.removeItem(REAL_BACKUP); }catch(e){}
     DB=defaultDB(); save(); closeFullscreen(); TAB='dash'; init();
-  }, ()=>openSettings());
+  }, ()=>openSettings('data'));
 }
 function requestResetOnboarding(){
   confirmDelete('Пройти налаштування знову?', 'Це відкриє майстер налаштувань. Ваші зміни, витрати й авто нікуди не зникнуть.', ()=>{
     DB.onboardingDone=false; save(); closeFullscreen(); startWizard();
-  }, ()=>openSettings());
+  }, ()=>openSettings('data'));
 }
 function toggleDemo(){
   if(isDemo()) exitDemo(); else enterDemo();
@@ -3295,7 +3374,7 @@ function enterDemo(){
       try{ localStorage.setItem(REAL_BACKUP, JSON.stringify(DB)); localStorage.setItem(DEMO_FLAG,'1'); }catch(e){}
       DB=buildDemoDB(); save(); closeFullscreen(); TAB='dash'; init();
     },
-    onCancel:()=>openSettings()
+    onCancel:()=>openSettings('data')
   });
 }
 function exitDemo(){
@@ -3504,7 +3583,7 @@ function checkForUpdate(manual){
       const remote=(data&&data.version)||'';
       if(remote && remote!==APP_VERSION){
         UPDATE_AVAILABLE=remote;
-        if(manual) alertSheet('Доступне оновлення 🎉', `Вийшла нова версія ${remote} (у вас ${APP_VERSION}). Оновіть сторінку, щоб отримати останню версію.`);
+        if(manual) openUpdateChoiceSheet(remote);
         else if(TAB==='dash') renderDash();
       }else{
         UPDATE_AVAILABLE=null;
@@ -3514,6 +3593,22 @@ function checkForUpdate(manual){
     .catch(()=>{
       if(manual) alertSheet('Не вдалося перевірити', 'Перевірте інтернет-з’єднання і спробуйте ще раз.');
     });
+}
+function updateCheckIntervalLabel(){
+  const minutes=Math.max(15, num(DB.settings.updateCheckMinutes)||60);
+  const found=UPDATE_CHECK_OPTS.find(o=>o[0]===minutes);
+  return found ? found[1] : (minutes+' хв');
+}
+function openUpdateChoiceSheet(remote){
+  showSheet(`
+    <h3>Доступне оновлення 🎉</h3>
+    <div class="confirm-msg">Вийшла нова версія ${esc(remote)} (у вас ${esc(APP_VERSION)}).</div>
+    <div class="confirm-actions">
+      <button class="btn primary" onclick="reloadForUpdate()">Оновити зараз</button>
+      <button class="btn ghost" onclick="closeSheet()">Оновити пізніше</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;color:var(--tx2);font-size:12.5px;line-height:1.4">Якщо оновити пізніше — застосунок сам перевірить ще раз приблизно через ${esc(updateCheckIntervalLabel())} і нагадає банером на дашборді.</div>
+  `, {center:true});
 }
 function scheduleUpdateChecks(){
   if(updateCheckTimerId) clearInterval(updateCheckTimerId);
