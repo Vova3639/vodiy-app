@@ -93,6 +93,18 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .segscroll button{flex:0 0 auto; border:0; background:var(--fill); padding:8px 13px; border-radius:9px; color:var(--tx); font-size:12.5px; font-weight:600; white-space:nowrap}
 .segscroll button.on{background:var(--bg-elev); box-shadow:var(--shadow)}
 
+/* ===== Tab grid (icon buttons instead of a hidden scroll strip) ===== */
+.tabgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px}
+.tabtile{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  background:var(--bg-grouped); border:0; border-radius:15px; padding:11px 4px 9px;
+  box-shadow:var(--shadow); color:var(--tx2); min-width:0;
+}
+.tabtile .ti{font-size:19px; line-height:1}
+.tabtile .tl{font-size:10.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; color:inherit}
+.tabtile.on{background:var(--blue); color:#fff; box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.18)}
+@media (min-width:420px){ .tabgrid{grid-template-columns:repeat(5,1fr)} }
+
 /* ===== Grouped list / cards ===== */
 .section-label{font-size:12.5px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:0.03em; margin:20px 4px 6px; display:flex; align-items:center; justify-content:space-between}
 .section-label:first-child{margin-top:2px}
@@ -381,7 +393,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.7';
+const APP_VERSION='0.8';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -395,6 +407,7 @@ const DEV_INFO={
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
 const CHANGELOG=[
+  {v:'0.8', date:'29.09.2026 00:18', items:['Розділи картки авто (Огляд, Заправки/Зарядки, Обслуговування, Фінанси, Заробіток, Історія, Вішліст) тепер відображаються сіткою з іконками замість смужки, яку треба було гортати вбік — усі розділи видно одразу, без свайпу']},
   {v:'0.7', date:'29.09.2026 00:15', items:['Виправлено картку «Ціль» на дашборді — на iPhone вона налягала на плитки нижче; тепер завжди є відступ, а смужка прогресу відображається як слід','Пошук зміни чи витрати за датою, сумою, платформою чи категорією — у меню «⋯» вгорі','Потягнути дашборд вниз, щоб оновити дані — звичний жест iOS (pull-to-refresh)','Легка тактильна віброзідача на свайпі видалення та підтвердженні видалення','Особисті нагадування тепер групуються за терміновістю: прострочені, найближчі, пізніше, без дати, виконані']},
   {v:'0.6', date:'29.09.2026 00:01', items:['Налаштування переробили на розділи: замість однієї довгої сторінки — список категорій («Профіль і податки», «Вигляд», «Цілі», «Нагадування», «Платформи», «Бонуси», «Контакти», «Дані», «Про застосунок»), кожна відкривається окремо','Нова кнопка меню зверху справа (поруч із шестернею) — швидкий доступ до перевірки оновлень, інструкції встановлення, історії версій, демо-режиму й сторінки розробника','Виправлено накладання шапки застосунку на виріз камери на деяких пристроях','Виправлено «сховану» кнопку видалення, яку було трохи видно збоку в списках зі свайпом']},
   {v:'0.5', date:'28.09.2026 23:47', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором','Вимкнено випадковий зум сторінки жестом «щипок» — розмір тексту тепер регулюється в Налаштуваннях → Вигляд','Дотик на «Версія» в Налаштуваннях відкриває історію оновлень','Перевірка оновлень тепер пропонує «Оновити зараз» або «Оновити пізніше» (з підказкою, коли перевірить наступного разу)']},
@@ -2163,7 +2176,15 @@ function openCarDetail(id){
 function renderCarDetail(id){
   const c=carById(id);
   if(!c){ closeFullscreen(); return; }
-  const tabs=[['overview','Огляд'],['fuel', c.fuelType==='ev'?'Зарядки':'Заправки'],['service','Обслуговування'],['finance','Фінанси'],['earnings','Заробіток'],['history','Історія'],['wishlist','Вішліст']];
+  const tabs=[
+    ['overview','Огляд','📋'],
+    ['fuel', c.fuelType==='ev'?'Зарядки':'Заправки', c.fuelType==='ev'?'🔌':'⛽'],
+    ['service','Обслуговування','🔧'],
+    ['finance','Фінанси','💳'],
+    ['earnings','Заробіток','💰'],
+    ['history','Історія','🕘'],
+    ['wishlist','Вішліст','🛒']
+  ];
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
@@ -2172,7 +2193,7 @@ function renderCarDetail(id){
         <button class="fsbtn right" onclick="${c.archived?`requestDeleteCar('${c.id}')`:`toggleCarArchive('${c.id}')`}" style="color:var(--red)">${c.archived?'Видалити':'В архів'}</button>
       </div>
       <div class="fsbody">
-        <div class="segscroll" style="margin-bottom:14px">${tabs.map(t=>`<button class="${CARDETAIL_TAB===t[0]?'on':''}" onclick="CARDETAIL_TAB='${t[0]}';renderCarDetail('${c.id}')">${t[1]}</button>`).join('')}</div>
+        <div class="tabgrid">${tabs.map(t=>`<button class="tabtile ${CARDETAIL_TAB===t[0]?'on':''}" onclick="CARDETAIL_TAB='${t[0]}';renderCarDetail('${c.id}')"><span class="ti">${t[2]}</span><span class="tl">${t[1]}</span></button>`).join('')}</div>
         <div id="carDetailBody"></div>
       </div>
     </div>`;
