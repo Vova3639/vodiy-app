@@ -29,6 +29,7 @@ img{max-width:100%}
   --fill:rgba(120,120,128,0.12); --fill2:rgba(120,120,128,0.08);
   --shadow:0 1px 3px rgba(0,0,0,0.05), 0 10px 28px rgba(0,0,0,0.06);
   --bar-bg:rgba(255,255,255,0.72);
+  --canvas:#E3E3E8;
   --r-lg:20px; --r-md:14px; --r-sm:10px;
   color-scheme:light;
 }
@@ -41,6 +42,7 @@ img{max-width:100%}
     --fill:rgba(120,120,128,0.24); --fill2:rgba(120,120,128,0.16);
     --shadow:0 1px 3px rgba(0,0,0,0.32), 0 10px 28px rgba(0,0,0,0.42);
     --bar-bg:rgba(28,28,30,0.72);
+    --canvas:#050505;
     color-scheme:dark;
   }
 }
@@ -52,6 +54,7 @@ img{max-width:100%}
   --fill:rgba(120,120,128,0.24); --fill2:rgba(120,120,128,0.16);
   --shadow:0 1px 3px rgba(0,0,0,0.32), 0 10px 28px rgba(0,0,0,0.42);
   --bar-bg:rgba(28,28,30,0.72);
+  --canvas:#050505;
   color-scheme:dark;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
@@ -68,6 +71,11 @@ h1,h2,h3{margin:0; text-wrap:balance}
 
 /* ===== App shell ===== */
 #app{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px)); min-height:100%; position:relative}
+@media (min-width:640px){
+  body{ background:var(--canvas) }
+  #app{ max-width:640px; margin:0 auto; min-height:100vh; box-shadow:0 0 0 0.5px var(--sep), 0 24px 60px rgba(0,0,0,0.28) }
+  .fullscreen{ width:100%; max-width:640px; margin:0 auto; box-shadow:0 0 0 0.5px var(--sep), 0 24px 60px rgba(0,0,0,0.28) }
+}
 .ptr-indicator{
   position:fixed; left:50%; top:calc(52px + env(safe-area-inset-top,0px)); z-index:15;
   width:30px; height:30px; border-radius:50%; background:var(--bg-elev); box-shadow:var(--shadow);
@@ -82,7 +90,7 @@ h1,h2,h3{margin:0; text-wrap:balance}
   border-bottom:0.5px solid var(--sep);
   padding:calc(10px + env(safe-area-inset-top,0px)) 18px 12px;
 }
-.topbar-row{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
+.topbar-row{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; max-width:600px; margin:0 auto}
 .topbar .eyebrow{font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:1px}
 .topbar h1{font-size:34px; font-weight:800; letter-spacing:-0.022em; line-height:1.1}
 main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
@@ -91,11 +99,15 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 
 /* ===== Tab bar ===== */
 .tabbar{
-  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  position:fixed; left:50%; transform:translateX(-50%); bottom:0; z-index:30;
+  width:100%; max-width:600px;
   display:flex; background:var(--bar-bg);
   backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
   border-top:0.5px solid var(--sep);
   padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (min-width:640px){
+  .tabbar{ border-left:0.5px solid var(--sep); border-right:0.5px solid var(--sep); border-radius:18px 18px 0 0; box-shadow:var(--shadow) }
 }
 .tabbar button{
   flex:1; background:none; border:0; padding:8px 2px 6px; display:flex; flex-direction:column;
@@ -227,24 +239,28 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 }
 
 /* ===== Sheet / modal ===== */
-.overlay{position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:70; display:flex; align-items:flex-end; justify-content:center}
+.overlay{position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; isolation:isolate; display:flex; align-items:flex-end; justify-content:center}
 .overlay.center{align-items:center; padding:24px}
 .sheet{
   width:100%; max-width:600px; background:var(--bg-elev); border-radius:20px 20px 0 0;
-  max-height:88vh; overflow-y:auto; padding:14px 18px calc(22px + env(safe-area-inset-bottom,0px));
+  max-height:88vh; display:flex; flex-direction:column;
   animation:up .22s ease-out;
 }
-.overlay.center .sheet{border-radius:18px; max-width:340px; padding:20px 20px calc(18px + env(safe-area-inset-bottom,0px)); text-align:center}
+.sheet .sheethead{position:relative; flex-shrink:0; padding:14px 18px 0}
+.sheet .sheetbody{overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:0 18px calc(22px + env(safe-area-inset-bottom,0px))}
+.overlay.center .sheet{border-radius:18px; max-width:340px}
+.overlay.center .sheet .sheethead{padding:20px 20px 0}
+.overlay.center .sheet .sheetbody{padding:0 20px calc(18px + env(safe-area-inset-bottom,0px)); text-align:center}
 @keyframes up{from{transform:translateY(24px); opacity:0.6} to{transform:translateY(0); opacity:1}}
 .sheet .handle{width:36px; height:5px; background:var(--fill); border-radius:3px; margin:2px auto 12px}
 .sheet h3{font-size:18px; font-weight:700; margin-bottom:2px}
-.sheet .close{position:absolute; right:14px; top:14px; width:30px; height:30px; border-radius:50%; background:var(--fill); border:0; color:var(--tx2); font-size:15px}
+.sheet .close{position:absolute; right:14px; top:14px; width:30px; height:30px; border-radius:50%; background:var(--fill); border:0; color:var(--tx2); font-size:15px; z-index:2}
 .confirm-msg{color:var(--tx2); font-size:14px; margin:8px 0 18px; line-height:1.4; white-space:pre-line}
 .confirm-actions{display:flex; flex-direction:column; gap:8px}
 .empty{padding:26px 14px; text-align:center; color:var(--tx2); font-size:13.5px}
 
 /* ===== Full-screen window (settings / onboarding / car detail) ===== */
-.fullscreen{position:fixed; inset:0; z-index:60; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch}
+.fullscreen{position:fixed; inset:0; z-index:100; isolation:isolate; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
 .fstop{
   position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:8px;
   padding:calc(16px + env(safe-area-inset-top,0px)) 8px 14px;
@@ -415,7 +431,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.2';
+const APP_VERSION='0.9.3';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -431,6 +447,7 @@ const DEV_INFO={
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.3', date:'29.09.2026 00:55', items:['Кнопка закриття шторки більше не зникає під час прокрутки її вмісту — тепер вона завжди на місці зверху','Фон більше не «прокручується» разом із відкритою шторкою чи вікном — сторінка позаду тепер зафіксована, поки дивишся деталі','Виправлено рідкісне накладання шапки з ефектом скла на вікна поверх неї','Застосунок адаптовано під планшети й комп’ютери — на широкому екрані вміст тепер акуратно по центру у вигляді картки, а не розтягнутий на всю ширину','Кнопка «Назад» на iPhone 16 Pro Max та подібних — перевірена і виправлена позиція']},
   {v:'0.9.2', date:'29.09.2026 00:42', items:['Перший крок редизайну (кольори, типографіка, форма елементів): точніший системний зелений колір, чіткіші роздільники карток, більший і виразніший заголовок вгорі екрана, жирніші заголовки розділів, заокругленіші картки й кнопки в дусі свіжого iOS — далі редизайн продовжимо по екранах']},
   {v:'0.9.1', date:'29.09.2026 00:39', items:['Кнопка «Назад» вгорі екранів налаштувань та деталей — більше відступу зверху і більша область дотику, щоб було зручно натискати']},
   {v:'0.9', date:'29.09.2026 00:30', items:['Свайп від краю екрана назад — для телефонів без рамки і без кнопки «Назад»: працює лише там, де справді є куди повертатись','Тактильний відгук тепер можна вимкнути повністю або окремо для свайпів, видалення чи важливих дій — у Налаштуваннях → Вигляд','Порівняння прибутку цього тижня з минулим прямо під сумою на дашборді','Таймер активної зміни на дашборді тепер оновлюється наживо й пульсує зеленим, поки зміна триває','Кольорова крапка стану біля кожного авто у гаражі — зелена/жовта/червона залежно від того, як давно були записи','Попередження, якщо витрати на обслуговування за цей місяць помітно вищі за звичайні','Довге натискання на кнопку «+» на будь-якій вкладці відкриває швидке меню додавання (зміна, витрата, заправка, нагадування)']},
@@ -483,6 +500,41 @@ const DB_KEY='vodiy_db_v2';
 const DEMO_FLAG='vodiy_demo_active';
 const REAL_BACKUP='vodiy_db_real_backup';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+let bodyLockCount=0, bodyLockScrollY=0;
+function lockBodyScroll(){
+  if(bodyLockCount===0){
+    bodyLockScrollY=window.scrollY||window.pageYOffset||0;
+    document.body.style.position='fixed';
+    document.body.style.top=(-bodyLockScrollY)+'px';
+    document.body.style.left='0';
+    document.body.style.right='0';
+    document.body.style.width='100%';
+  }
+  bodyLockCount++;
+}
+function unlockBodyScroll(){
+  bodyLockCount=Math.max(0,bodyLockCount-1);
+  if(bodyLockCount===0){
+    document.body.style.position='';
+    document.body.style.top='';
+    document.body.style.left='';
+    document.body.style.right='';
+    document.body.style.width='';
+    window.scrollTo(0, bodyLockScrollY);
+  }
+}
+function modalRootLockInit(){
+  const root=$('#modalRoot');
+  if(!root || root.dataset.lockBound) return;
+  root.dataset.lockBound='1';
+  let wasEmpty=true;
+  const mo=new MutationObserver(()=>{
+    const hasContent = root.children.length>0;
+    if(hasContent && wasEmpty){ lockBodyScroll(); wasEmpty=false; }
+    else if(!hasContent && !wasEmpty){ unlockBodyScroll(); wasEmpty=true; }
+  });
+  mo.observe(root, {childList:true});
+}
 function haptic(category){
   try{
     if(!navigator.vibrate) return;
@@ -3091,22 +3143,26 @@ function requestDeleteFuel(id){
 /* ============ SHEETS / MODALS ============ */
 function showSheet(innerHTML, opts={}){
   const center = !!opts.center;
-  const existing=document.getElementById('sheetLayer'); if(existing) existing.remove();
+  const existing=document.getElementById('sheetLayer'); if(existing){ existing.remove(); unlockBodyScroll(); }
   const wrap=document.createElement('div');
   wrap.id='sheetLayer';
   wrap.innerHTML=`
     <div class="overlay ${center?'center':''}" onclick="if(event.target===this)closeSheet()">
-      <div class="sheet" style="position:relative">
-        ${center?'':'<div class="handle"></div>'}
-        <button class="close" onclick="closeSheet()">✕</button>
-        ${innerHTML}
+      <div class="sheet">
+        <div class="sheethead">
+          ${center?'':'<div class="handle"></div>'}
+          <button class="close" onclick="closeSheet()">✕</button>
+        </div>
+        <div class="sheetbody">${innerHTML}</div>
       </div>
     </div>`;
   document.body.appendChild(wrap);
+  lockBodyScroll();
 }
 function closeSheet(){
   const el=document.getElementById('sheetLayer'); if(!el) return;
   const overlay=el.querySelector('.overlay');
+  unlockBodyScroll();
   if(overlay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     overlay.classList.add('closing');
     setTimeout(()=>{ if(el.parentNode) el.remove(); }, 190);
@@ -4318,6 +4374,7 @@ function init(){
   ptrInit();
   edgeBackInit();
   fabInit();
+  modalRootLockInit();
   scheduleUpdateChecks();
   if(!DB.onboardingDone && !isDemo()) startWizard();
 }
