@@ -456,11 +456,16 @@ const DB_KEY='vodiy_db_v2';
 const DEMO_FLAG='vodiy_demo_active';
 const REAL_BACKUP='vodiy_db_real_backup';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-function haptic(kind){
+function haptic(category){
   try{
     if(!navigator.vibrate) return;
-    if(kind==='warn') navigator.vibrate([12,40,12]);
-    else if(kind==='success') navigator.vibrate([10,30,10,30,20]);
+    const h=(typeof DB!=='undefined' && DB && DB.settings && DB.settings.haptics) || {master:true, swipe:true, delete:true, actions:true};
+    if(h.master===false) return;
+    if(category==='swipe' && h.swipe===false) return;
+    if(category==='delete' && h.delete===false) return;
+    if((category==='action' || category==='success' || !category) && h.actions===false) return;
+    if(category==='delete') navigator.vibrate([12,40,12]);
+    else if(category==='success') navigator.vibrate([10,30,10,30,20]);
     else navigator.vibrate(10);
   }catch(e){}
 }
@@ -478,7 +483,7 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, haptics:{master:true, swipe:true, delete:true, actions:true}},
     contacts:[],
     goals:{daily:0, weekly:0, monthly:0},
     reminders:[],
@@ -500,6 +505,12 @@ function load(){
     if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
     if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
     if(DB.settings.textScale===undefined) DB.settings.textScale=1;
+    if(DB.settings.edgeBack===undefined) DB.settings.edgeBack=true;
+    if(!DB.settings.haptics) DB.settings.haptics={master:true, swipe:true, delete:true, actions:true};
+    if(DB.settings.haptics.master===undefined) DB.settings.haptics.master=true;
+    if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
+    if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
+    if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -638,8 +649,13 @@ function render(){
 let timerHandle=null;
 function manageTimerLoop(){
   if(timerHandle){ clearInterval(timerHandle); timerHandle=null; }
-  if(TAB==='shifts' && DB.activeShift && !DB.activeShift.pausedAt){
-    timerHandle=setInterval(()=>{ const el=$('#activeTimer'); if(el) el.textContent=fmtDur(activeElapsedMs()); else manageTimerLoop(); }, 1000);
+  if((TAB==='shifts'||TAB==='dash') && DB.activeShift && !DB.activeShift.pausedAt){
+    timerHandle=setInterval(()=>{
+      const el=$('#activeTimer'); const de=$('#dashActiveTimer');
+      if(!el && !de){ manageTimerLoop(); return; }
+      if(el) el.textContent=fmtDur(activeElapsedMs());
+      if(de){ const c=carById(DB.activeShift.carId); de.textContent=(c?c.name+' · ':'')+fmtDur(activeElapsedMs()); }
+    }, 1000);
   }
 }
 function activeElapsedMs(){
@@ -670,6 +686,32 @@ function inPeriod(dateStr){
   return true;
 }
 function shiftIncome(s){ return (s.entries||[]).reduce((a,e)=>a+num(e.amount)+num(e.tips),0); }
+function profitForRange(fromDate, toDate){
+  const inR=d=>d>=fromDate && d<=toDate;
+  const income=DB.shifts.filter(s=>inR(s.date)).reduce((a,s)=>a+shiftIncome(s),0);
+  const exp=DB.expenses.filter(e=>inR(e.date)).reduce((a,e)=>a+num(e.amount),0) + DB.fuel.filter(f=>inR(f.date)).reduce((a,f)=>a+num(f.cost),0);
+  return income-exp;
+}
+function weekCompareHtml(){
+  const now=new Date(today()+'T00:00:00');
+  const d0=new Date(now); d0.setDate(d0.getDate()-6);
+  const thisFrom=toLocalISO(d0), thisTo=today();
+  const d1=new Date(d0); d1.setDate(d1.getDate()-7);
+  const d2=new Date(d0); d2.setDate(d2.getDate()-1);
+  const prevFrom=toLocalISO(d1), prevTo=toLocalISO(d2);
+  const cur=profitForRange(thisFrom,thisTo);
+  const prev=profitForRange(prevFrom,prevTo);
+  if(cur===0 && prev===0) return '';
+  let arrow, color, txt;
+  if(prev===0){
+    arrow='▲'; color='var(--green)'; txt=`${money(cur)} за останні 7 дн. — попередні 7 дн. без записів`;
+  }else{
+    const pct=Math.round((cur-prev)/Math.abs(prev)*100);
+    arrow=pct>=0?'▲':'▼'; color=pct>=0?'var(--green)':'var(--red)';
+    txt=`${pct>=0?'+':''}${pct}% за 7 дн. проти попередніх 7 дн.`;
+  }
+  return `<div class="sub" style="margin-top:5px"><span style="color:${color};font-weight:700">${arrow}</span> ${txt}</div>`;
+}
 function todayIncomeSoFar(){ return DB.shifts.filter(s=>s.date===today()).reduce((a,s)=>a+shiftIncome(s),0); }
 function periodDaysCount(){
   if(PERIOD==='today') return 1;
@@ -810,7 +852,7 @@ function renderDash(){
   if(DB.activeShift){
     const as=DB.activeShift, c=carById(as.carId);
     html+=`<div class="group" style="margin-bottom:14px;cursor:pointer" onclick="setTab('shifts')">
-      <div class="row"><span class="dot g"></span><div class="rtitle"><b>Зміна триває</b><div class="sub">${esc(c?c.name:'')} · ${fmtDur(activeElapsedMs())}</div></div><span class="chev">›</span></div>
+      <div class="row"><span class="dot g" style="${as.pausedAt?'':'animation:pulse 1.4s infinite'}"></span><div class="rtitle"><b>Зміна триває</b><div class="sub" id="dashActiveTimer">${esc(c?c.name:'')} · ${fmtDur(activeElapsedMs())}</div></div><span class="chev">›</span></div>
     </div>`;
   }else{
     html+=`<button class="btn green" style="margin-bottom:14px" onclick="setTab('shifts');openStartShiftForm()">▶ Почати зміну</button>`;
@@ -830,6 +872,7 @@ function renderDash(){
     <div class="lbl">Чистий прибуток</div>
     <div class="big tnum ${profit>=0?'pos':'neg'}">${money(profit)}</div>
     <div class="sub">Дохід ${money(income)} · Витрати ${money(expTotal)}</div>
+    ${weekCompareHtml()}
   </div>`;
 
   if(!isDemo() && (DB.shifts.length>0 || DB.expenses.length>0)){
@@ -1307,7 +1350,7 @@ function swTouchEnd(e){
     const shouldOpen=finalX < -42;
     if(content) content.style.transform='';
     if(swOpenRow && swOpenRow!==swEl) swOpenRow.classList.remove('swopen');
-    if(shouldOpen && !swEl.classList.contains('swopen')) haptic();
+    if(shouldOpen && !swEl.classList.contains('swopen')) haptic('swipe');
     swEl.classList.toggle('swopen', shouldOpen);
     swOpenRow = shouldOpen ? swEl : null;
   }
@@ -1320,6 +1363,51 @@ function swClickGuard(e){
   if(swOpenRow && row===swOpenRow && !e.target.closest('.swipedel')){
     e.preventDefault(); e.stopPropagation();
     swOpenRow.classList.remove('swopen'); swOpenRow=null;
+  }
+}
+/* ===== Edge swipe back (for frameless/buttonless displays) ===== */
+let ebStartX=0, ebStartY=0, ebActive=false, ebMoved=false;
+function edgeBackInit(){
+  if(document.body.dataset.ebBound) return;
+  document.body.dataset.ebBound='1';
+  document.addEventListener('touchstart', ebTouchStart, {passive:true});
+  document.addEventListener('touchmove', ebTouchMove, {passive:false});
+  document.addEventListener('touchend', ebTouchEnd, {passive:true});
+}
+function edgeBackTarget(){
+  if(DB.settings && DB.settings.edgeBack===false) return null;
+  const root=$('#modalRoot');
+  if(!root) return null;
+  const fs=root.querySelector('.fullscreen:not(.closing)');
+  if(!fs) return null;
+  return fs.querySelector('.fstop .fsbtn:not(.right)') || null;
+}
+function ebTouchStart(e){
+  ebActive=false; ebMoved=false;
+  const t=e.touches[0];
+  if(t.clientX>24) return;
+  if(!edgeBackTarget()) return;
+  ebStartX=t.clientX; ebStartY=t.clientY;
+  ebActive=true;
+}
+function ebTouchMove(e){
+  if(!ebActive) return;
+  const t=e.touches[0];
+  const dx=t.clientX-ebStartX, dy=t.clientY-ebStartY;
+  if(!ebMoved && (Math.abs(dx)>10 || Math.abs(dy)>10)){
+    if(Math.abs(dy)>Math.abs(dx)){ ebActive=false; return; }
+    ebMoved=true;
+  }
+  if(ebMoved && dx>0) e.preventDefault();
+}
+function ebTouchEnd(e){
+  if(!ebActive || !ebMoved){ ebActive=false; return; }
+  ebActive=false;
+  const t=e.changedTouches[0];
+  const dx=t.clientX-ebStartX;
+  if(dx>60){
+    const btn=edgeBackTarget();
+    if(btn){ haptic('swipe'); btn.click(); }
   }
 }
 /* ===== Pull-to-refresh (dashboard) ===== */
@@ -1353,7 +1441,7 @@ function ptrTouchMove(e){
     ind.style.transform=`translate(-50%, ${pull-20}px)`;
     ind.textContent = pull>=50 ? '↑' : '↓';
   }
-  if(pull>=50 && !ptrTriggered){ ptrTriggered=true; haptic(); }
+  if(pull>=50 && !ptrTriggered){ ptrTriggered=true; haptic('swipe'); }
   else if(pull<50 && ptrTriggered){ ptrTriggered=false; }
 }
 function ptrTouchEnd(){
@@ -1785,7 +1873,7 @@ function openFinishShiftForm(){
     const endTime=Date.now();
     const s={ id:uid(), date:today(), carId:as.carId, entries:finalEntries, hours, platformHours:computePlatformHours(as,endTime), km, startOdo:as.startOdo, endOdo, startCash:as.startCash||0, startTime:as.startTime, endTime, checkins:as.checkins||[], note:$('#fNote').value.trim(), log:[] };
     const car=carById(s.carId); if(car && endOdo>num(car.odo)) car.odo=endOdo;
-    DB.shifts.push(s); DB.activeShift=null; save(); closeSheet(); render(); manageTimerLoop();
+    DB.shifts.push(s); DB.activeShift=null; save(); haptic('success'); closeSheet(); render(); manageTimerLoop();
   };
 }
 function openManualShiftForm(){
@@ -2099,11 +2187,21 @@ function requestDeleteExpense(id){
 }
 
 /* ============ CARS (list) ============ */
+function carLastActivityDays(c){
+  let last=Infinity;
+  DB.fuel.forEach(f=>{ if(f.carId===c.id){ const d=daysAgo(f.date); if(d<last) last=d; } });
+  DB.shifts.forEach(s=>{ if(s.carId===c.id){ const d=daysAgo(s.date); if(d<last) last=d; } });
+  DB.expenses.forEach(e=>{ if(e.carId===c.id){ const d=daysAgo(e.date); if(d<last) last=d; } });
+  return last;
+}
 function carRowHtml(c){
   const logs=DB.fuel.filter(f=>f.carId===c.id);
   const cons=computeConsumption(c, logs);
+  const lastDays=carLastActivityDays(c);
+  const y=DB.settings.yellowDays, r=DB.settings.redDays;
+  const st = lastDays===Infinity ? '' : (lastDays<=y ? 'g' : (lastDays<=r ? 'y' : 'r'));
   return `<div class="row" onclick="openCarDetail('${c.id}')" style="cursor:pointer">
-    <div class="caravatar">${c.photo?`<img src="${c.photo}">`:'🚗'}</div>
+    <div class="caravatar" style="position:relative">${c.photo?`<img src="${c.photo}">`:'🚗'}${st?`<span class="dot ${st}" style="position:absolute;right:-2px;bottom:-2px;border:2px solid var(--bg-grouped)"></span>`:''}</div>
     <div class="rtitle"><b>${esc(c.name)}${carDisplayPlate(c)?' · '+esc(carDisplayPlate(c)):''}</b><div class="sub">${FUEL_TYPES[c.fuelType]?.label||''} · ${Math.round(c.odo)} км${cons.value!==null?' · '+cons.value.toFixed(1)+' '+fuelUnit(c)+'/100км':''}</div></div>
     <span class="chev">›</span>
   </div>`;
@@ -3018,7 +3116,7 @@ function confirmDelete(title, msg, onConfirm, onCancel){
     onConfirm, onCancel
   });
 }
-function runDelete(){ haptic('warn'); closeSheet(); if(typeof window.__pendingDelete==='function'){ window.__pendingDelete(); window.__pendingDelete=null; } window.__pendingCancel=null; }
+function runDelete(){ haptic('delete'); closeSheet(); if(typeof window.__pendingDelete==='function'){ window.__pendingDelete(); window.__pendingDelete=null; } window.__pendingCancel=null; }
 function runCancel(){ closeSheet(); if(typeof window.__pendingCancel==='function'){ window.__pendingCancel(); } window.__pendingDelete=null; window.__pendingCancel=null; }
 
 /* ============ THEME ============ */
@@ -3237,6 +3335,24 @@ function renderSettingsAppearance(){
       <div class="seg">
         ${TEXT_SCALE_OPTS.map(s=>`<button class="${(+DB.settings.textScale||1)===s?'on':''}" onclick="setTextScale(${s})">${Math.round(s*100)}%</button>`).join('')}
       </div>
+    </div>
+
+    <div class="section-label">Жести та відгук <button type="button" class="infob" onclick="alertSheet('Жести та відгук','Свайп від краю екрана — щоб повертатись назад на телефонах без кнопки «Назад» і без рамки. Тактильний відгук (легка вібрація) можна вимкнути повністю або лише для окремих дій.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Свайп від краю — назад</b><div class="sub">Потягнути від лівого краю екрана, щоб повернутись у попереднє меню</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.edgeBack?'on':''}" style="padding:6px 12px" onclick="DB.settings.edgeBack=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.edgeBack!==false?'on':''}" style="padding:6px 12px" onclick="DB.settings.edgeBack=true;save();openSettings('appearance')">Так</button></div></div>
+    </div>
+    <div class="group" style="margin-top:10px">
+      <div class="row"><div class="rtitle"><b>Тактильний відгук</b><div class="sub">Легка вібрація на дотик. Вимкніть, якщо заважає</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.haptics.master?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.master=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.haptics.master!==false?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.master=true;save();openSettings('appearance')">Так</button></div></div>
+      ${DB.settings.haptics.master!==false?`
+      <div class="row"><div class="rtitle"><b>— на свайпах</b><div class="sub">Відкриття кнопки видалення, pull-to-refresh</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.haptics.swipe?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.swipe=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.haptics.swipe!==false?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.swipe=true;save();openSettings('appearance')">Так</button></div></div>
+      <div class="row"><div class="rtitle"><b>— на видаленні</b><div class="sub">Підтвердження видалення запису</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.haptics.delete?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.delete=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.haptics.delete!==false?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.delete=true;save();openSettings('appearance')">Так</button></div></div>
+      <div class="row"><div class="rtitle"><b>— на діях</b><div class="sub">Завершення зміни та інші важливі дії</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.haptics.actions?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.actions=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.haptics.actions!==false?'on':''}" style="padding:6px 12px" onclick="DB.settings.haptics.actions=true;save();openSettings('appearance')">Так</button></div></div>
+      `:''}
     </div>
 
     <div class="section-label">Статус актуальності даних <button type="button" class="infob" onclick="alertSheet('Статус актуальності даних','Якщо давно не додавали записів по авто (заправка, обслуговування), картка авто підсвічується жовтим чи червоним — щоб не забути оновити дані.')">i</button></div>
@@ -3893,6 +4009,12 @@ function tryApplyBackup(text){
       if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
       if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
       if(DB.settings.textScale===undefined) DB.settings.textScale=1;
+      if(DB.settings.edgeBack===undefined) DB.settings.edgeBack=true;
+      if(!DB.settings.haptics) DB.settings.haptics={master:true, swipe:true, delete:true, actions:true};
+      if(DB.settings.haptics.master===undefined) DB.settings.haptics.master=true;
+      if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
+      if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
+      if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
       if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
       if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
@@ -4146,6 +4268,7 @@ function init(){
   swipeInit();
   dashSwipeInit();
   ptrInit();
+  edgeBackInit();
   scheduleUpdateChecks();
   if(!DB.onboardingDone && !isDemo()) startWizard();
 }
