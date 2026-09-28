@@ -279,6 +279,49 @@ main{max-width:600px; margin:0 auto; padding:14px 16px 130px}
 .activecard .checkins .ci .t{color:rgba(255,255,255,0.5); font-size:11.5px; white-space:nowrap}
 
 @media (min-width:700px){ .tilegrid{grid-template-columns:repeat(4,1fr)} }
+
+/* ===== Smooth / springy polish layer ===== */
+:root{ --spring:cubic-bezier(0.32,0.72,0,1); --spring-bounce:cubic-bezier(0.34,1.56,0.64,1); }
+@media (prefers-reduced-motion:no-preference){
+  body{ animation:appin .3s var(--spring) }
+  @keyframes appin{from{opacity:0} to{opacity:1}}
+  .group,.tile,.hero,.activecard,.opt,.carcard,.ctacard{ transition:background-color .2s ease, box-shadow .2s ease, transform .15s var(--spring-bounce) }
+  .btn,.chip,.seg button,.segscroll button,.fab,.gearbtn,.infob,.iconbtn,.ctabtn,.codechip,.tabbar button,.close,.swipedel,.opt{
+    transition:transform .13s var(--spring-bounce), background-color .15s ease, color .15s ease, opacity .15s ease;
+  }
+  .btn:active,.chip:active,.ctabtn:active,.codechip:active,.fab:active,.iconbtn:active,.infob:active,.close:active,.opt:active{ transform:scale(0.95) }
+  .tabbar button:active{ transform:scale(0.88) }
+  .gearbtn:active{ transform:scale(0.88) rotate(-8deg) }
+  .row[onclick],.swipecontent[onclick],.carcard[onclick],div[onclick].group,.opt{ transition:background-color .15s ease }
+  .row[onclick]:active,.swipecontent[onclick]:active{ background:var(--fill2) }
+  .hero[onclick]:active,.tile[onclick]:active,.activecard[onclick]:active,.carcard[onclick]:active,div[onclick].group:active{ transform:scale(0.97) }
+  body{ transition:background-color .25s ease }
+  .fab{ transition:transform .18s var(--spring-bounce), box-shadow .18s ease }
+  .fab:active{ transform:scale(0.9); box-shadow:0 3px 10px rgba(0,0,0,0.22) }
+  #main{ animation:mainfade .22s var(--spring) }
+  @keyframes mainfade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+}
+/* Sheet: Apple-style spring sheet with fade overlay, animated in and out */
+.overlay{ animation:ovin .2s var(--spring) }
+.overlay.closing{ animation:ovout .18s ease-in forwards }
+@keyframes ovin{from{opacity:0} to{opacity:1}}
+@keyframes ovout{from{opacity:1} to{opacity:0}}
+.overlay.closing .sheet{ animation:sheetdown .18s cubic-bezier(0.36,0,0.66,-0.56) forwards }
+.overlay.center.closing .sheet{ animation:sheetdownc .18s ease-in forwards }
+@keyframes sheetdown{from{transform:translateY(0); opacity:1} to{transform:translateY(40px); opacity:0}}
+@keyframes sheetdownc{from{transform:scale(1); opacity:1} to{transform:scale(0.92); opacity:0}}
+/* Full-screen pages: slide up + fade, and slide down on close */
+.fullscreen{ animation:fsin .26s var(--spring) }
+.fullscreen.closing{ animation:fsout .2s ease-in forwards }
+@keyframes fsin{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)}}
+@keyframes fsout{from{opacity:1; transform:translateY(0)} to{opacity:0; transform:translateY(14px)}}
+/* Rounder "continuous corner" feel for iOS-26-style depth */
+.group,.hero,.tile,.activecard,.opt,.carcard{ border-radius:18px }
+.overlay .sheet{ border-radius:22px 22px 0 0 }
+.overlay.center .sheet{ border-radius:20px }
+.hero,.activecard{ box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08) }
+.tabbar button svg,.tabbar button{ transition:transform .18s var(--spring-bounce), color .15s ease }
+.tabbar button.on svg{ transform:translateY(-1px) scale(1.06) }
 </style>
 
 <div id="app">
@@ -336,7 +379,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.4';
+const APP_VERSION='0.5';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -350,6 +393,7 @@ const DEV_INFO={
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'. */
 const CHANGELOG=[
+  {v:'0.5', date:'28.09.2026 23:45', items:['Новий візуальний стиль у дусі «рідкого скла» iOS: плавні пружинні анімації відкриття/закриття вікон і шторок','Тактильний відгук на дотик — кнопки, картки й рядки списків злегка пружинять при натисканні','Заокругленіші картки та м’якше скло на панелях і плашках','Плавна поява вкладок і плавний перехід між темною/світлою темою та акцентним кольором']},
   {v:'0.4', date:'28.09.2026 23:13', items:['Свайп для видалення зміни чи витрати зі списку','Свайп між періодами на дашборді','Пошук і фільтри в історії витрат і змін','Тренд витрат на обслуговування по місяцях для кожного авто','Повтор останньої зміни та шаблони швидких витрат','Конверт на податки й ЄСВ, річний підсумок','Акцентний колір інтерфейсу','Експорт у CSV та PDF-звіт','Перевірка оновлень застосунку']},
   {v:'0.3', date:'28.09.2026 20:10', items:['Нагадування про сезонне перевзування шин','Орієнтовний розрахунок податків за групою ФОП і ЄСВ у точці беззбитковості','Сторінка про розробника, зв’язок і донат','Посилання на офіційні сайти платформ і сервісів','Порівняння платформ по ₴/год і ₴/км']},
   {v:'0.2', date:'28.09.2026 17:05', items:['Цілі по прибутку та особисті нагадування','Калькулятор «чи вигідне замовлення?»','Швидке додавання через кнопку «+» на будь-якій вкладці','Резервна копія даних (текст/файл)']},
@@ -2813,6 +2857,7 @@ function requestDeleteFuel(id){
 /* ============ SHEETS / MODALS ============ */
 function showSheet(innerHTML, opts={}){
   const center = !!opts.center;
+  const existing=document.getElementById('sheetLayer'); if(existing) existing.remove();
   const wrap=document.createElement('div');
   wrap.id='sheetLayer';
   wrap.innerHTML=`
@@ -2825,7 +2870,16 @@ function showSheet(innerHTML, opts={}){
     </div>`;
   document.body.appendChild(wrap);
 }
-function closeSheet(){ const el=document.getElementById('sheetLayer'); if(el) el.remove(); }
+function closeSheet(){
+  const el=document.getElementById('sheetLayer'); if(!el) return;
+  const overlay=el.querySelector('.overlay');
+  if(overlay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    overlay.classList.add('closing');
+    setTimeout(()=>{ if(el.parentNode) el.remove(); }, 190);
+  }else{
+    el.remove();
+  }
+}
 function alertSheet(title,msg){
   showSheet(`<h3>${esc(title)}</h3><div class="confirm-msg">${esc(msg)}</div><button class="btn ghost" onclick="closeSheet()">Зрозуміло</button>`, {center:true});
 }
@@ -2914,7 +2968,17 @@ function setAccent(hex){
 }
 
 /* ============ SETTINGS (fullscreen) ============ */
-function closeFullscreen(){ $('#modalRoot').innerHTML=''; render(); }
+function closeFullscreen(){
+  const root=$('#modalRoot');
+  const el=root.querySelector('.fullscreen');
+  render();
+  if(el && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    el.classList.add('closing');
+    setTimeout(()=>{ if(root.contains(el)) root.innerHTML=''; }, 190);
+  }else{
+    root.innerHTML='';
+  }
+}
 const FOP_LABELS={none:'Немає ФОП', group2:'2 група', group3:'3 група'};
 const WORK_LABELS={taxi:'Таксі', delivery:'Доставка', both:'Таксі й доставка'};
 function openSettings(){
