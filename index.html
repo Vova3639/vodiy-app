@@ -497,7 +497,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.9';
+const APP_VERSION='0.9.11';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -513,6 +513,8 @@ const DEV_INFO={
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.11', date:'29.09.2026 10:59', items:['У вкладці «Профіль»: кнопка «Усі налаштування» перенесена вище — одразу під швидкими перемикачами, а не в самому низу','Поруч із версією застосунку у «Профілі» — кнопка «Оновити»: перевіряє, чи є нова версія, і одразу пропонує оновитись, якщо є','Контакти майстрів і СТО: додано швидкі кнопки типових спеціалізацій (шиномонтаж, електрик, СТО, кузовний ремонт, мийка, діагностика) — не тільки вільний текст']},
+  {v:'0.9.10', date:'29.09.2026 10:53', items:['Додавання платформи в Налаштування → Платформи: тепер зверху готові кнопки (Uklon, OnTaxi, Glovo, Bolt Food, iPost) — дотик одразу додає платформу з правильним типом і посиланням, а не лише вручну через назву']},
   {v:'0.9.9', date:'29.09.2026 10:20', items:['Ряд швидких кнопок на дашборді («Почати зміну», «Чи вигідне?», «Витрата», «Заправка») тепер акуратною сіткою 2×2 — усі видно одразу, без прокрутки вбік','Нагадування «Ще не робили резервну копію» більше не притискається впритул до плиток статистики нижче','Дотик на нагадування про резервну копію тепер відкриває вибір: зробити копію або приховати нагадування на 7 чи 30 днів — потім воно з’явиться знову']},
   {v:'0.9.8', date:'29.09.2026 10:08', items:['Нова вкладка «Профіль» у нижній панелі — фото та ім’я, швидке редагування типу роботи й ФОП прямо на вкладці, розділ «Знижки та бонуси» з реферальними посиланнями на платформи й сервіси, і кнопка переходу в повні налаштування — не лише через шестерню вгорі']},
   {v:'0.9.7', date:'29.09.2026 07:37', items:['Прибрано моргання індикатора демо-режиму/офлайн — вмикається з невеликою затримкою, а не одразу на кожне коливання з’єднання','Поле суми у формі витрати більше не має різкої синьої рамки й не «стрибає» від автофокусу — власний спокійний стиль полів, клавіатура з’являється лише після дотику','Шторки (вікна знизу) тепер реагують лише на вертикальний свайп — під час заповнення форми вміст не «пливе» вбік','Свайп між періодами тепер працює і в розділі «Витрати», і на вкладках «Заробіток»/«Історія» картки авто — не лише на головному дашборді','Дотик на авто в дашборді (у «По авто», нагадуваннях про шини чи ТО) відкриває невелике віконце з коротким оглядом і кнопками — а не одразу переносить у повний розділ авто; закривається назад тим самим рухом, що й інші шторки','Розділ «По категоріях» у витратах — тепер розкривні рядки: дотик показує кількість записів, частку від загальних витрат, середній чек і останні записи категорії','Мій гараж: перемикач вигляду карток авто — великі банери (як було) або компактний список — і можливість вручну змінити порядок авто стрілками']},
@@ -872,18 +874,20 @@ function renderProfile(){
     </div>
 
     <div class="group">
+      <div class="row" onclick="openSettings()" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('info',17)}</div><div class="rtitle"><b>Усі налаштування</b><div class="sub">Вигляд, цілі, нагадування, дані й ще</div></div><span class="chev">›</span></div>
+    </div>
+
+    <div class="group" style="margin-top:10px">
       <div class="row"><div class="rtitle"><b>Авто в гаражі</b></div><div class="rval tnum">${activeCarsN}${totalCars>activeCarsN?' з '+totalCars:''}</div></div>
-      <div class="row"><div class="rtitle"><b>Версія застосунку</b></div><div class="rval tnum">${esc(APP_VERSION)}${UPDATE_AVAILABLE?' 🎉':''}</div></div>
+      <div class="row"><div class="rtitle"><b>Версія застосунку</b>${UPDATE_AVAILABLE?`<div class="sub" style="color:var(--blue)">Доступна ${esc(UPDATE_AVAILABLE)}</div>`:''}</div>
+        <button type="button" class="infob" style="width:auto;height:24px;padding:0 10px;border-radius:10px;font-size:11.5px;background:${UPDATE_AVAILABLE?'var(--blue)':'var(--fill)'};color:${UPDATE_AVAILABLE?'#fff':'var(--tx2)'}" onclick="event.stopPropagation();checkForUpdate(true)">${UPDATE_AVAILABLE?'Оновити 🎉':esc(APP_VERSION)+' · Оновити'}</button>
+      </div>
     </div>
 
     <div class="section-label">Знижки та бонуси <button type="button" class="infob" onclick="alertSheet('Знижки та бонуси','Реферальні посилання на платформи й сервіси, якими сам користуюсь. Перехід і реєстрація за ними — за бажанням, і зазвичай дає бонус і вам.')">i</button></div>
     <div class="group">
       ${PLATFORM_MASTER.filter(m=>m.url).map(m=>refCardHtml(m.name, m.url, m.refNote, m.refCode)).join('')}
       ${(DB.referralLinks||[]).map(r=>refCardHtml(r.name, r.url, r.note, r.code)).join('')}
-    </div>
-
-    <div class="group" style="margin-top:14px">
-      <div class="row" onclick="openSettings()" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('info',17)}</div><div class="rtitle"><b>Усі налаштування</b><div class="sub">Вигляд, цілі, нагадування, дані й ще</div></div><span class="chev">›</span></div>
     </div>
   `;
   $('#main').innerHTML=html;
@@ -4117,10 +4121,17 @@ function openChangelogSheet(){
   showSheet(`<h3>Історія версій</h3><div style="margin-top:12px">${changelogHtml()}</div>`);
 }
 function openPlatformForm(){
+  const existingIds=new Set(DB.platforms.map(p=>p.id));
+  const presets=PLATFORM_MASTER.filter(m=>!existingIds.has(m.id));
   showSheet(`
     <h3>Нова платформа</h3>
-    <div style="margin-top:14px">
-      <div class="field"><label>Назва</label><input type="text" id="pName" placeholder="напр. Bolt"></div>
+    ${presets.length?`<div class="confirm-msg" style="margin-top:10px">Готові платформи — дотик додає одразу, з правильним типом і посиланням</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px">
+      ${presets.map(m=>`<button type="button" class="chip" onclick="addPresetPlatform('${m.id}')">${esc(m.name)}</button>`).join('')}
+    </div>
+    <div class="section-label" style="margin:0 0 6px">Або своя платформа</div>`:''}
+    <div style="margin-top:${presets.length?'0':'14px'}">
+      <div class="field"><label>Назва</label><input type="text" id="pName" placeholder="напр. Uber"></div>
       <div class="field"><label>Тип</label><div class="seg" id="pGroupSeg"><button class="on" onclick="setPGroup('taxi')">Таксі</button><button onclick="setPGroup('delivery')">Доставка</button></div></div>
       <button class="btn primary" onclick="savePlatform()">Додати платформу</button>
     </div>
@@ -4132,6 +4143,12 @@ function openPlatformForm(){
     if(!name){ alertSheet('Вкажіть назву','Дайте платформі коротку назву.'); return; }
     DB.platforms.push({ id:uid(), name, group:pgroup }); save(); closeSheet(); openSettings('platforms');
   };
+}
+function addPresetPlatform(id){
+  if(DB.platforms.some(p=>p.id===id)){ closeSheet(); openSettings('platforms'); return; }
+  const m=PLATFORM_MASTER.find(x=>x.id===id); if(!m) return;
+  DB.platforms.push({ id:m.id, name:m.name, group:m.group, url:m.url||'' });
+  save(); closeSheet(); openSettings('platforms');
 }
 function setPlatCommission(id,val){ const p=platById(id); if(!p) return; p.commissionPct=num(val)||0; save(); }
 function requestDeletePlatform(id){
@@ -4149,6 +4166,9 @@ function openContactForm(id){
       <div class="field"><label>Ім’я / назва СТО</label><input type="text" id="ctName" placeholder="напр. Сергій, СТО «Швидко»" value="${esc(ct?ct.name:'')}"></div>
       <div class="field"><label>Телефон</label><input type="tel" id="ctPhone" placeholder="+380..." value="${esc(ct?ct.phone||'':'')}"></div>
       <div class="field"><label>Спеціалізація</label><input type="text" id="ctSpec" placeholder="напр. гальма, шиномонтаж, електрика" value="${esc(ct?ct.specialty||'':'')}"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px">
+        ${['Шиномонтаж','Електрик','СТО','Кузовний ремонт','Мийка','Діагностика','Заправка кондиціонера'].map(s=>`<button type="button" class="chip" style="padding:6px 11px;font-size:12.5px" onclick="$('#ctSpec').value='${esc(s)}'">${esc(s)}</button>`).join('')}
+      </div>
       <div class="field"><label>Нотатка</label><textarea id="ctNote" placeholder="адреса, ціни, враження...">${esc(ct?ct.note||'':'')}</textarea></div>
       <button class="btn primary" onclick="saveContact(${id?`'${id}'`:'null'})">Зберегти</button>
       ${ct?`<button class="btn danger" style="margin-top:10px" onclick="requestDeleteContact('${id}')">Видалити контакт</button>`:''}
@@ -4471,10 +4491,11 @@ function checkForUpdate(manual){
       const remote=(data&&data.version)||'';
       if(remote && remote!==APP_VERSION){
         UPDATE_AVAILABLE=remote;
+        if(TAB==='dash') renderDash(); else if(TAB==='profile') renderProfile();
         if(manual) openUpdateChoiceSheet(remote);
-        else if(TAB==='dash') renderDash();
       }else{
         UPDATE_AVAILABLE=null;
+        if(TAB==='profile') renderProfile();
         if(manual) alertSheet('Це остання версія', `У вас встановлена остання версія застосунку (${APP_VERSION}).`);
       }
     })
