@@ -183,9 +183,8 @@ main{max-width:600px; margin:0 auto; padding:14px 16px calc(168px + env(safe-are
 .tile .v{font-size:19px; font-weight:700; margin-top:6px}
 
 /* ===== Quick-action pill row ===== */
-.qarow{display:flex; gap:8px; overflow-x:auto; margin:0 0 14px; padding:1px 1px 3px; -webkit-overflow-scrolling:touch}
-.qarow::-webkit-scrollbar{display:none}
-.qapill{flex:0 0 auto; display:flex; align-items:center; gap:7px; padding:11px 16px; border-radius:20px; border:0; font-weight:600; font-size:13.5px; white-space:nowrap}
+.qarow{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 14px}
+.qapill{display:flex; align-items:center; justify-content:center; gap:6px; padding:11px 10px; border-radius:16px; border:0; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%}
 .qapill.primary{background:var(--blue); color:#fff}
 .qapill.green{background:var(--green); color:#fff}
 .qapill.ghost{background:var(--fill); color:var(--tx)}
@@ -498,7 +497,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.8';
+const APP_VERSION='0.9.9';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -514,6 +513,7 @@ const DEV_INFO={
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.9', date:'29.09.2026 10:20', items:['Ряд швидких кнопок на дашборді («Почати зміну», «Чи вигідне?», «Витрата», «Заправка») тепер акуратною сіткою 2×2 — усі видно одразу, без прокрутки вбік','Нагадування «Ще не робили резервну копію» більше не притискається впритул до плиток статистики нижче','Дотик на нагадування про резервну копію тепер відкриває вибір: зробити копію або приховати нагадування на 7 чи 30 днів — потім воно з’явиться знову']},
   {v:'0.9.8', date:'29.09.2026 10:08', items:['Нова вкладка «Профіль» у нижній панелі — фото та ім’я, швидке редагування типу роботи й ФОП прямо на вкладці, розділ «Знижки та бонуси» з реферальними посиланнями на платформи й сервіси, і кнопка переходу в повні налаштування — не лише через шестерню вгорі']},
   {v:'0.9.7', date:'29.09.2026 07:37', items:['Прибрано моргання індикатора демо-режиму/офлайн — вмикається з невеликою затримкою, а не одразу на кожне коливання з’єднання','Поле суми у формі витрати більше не має різкої синьої рамки й не «стрибає» від автофокусу — власний спокійний стиль полів, клавіатура з’являється лише після дотику','Шторки (вікна знизу) тепер реагують лише на вертикальний свайп — під час заповнення форми вміст не «пливе» вбік','Свайп між періодами тепер працює і в розділі «Витрати», і на вкладках «Заробіток»/«Історія» картки авто — не лише на головному дашборді','Дотик на авто в дашборді (у «По авто», нагадуваннях про шини чи ТО) відкриває невелике віконце з коротким оглядом і кнопками — а не одразу переносить у повний розділ авто; закривається назад тим самим рухом, що й інші шторки','Розділ «По категоріях» у витратах — тепер розкривні рядки: дотик показує кількість записів, частку від загальних витрат, середній чек і останні записи категорії','Мій гараж: перемикач вигляду карток авто — великі банери (як було) або компактний список — і можливість вручну змінити порядок авто стрілками']},
   {v:'0.9.6', date:'29.09.2026 07:16', items:['Вікна знизу (шторки) тепер можна закрити, потягнувши за смужку зверху вниз до кінця — не лише кнопкою «✕»','Виправлено накладання кнопки «+» на останнє нагадування на дашборді, коли записів мало','Виправлено горизонтальне прокручування у формі заправки/зарядки — поля «кВт·год/л» і «Вартість» тепер завжди поміщаються на екрані','Стабілізовано позицію нижньої панелі вкладок, яка могла злегка «пливти»']},
@@ -634,7 +634,7 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner'},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:''},
     contacts:[],
     goals:{daily:0, weekly:0, monthly:0},
     reminders:[],
@@ -666,6 +666,7 @@ function load(){
     if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
     if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
     if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
+    if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -1124,9 +1125,11 @@ function renderDash(){
   if(!isDemo() && (DB.shifts.length>0 || DB.expenses.length>0)){
     const bdays=daysSinceBackup();
     const bThreshold=+DB.settings.autoBackupDays||30;
-    if(bdays===null || bdays>=bThreshold){
-      html+=`<div class="group" style="margin-top:10px;cursor:pointer" onclick="openBackupSheet()">
-        <div class="row"><span class="dot" style="background:var(--orange)"></span><div class="rtitle"><b>${bdays===null?'Ще не робили резервну копію':'Резервна копія '+bdays+' дн. тому'}</b><div class="sub">Дані лише в цьому браузері — збережіть копію, щоб не втратити</div></div><span class="chev">›</span></div>
+    const snoozeUntil=DB.settings.backupReminderSnoozeUntil;
+    const snoozed = snoozeUntil && snoozeUntil>today();
+    if((bdays===null || bdays>=bThreshold) && !snoozed){
+      html+=`<div class="group" style="margin:10px 0 14px;cursor:pointer" onclick="openBackupReminderSheet()">
+        <div class="row"><span class="dot" style="background:var(--orange);margin-top:2px;align-self:flex-start"></span><div class="rtitle"><b>${bdays===null?'Ще не робили резервну копію':'Резервна копія '+bdays+' дн. тому'}</b><div class="sub">Дані лише в цьому браузері — збережіть копію, щоб не втратити</div></div><span class="chev" style="align-self:flex-start;margin-top:1px">›</span></div>
       </div>`;
     }
   }
@@ -4511,6 +4514,26 @@ function setUpdateCheckMinutes(v){
 function reloadForUpdate(){ location.reload(); }
 function markBackupDone(){ DB.lastBackupAt=Date.now(); save(); }
 function daysSinceBackup(){ if(!DB.lastBackupAt) return null; return Math.floor((Date.now()-DB.lastBackupAt)/86400000); }
+function openBackupReminderSheet(){
+  showSheet(`
+    <h3>Резервна копія</h3>
+    <div class="confirm-msg">Дані зберігаються лише в цьому браузері. Резервна копія вбереже їх, якщо зміниться телефон чи очиститься кеш.</div>
+    <div class="group" style="margin-top:12px">
+      <div class="row" onclick="closeSheet();openBackupSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('box',17)}</div><div class="rtitle"><b>Зробити резервну копію</b></div><span class="chev">›</span></div>
+    </div>
+    <div class="section-label" style="margin-top:16px">Приховати нагадування</div>
+    <div class="group">
+      <div class="row" onclick="snoozeBackupReminder(7)" style="cursor:pointer"><div class="rtitle"><b>На 7 днів</b></div></div>
+      <div class="row" onclick="snoozeBackupReminder(30)" style="cursor:pointer"><div class="rtitle"><b>На 30 днів</b></div></div>
+    </div>
+    <button class="btn ghost" style="margin-top:12px" onclick="closeSheet()">Закрити</button>
+  `);
+}
+function snoozeBackupReminder(days){
+  const d=new Date(); d.setDate(d.getDate()+days);
+  DB.settings.backupReminderSnoozeUntil=toLocalISO(d);
+  save(); closeSheet(); render();
+}
 function openBackupSheet(){
   let mode='export';
   const shareOk = (typeof navigator!=='undefined' && !!navigator.share);
@@ -4630,6 +4653,7 @@ function tryApplyBackup(text){
       if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
       if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
       if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
+      if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
       if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
       if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();

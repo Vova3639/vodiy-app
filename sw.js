@@ -1,4 +1,4 @@
-const CACHE = 'vodiy-v18';
+const CACHE = 'vodiy-v19';
 const ASSETS = [
   './',
   './index.html',
