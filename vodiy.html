@@ -484,7 +484,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.30';
+const APP_VERSION='0.9.33';
 const PUSH_WORKER_URL='https://vodiy-push.vova3639.workers.dev';
 const VAPID_PUBLIC_KEY='BPsqd992FWBsMOxbVnU6mv81urUPfACv4HJqJS3aMgtgJ8EjK4vhlHX34GMyhlpi2sqQmJxZexIyaVLYzvGAmGo';
 const PUSH_APP_SECRET='-Ir0ChVhJ90OTvNo6wrdbiTzsJNxkCMR';
@@ -504,6 +504,9 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.33', date:'29.09.2026 18:53', items:['Нова опційна (вимкнена за замовчуванням) детальна статистика для адмінки — дохід, години й платформи, щоб бачити загальну картину по всіх водіях: скільки людей і на яких платформах працюють, середній/найбільший/найменший дохід, що найпопулярніше','За замовчуванням дані анонімні — прив’язані лише до випадкового ідентифікатора пристрою; ім’я можна показати окремо, якщо самі захочете']},
+  {v:'0.9.32', date:'29.09.2026 18:43', items:['Виправлено звук push-сповіщень на Android (вібрація й звук більше не вимикаються за замовчуванням) — плюс підказка в Налаштуваннях, що робити, якщо звуку все одно немає','«Жива» зміна — поки триває зміна, сповіщення періодично оновлюється показуючи, скільки вже минуло часу (без сум і доходу)','GPS-локація на заправці — можна одним дотиком зберегти, де саме заправлялись, і відкрити це на карті пізніше; станції також підтягуються автоматично, якщо назва не вказана вручну','Локація для нотаток і контактів майстрів/СТО — можна прикріпити місце (наприклад, де знаходиться СТО) і потім відкрити на карті','Порівняння цін по заправках тепер показує посилання на карту для кожної станції','Анонімний бенчмарк (необов’язково, вимкнено за замовчуванням) — можна звірити свій ₴/год по платформах із середнім серед інших водіїв, які теж це увімкнули; надсилається лише округлений показник, без дат і сум']},
+  {v:'0.9.31', date:'29.09.2026 17:40', items:['Тижневий підсумок прибутку — коротке сповіщення в неділю ввечері чи понеділок, скільки заробили за останні 7 днів (рахується прямо на телефоні, нічого фінансового нікуди не надсилається)','Нагадування, якщо зміна триває надто довго — типово 10 годин, можна не помітити, що забув завершити','Форма «💡 Ідея чи 🐞 баг» у Профілі тепер надсилає повідомлення напряму розробнику, не виходячи з застосунку','Опитування від розробника — натискання на push-сповіщення з питанням відкриває коротку форму з варіантами відповіді прямо в застосунку','Позначка на версії застосунку, якщо є непереглянута історія оновлень']},
   {v:'0.9.30', date:'29.09.2026 16:15', items:['У Профілі зʼявляється прихована кнопка «Адмінка» — але лише для акаунтів з білого списку адміністраторів, і тільки після успішної синхронізації з Google Диском (застосунок сам, без жодних дій, перевіряє вашу пошту на сервері)']},
   {v:'0.9.29', date:'29.09.2026 16:05', items:['Push-сповіщення від розробника (з адмінки) тепер можуть вести на конкретний розділ застосунку — натиснув сповіщення, і одразу відкрилось потрібне місце, а не просто головний екран']},
   {v:'0.9.28', date:'29.09.2026 15:16', items:['Справжні push-сповіщення про дедлайни — податки, страховку, ТО, кредит і особисті нагадування — тепер приходять навіть коли застосунок закритий, на iPhone (після встановлення на головний екран) і Android','Новий розділ «Сповіщення» в Профілі й Налаштуваннях: вмикається одним перемикачем, є кнопка тестового сповіщення і список того, що саме надсилатиметься','На сервер передаються лише короткі підписи й дати найближчих подій — без сум доходу, витрат чи інших фінансових деталей; вимикається будь-коли']},
@@ -647,6 +650,7 @@ function defaultDB(){
     expenses:[],
     fuel:[],
     settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true, gdriveClientId:'', gdriveLastSyncAt:null, gdriveLastSyncEmail:'', isAdmin:false,
+    lastSeenChangelogVersion:'', weeklySummaryEnabled:true, lastWeeklySummaryWeek:'', shiftReminderHours:10, benchmarkShare:false, statsShare:false, statsShareName:false,
     shareBannerStyle:'minimal', shareBannerOpts:{income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false}},
     contacts:[],
     notes:[],
@@ -687,6 +691,13 @@ function load(){
     if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
     if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
     if(DB.settings.isAdmin===undefined) DB.settings.isAdmin=false;
+    if(DB.settings.lastSeenChangelogVersion===undefined) DB.settings.lastSeenChangelogVersion='';
+    if(DB.settings.weeklySummaryEnabled===undefined) DB.settings.weeklySummaryEnabled=true;
+    if(DB.settings.lastWeeklySummaryWeek===undefined) DB.settings.lastWeeklySummaryWeek='';
+    if(DB.settings.shiftReminderHours===undefined) DB.settings.shiftReminderHours=10;
+    if(DB.settings.benchmarkShare===undefined) DB.settings.benchmarkShare=false;
+    if(DB.settings.statsShare===undefined) DB.settings.statsShare=false;
+    if(DB.settings.statsShareName===undefined) DB.settings.statsShareName=false;
     if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
     if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
     if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
@@ -727,6 +738,32 @@ load();
 /* ============ UTIL ============ */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ GPS: одноразова фіксація точки на місці (заправка, нотатка, контакт) ============
+   Ніякого фонового трекінгу — лише разовий запит координат, поки людина стоїть на
+   місці й заповнює форму. Працює однаково на iOS і Android. */
+function geoCapture(onOk, onErr){
+  if(!('geolocation' in navigator)){ if(onErr) onErr('unsupported'); else alertSheet('Не підтримується','Цей браузер не підтримує визначення локації.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ onOk({lat:+pos.coords.latitude.toFixed(6), lng:+pos.coords.longitude.toFixed(6)}); },
+    err=>{ if(onErr) onErr(err); else alertSheet('Не вдалось визначити локацію','Перевірте дозвіл на геолокацію для застосунку в налаштуваннях телефону.'); },
+    {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
+  );
+}
+function mapUrl(loc){ return loc && loc.lat!=null ? `https://www.google.com/maps?q=${loc.lat},${loc.lng}` : ''; }
+function mapLinkHtml(loc, label){ return loc && loc.lat!=null ? `<a href="${mapUrl(loc)}" target="_blank" rel="noopener" style="color:var(--blue)">${label||'🗺️ Відкрити на карті'}</a>` : ''; }
+// Best-effort: намагається вгадати назву місця за координатами через безкоштовний
+// OpenStreetMap Nominatim. Ніколи не блокує форму — якщо мережа підвела чи нічого
+// не знайшлось, просто повертає null і поле лишається порожнім для ручного вводу.
+async function reverseGeocode(lat,lng){
+  try{
+    const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=17`, {headers:{'Accept':'application/json'}});
+    if(!resp.ok) return null;
+    const data=await resp.json();
+    const a=data.address||{};
+    return a.amenity || a.shop || a.fuel || a.road || data.name || null;
+  }catch(e){ return null; }
+}
 const ICON_PATHS={
   overview:'<path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/>',
   fuel:'<rect x="8" y="4" width="4" height="4" rx="0.6"/><path d="M6 21V8a2 2 0 0 1 2-2h4v15M6 21h6M17 6l2.3 2.3c.4.4.7 1 .7 1.6V17a1.5 1.5 0 0 1-3 0v-2.5h-1" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -926,7 +963,7 @@ function renderProfile(){
 
     <div class="group" style="margin-top:10px">
       <div class="row"><div class="rtitle"><b>Авто в гаражі</b></div><div class="rval tnum">${activeCarsN}${totalCars>activeCarsN?' з '+totalCars:''}</div></div>
-      <div class="row"><div class="rtitle"><b>Версія застосунку</b>${UPDATE_AVAILABLE?`<div class="sub" style="color:var(--blue)">Доступна ${esc(UPDATE_AVAILABLE)}</div>`:''}</div>
+      <div class="row" onclick="openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>Версія застосунку${hasUnseenChangelog()?' <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);vertical-align:middle;margin-left:2px"></span>':''}</b>${UPDATE_AVAILABLE?`<div class="sub" style="color:var(--blue)">Доступна ${esc(UPDATE_AVAILABLE)}</div>`:hasUnseenChangelog()?`<div class="sub">Що нового у v${esc(APP_VERSION)}</div>`:''}</div>
         <button type="button" class="infob" style="width:auto;height:24px;padding:0 10px;border-radius:10px;font-size:11.5px;background:${UPDATE_AVAILABLE?'var(--blue)':'var(--fill)'};color:${UPDATE_AVAILABLE?'#fff':'var(--tx2)'}" onclick="event.stopPropagation();checkForUpdate(true)">${UPDATE_AVAILABLE?'Оновити 🎉':esc(APP_VERSION)+' · Оновити'}</button>
       </div>
     </div>
@@ -956,6 +993,7 @@ function manageTimerLoop(){
       if(!el && !de){ manageTimerLoop(); return; }
       if(el) el.textContent=fmtDur(activeElapsedMs());
       if(de){ const c=carById(DB.activeShift.carId); de.textContent=(c?c.name+' · ':'')+fmtDur(activeElapsedMs()); }
+      maybeCheckShiftReminder();
     }, 1000);
   }
 }
@@ -2119,6 +2157,7 @@ function openStartShiftForm(){
     DB.lastUsed=DB.lastUsed||{}; DB.lastUsed.carId=carId; DB.lastUsed.platformIds=[...sel];
     clearStartDraft();
     save(); closeSheet(); setTab('shifts');
+    startLiveShiftPush(carId);
   };
 }
 function pauseShift(){ if(!DB.activeShift||DB.activeShift.pausedAt) return; DB.activeShift.pausedAt=Date.now(); save(); render(); manageTimerLoop(); }
@@ -2226,7 +2265,7 @@ function openCheckinForm(){
 }
 function requestCancelShift(){
   confirmDelete('Скасувати зміну?', 'Весь час і проміжні записи цієї зміни буде втрачено.', ()=>{
-    DB.activeShift=null; save(); render();
+    DB.activeShift=null; save(); render(); stopLiveShiftPush();
   });
 }
 function openFinishShiftForm(){
@@ -2317,6 +2356,7 @@ function openFinishShiftForm(){
     const car=carById(s.carId); if(car && endOdo>num(car.odo)) car.odo=endOdo;
     const avgBefore=shiftAverageIncome();
     DB.shifts.push(s); DB.activeShift=null; save(); haptic('success'); render(); manageTimerLoop();
+    stopLiveShiftPush(); maybeSubmitBenchmark(s); submitDetailedStats();
     openShiftSavedSheet(s, avgBefore);
   };
 }
@@ -2385,6 +2425,7 @@ function openManualShiftForm(){
     const s={ id:uid(), date:$('#mDate').value||today(), carId:$('#mCar').value, entries:finalEntries, hours:num($('#mHours').value), km, note:$('#mNote').value.trim() };
     const c=carById(s.carId); if(c && km) c.odo=num(c.odo)+km;
     DB.shifts.push(s); save(); closeSheet(); render();
+    maybeSubmitBenchmark(s); submitDetailedStats();
   };
 }
 function openShiftDetail(id){
@@ -3229,14 +3270,15 @@ function openStationPricesSheet(carId){
   const unit=fuelUnit(c);
   const byStation={};
   DB.fuel.filter(f=>f.carId===carId && f.station && num(f.amount)>0).forEach(f=>{
-    const s=byStation[f.station]=byStation[f.station]||{sum:0,n:0,last:0,lastDate:''};
+    const s=byStation[f.station]=byStation[f.station]||{sum:0,n:0,last:0,lastDate:'',geo:null,geoDate:''};
     const price=num(f.cost)/num(f.amount);
     s.sum+=price; s.n++;
     if(f.date>=s.lastDate){ s.lastDate=f.date; s.last=price; }
+    if(f.geo && f.date>=s.geoDate){ s.geoDate=f.date; s.geo=f.geo; }
   });
   const rows=Object.entries(byStation).sort((a,b)=>a[1].last-b[1].last);
   let html=`<h3>Ціни по ${c.fuelType==='ev'?'станціях':'заправках'}</h3><div class="confirm-msg">${esc(c.name)} · середня й остання ціна за ${unit}, від дешевшої до дорожчої</div><div class="group">`;
-  html+= rows.length ? rows.map(([name,s])=>`<div class="row"><div class="rtitle"><b>${esc(name)}</b><div class="sub">${s.n} ${s.n===1?'запис':'записів'} · середня ${(s.sum/s.n).toFixed(2)} ₴</div></div><div class="rval tnum">${s.last.toFixed(2)} ₴</div></div>`).join('') : `<div class="empty">Немає записів зі станцією</div>`;
+  html+= rows.length ? rows.map(([name,s])=>`<div class="row"><div class="rtitle"><b>${esc(name)}</b><div class="sub">${s.n} ${s.n===1?'запис':'записів'} · середня ${(s.sum/s.n).toFixed(2)} ₴${s.geo?` · ${mapLinkHtml(s.geo,'🗺️ карта')}`:''}</div></div><div class="rval tnum">${s.last.toFixed(2)} ₴</div></div>`).join('') : `<div class="empty">Немає записів зі станцією</div>`;
   html+=`</div>`;
   showSheet(html);
 }
@@ -3633,6 +3675,7 @@ async function syncPushItems(subArg){
     const items=collectPushItems();
     await fetch(PUSH_WORKER_URL+'/register', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pushId(), subscription:sub.toJSON(), items }) });
     DB.push.lastSyncAt=Date.now(); save({skipPushSync:true});
+    if(DB.settings.statsShare) submitDetailedStats();
   }catch(e){}
 }
 async function sendTestPush(){
@@ -3646,6 +3689,229 @@ async function sendTestPush(){
     alertSheet('Не вдалось', 'Перевірте інтернет-з’єднання і спробуйте ще раз.');
   }
 }
+
+/* ============ "Жива" зміна (оновлюване push-сповіщення про тривалість) ============
+   Не справжній Live Activity (той доступний лише нативним застосункам) — а
+   заміна: сервер раз на ~15 хв оновлює одне сповіщення з тривалістю зміни.
+   На сервер летить лише час старту й назва авто — жодних сум чи доходу. */
+async function startLiveShiftPush(carId){
+  if(!DB.push || !DB.push.enabled || !DB.push.id) return;
+  try{
+    const c=carById(carId);
+    await fetch(PUSH_WORKER_URL+'/shift/live-start', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pushId(), startTime:Date.now(), carName:c?c.name:'' }) });
+  }catch(e){}
+}
+async function stopLiveShiftPush(){
+  if(!DB.push || !DB.push.id) return;
+  try{
+    await fetch(PUSH_WORKER_URL+'/shift/live-stop', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pushId() }) });
+  }catch(e){}
+}
+
+/* ============ Анонімний бенчмарк заробітку (₴/год по платформах) ============
+   Суворо опційно (вимкнено за замовчуванням, Налаштування → Дані й звітність).
+   На сервер летить лише округлене ₴/год і анонімний ідентифікатор пристрою —
+   без дат, сум доходу чи витрат. */
+async function maybeSubmitBenchmark(shift){
+  try{
+    if(!DB.settings.benchmarkShare) return;
+    if(isPersonalMode() || isDemo()) return;
+    const hours=num(shift.hours);
+    if(hours<=0) return;
+    const byPlat={};
+    (shift.entries||[]).forEach(e=>{ if(!e.platformId) return; byPlat[e.platformId]=(byPlat[e.platformId]||0)+num(e.amount)+num(e.tips); });
+    const ids=Object.keys(byPlat);
+    if(!ids.length) return;
+    for(const pid of ids){
+      const rate=Math.round(byPlat[pid]/hours);
+      if(rate<=0 || rate>5000) continue;
+      fetch(PUSH_WORKER_URL+'/benchmark/submit', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ platformId:pid, uahPerHour:rate }) }).catch(()=>{});
+    }
+  }catch(e){}
+}
+async function fetchBenchmark(platformId){
+  try{
+    const resp=await fetch(PUSH_WORKER_URL+'/benchmark/get', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ platformId }) });
+    return await resp.json();
+  }catch(e){ return null; }
+}
+function openBenchmarkSheet(){
+  const byPlat={};
+  DB.shifts.forEach(s=>{ const h=num(s.hours); if(h<=0) return; (s.entries||[]).forEach(e=>{ if(!e.platformId) return; byPlat[e.platformId]=byPlat[e.platformId]||{amt:0,hrs:0}; byPlat[e.platformId].amt+=num(e.amount)+num(e.tips); byPlat[e.platformId].hrs+=h/( (s.entries||[]).filter(x=>x.platformId).length||1); }); });
+  const ids=Object.keys(byPlat);
+  if(!ids.length){ alertSheet('Замало даних','Спершу внесіть кілька змін із годинами й платформами.'); return; }
+  showSheet(`<h3>Порівняти з іншими водіями</h3><div class="confirm-msg">Анонімний середній ₴/год серед водіїв, які теж увімкнули цю функцію (Налаштування → Дані й звітність).</div><div class="group" id="benchWrap" style="margin-top:10px">${ids.map(pid=>{ const p=platById(pid); return `<div class="row"><div class="rtitle"><b>${esc(p?p.name:'Платформа')}</b><div class="sub tnum">Ваш ₴/год: ${money(Math.round(byPlat[pid].amt/byPlat[pid].hrs))}</div></div><div class="rval tnum" id="bench-${pid}">…</div></div>`; }).join('')}</div>`);
+  ids.forEach(async pid=>{
+    const data=await fetchBenchmark(pid);
+    const el=$('#bench-'+pid); if(!el) return;
+    if(!data || !data.ok){ el.textContent='—'; return; }
+    if(!data.enough){ el.textContent='замало даних'; el.style.fontSize='12px'; return; }
+    el.innerHTML=`Середнє: ${money(data.avg)}`;
+  });
+}
+
+// Детальна анонімна (за замовчуванням) статистика для адмінки — окрема, явно опційна
+// функція (Налаштування → Дані й звітність), вимкнена за замовчуванням. На відміну від
+// нагадувань про дедлайни, тут навмисно надсилаються справжні суми доходу — але лише якщо
+// людина сама це увімкнула, і лише прив'язано до анонімного ідентифікатора пристрою, без
+// імені, якщо вона окремо не погодилась ділитись і ним.
+function collectDetailedStats(){
+  const byPlat={};
+  let totalIncome=0, totalHours=0;
+  DB.shifts.forEach(s=>{
+    const h=num(s.hours);
+    totalHours+=h;
+    const usedPlat=new Set();
+    (s.entries||[]).forEach(e=>{
+      const amt=num(e.amount)+num(e.tips);
+      totalIncome+=amt;
+      if(e.platformId){
+        byPlat[e.platformId]=byPlat[e.platformId]||{income:0,shifts:0};
+        byPlat[e.platformId].income+=amt;
+        usedPlat.add(e.platformId);
+      }
+    });
+    usedPlat.forEach(pid=>{ byPlat[pid].shifts++; });
+  });
+  const platforms=Object.entries(byPlat).map(([pid,v])=>{
+    const p=platById(pid);
+    return { name:(p?p.name:'Інше').slice(0,40), income:Math.round(v.income), shifts:v.shifts };
+  });
+  return {
+    totalIncome:Math.round(totalIncome),
+    totalHours:Math.round(totalHours*10)/10,
+    totalShifts:DB.shifts.length,
+    carsCount:activeCars().length,
+    platforms
+  };
+}
+async function submitDetailedStats(){
+  if(!DB.settings.statsShare) return;
+  if(isPersonalMode() || isDemo()) return;
+  try{
+    const stats=collectDetailedStats();
+    const name = DB.settings.statsShareName ? (DB.profile.name||'').trim().slice(0,40) : '';
+    await fetch(PUSH_WORKER_URL+'/stats/submit', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pushId(), name, ...stats }) });
+  }catch(e){}
+}
+async function clearDetailedStats(){
+  try{
+    await fetch(PUSH_WORKER_URL+'/stats/clear', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pushId() }) });
+  }catch(e){}
+}
+
+/* ============ Локальні сповіщення: тижневий підсумок і "заверши зміну" ============
+   Обидва рахуються повністю на пристрої й ніколи не летять на сервер — це просто
+   showNotification() через service worker, коли застосунок відкрито. */
+function isoWeekKey(d){
+  const dt=new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day=(dt.getUTCDay()+6)%7; // 0=понеділок
+  dt.setUTCDate(dt.getUTCDate()-day+3);
+  const firstThu=new Date(Date.UTC(dt.getUTCFullYear(),0,4));
+  const week=1+Math.round(((dt-firstThu)/86400000-3+((firstThu.getUTCDay()+6)%7))/7);
+  return dt.getUTCFullYear()+'-W'+String(week).padStart(2,'0');
+}
+async function localNotify(title, body, tag){
+  try{
+    if(!('Notification' in window) || Notification.permission!=='granted') return false;
+    if(!('serviceWorker' in navigator)) return false;
+    const reg=await navigator.serviceWorker.ready;
+    await reg.showNotification(title, { body, icon:'./icon-192.png', badge:'./icon-32.png', tag: tag||'vodiy-local' });
+    return true;
+  }catch(e){ return false; }
+}
+async function maybeShowWeeklySummary(){
+  if(isPersonalMode() || isDemo()) return;
+  if(DB.settings.weeklySummaryEnabled===false) return;
+  const now=new Date();
+  // Показуємо в неділю ввечері (від 18:00) чи будь-коли пізніше, і лише раз на тиждень.
+  const wk=isoWeekKey(now);
+  if(DB.settings.lastWeeklySummaryWeek===wk) return;
+  const isSunEvening = now.getDay()===0 && now.getHours()>=18;
+  const isMonday = now.getDay()===1;
+  if(!isSunEvening && !isMonday) return;
+  // Підсумок за останні 7 днів, що завершились сьогодні.
+  const to=today(); const d0=new Date(now); d0.setDate(d0.getDate()-6);
+  const from=toLocalISO(d0);
+  const profit=profitForRange(from,to);
+  const shiftsN=DB.shifts.filter(s=>s.date>=from && s.date<=to).length;
+  if(!shiftsN) return; // нема чим підсумовувати
+  const ok=await localNotify('Підсумок тижня', `За останні 7 днів: ${money(profit)}, ${shiftsN} ${shiftsN===1?'зміна':'змін'}. Тисни, щоб переглянути.`, 'vodiy-weekly');
+  if(ok){ DB.settings.lastWeeklySummaryWeek=wk; save({skipPushSync:true}); }
+}
+function maybeCheckShiftReminder(){
+  const as=DB.activeShift; if(!as || as.pausedAt) return;
+  const hours=DB.settings.shiftReminderHours||10;
+  if(as.reminderShownAt) return;
+  const elapsedH=activeElapsedMs()/3600000;
+  if(elapsedH>=hours){
+    as.reminderShownAt=Date.now(); save({skipPushSync:true});
+    localNotify('Довга зміна', `Зміна триває вже понад ${hours} год. Не забудь завершити її, якщо вже закінчив.`, 'vodiy-shift-long');
+  }
+}
+
+/* ============ Зворотний зв'язок розробнику (через Cloudflare Worker → Telegram) ============ */
+function openFeedbackForm(){
+  showSheet(`
+    <h3>💡 Ідея чи 🐞 баг</h3>
+    <div class="confirm-msg">Напишіть, що покращити або що не працює — повідомлення піде напряму розробнику.</div>
+    <div style="margin-top:14px">
+      <div class="field"><label>Повідомлення</label><textarea id="fbText" placeholder="Опишіть ідею чи проблему..." maxlength="1000"></textarea></div>
+      <div class="field"><label>Як з вами зв'язатись (необов'язково)</label><input type="text" id="fbContact" placeholder="телефон, telegram чи пошта" maxlength="200"></div>
+      <button class="btn primary" id="fbSendBtn" onclick="submitFeedback()">Надіслати</button>
+      ${DEV_INFO.feedbackUrl?`<a href="${esc(DEV_INFO.feedbackUrl)}" target="_blank" rel="noopener" class="btn ghost" style="display:block;text-align:center;margin-top:10px;text-decoration:none">Або написати напряму →</a>`:''}
+    </div>
+  `);
+}
+async function submitFeedback(){
+  const text=($('#fbText').value||'').trim();
+  if(!text){ alertSheet('Порожнє повідомлення','Напишіть хоч кілька слів.'); return; }
+  const contact=($('#fbContact').value||'').trim();
+  const btn=$('#fbSendBtn'); if(btn){ btn.disabled=true; btn.textContent='Надсилаємо…'; }
+  try{
+    const resp=await fetch(PUSH_WORKER_URL+'/feedback', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ text, contact }) });
+    const data=await resp.json().catch(()=>({}));
+    if(data && data.ok){
+      closeSheet();
+      showSheet(`<h3>Дякую! 🙏</h3><div class="confirm-msg">Повідомлення надіслано розробнику.</div><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Закрити</button>`, {center:true});
+    }else{
+      if(btn){ btn.disabled=false; btn.textContent='Надіслати'; }
+      alertSheet('Не вдалось надіслати','Перевірте інтернет-з’єднання і спробуйте ще раз.');
+    }
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Надіслати'; }
+    alertSheet('Не вдалось надіслати','Перевірте інтернет-з’єднання і спробуйте ще раз.');
+  }
+}
+
+/* ============ Опитування від адмінки (через push-сповіщення) ============ */
+async function openPollSheet(pollId){
+  showSheet(`<h3>Опитування</h3><div class="confirm-msg" id="pollBody">Завантаження…</div>`, {center:true});
+  try{
+    const resp=await fetch(PUSH_WORKER_URL+'/poll/get', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ id:pollId }) });
+    const data=await resp.json().catch(()=>({}));
+    if(!data || !data.ok){ const b=$('#pollBody'); if(b) b.textContent='Опитування вже недоступне.'; return; }
+    const box=document.querySelector('#sheetLayer .sheetbody');
+    if(!box) return;
+    box.innerHTML=`<h3>${esc(data.question)}</h3><div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      ${data.options.map((o,i)=>`<button class="btn ghost" onclick="votePoll('${pollId}',${i})">${esc(o)}</button>`).join('')}
+    </div>`;
+  }catch(e){
+    const b=$('#pollBody'); if(b) b.textContent='Не вдалось завантажити опитування.';
+  }
+}
+async function votePoll(pollId, optionIndex){
+  try{
+    const resp=await fetch(PUSH_WORKER_URL+'/poll/vote', { method:'POST', headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET}, body:JSON.stringify({ pollId, deviceId:pushId(), optionIndex }) });
+    const data=await resp.json().catch(()=>({}));
+    const box=document.querySelector('#sheetLayer .sheetbody');
+    if(box) box.innerHTML = (data && data.ok) ? `<h3>Дякую! 🙏</h3><div class="confirm-msg">${data.already?'Ви вже відповідали на це опитування.':'Вашу відповідь враховано.'}</div><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Закрити</button>` : `<h3>Не вдалось</h3><div class="confirm-msg">Спробуйте ще раз пізніше.</div><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Закрити</button>`;
+  }catch(e){
+    const box=document.querySelector('#sheetLayer .sheetbody');
+    if(box) box.innerHTML=`<h3>Не вдалось</h3><div class="confirm-msg">Перевірте інтернет-з’єднання.</div><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Закрити</button>`;
+  }
+}
+
 function loanMonthlyEquivalent(c){
   const loan=c.loan; if(!loan) return 0;
   const type=loan.scheduleType||'monthly';
@@ -4102,7 +4368,9 @@ function openFuelForm(carId){
         <div class="amtfield sm"><label>Вартість</label><div class="amtwrap"><input type="number" inputmode="decimal" step="0.01" id="fCost" placeholder="0" oninput="updFuelPrice()"><span class="cur">₴</span></div></div>
       </div>
       <div class="sub" id="fPriceHint" style="margin:-6px 0 10px"></div>
-      <div class="field"><label>${isEv?'Станція / точка зарядки':'АЗС'} (необов'язково)</label><input type="text" id="fStation" list="fStationList" placeholder="напр. ${isEv?'Укренерго, дім':'WOG, OKKO'}"><datalist id="fStationList">${fuelStationsFor(c).map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div>
+      <div class="field"><label>${isEv?'Станція / точка зарядки':'АЗС'} (необов'язково)</label><input type="text" id="fStation" list="fStationList" placeholder="напр. ${isEv?'Укренерго, дім':'WOG, OKKO'}"><datalist id="fStationList">${fuelStationsFor(c).map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+        <div style="margin-top:6px"><button type="button" class="infob" style="width:auto;height:26px;padding:0 10px;border-radius:13px;font-size:12px" onclick="captureFuelLocation()">📍 Моя локація зараз</button> <span class="sub" id="fLocStatus"></span></div>
+      </div>
       <div class="field"><label>${isEv?'Повна зарядка':'Повний бак'}</label><div class="seg" id="fFullSeg">
         <button class="on" onclick="setFull(true)">Так</button><button onclick="setFull(false)">Часткова</button>
       </div></div>
@@ -4112,7 +4380,7 @@ function openFuelForm(carId){
       <button class="btn primary" onclick="saveFuel('${carId}')">Зберегти</button>
     </div>
   `);
-  let full=true, loc='home';
+  let full=true, loc='home', fuelGeo=null;
   window.setFull=(v)=>{ full=v; $('#fFullSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',(i===0)===v)); };
   window.setLoc=(v)=>{ loc=v; $('#fLocSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',(i===0)===(v==='home'))); };
   window.updFuelPrice=()=>{
@@ -4120,11 +4388,21 @@ function openFuelForm(carId){
     const hint=$('#fPriceHint'); if(!hint) return;
     hint.textContent = (amount>0 && cost>0) ? `${(cost/amount).toFixed(2)} ₴ за ${isEv?'кВт·год':'л'}` : '';
   };
+  window.captureFuelLocation=()=>{
+    const st=$('#fLocStatus'); if(st) st.textContent='визначаємо…';
+    geoCapture(g=>{
+      fuelGeo=g;
+      if(st) st.textContent='📍 Локацію збережено';
+      if(!$('#fStation').value.trim()){
+        reverseGeocode(g.lat,g.lng).then(name=>{ if(name && !$('#fStation').value.trim()) $('#fStation').value=name; });
+      }
+    }, ()=>{ if(st) st.textContent='не вдалось визначити'; });
+  };
   window.saveFuel=(carId)=>{
     const amount=num($('#fAmount').value), cost=num($('#fCost').value);
     if(amount<=0){ alertSheet('Вкажіть кількість', isEv?'Введіть кВт·год.':'Введіть кількість палива.'); return; }
     const odo=num($('#fOdo').value);
-    DB.fuel.push({ id:uid(), carId, date:$('#fDate').value||today(), odo, amount, cost, full, location: isEv?loc:'', station:$('#fStation').value.trim() });
+    DB.fuel.push({ id:uid(), carId, date:$('#fDate').value||today(), odo, amount, cost, full, location: isEv?loc:'', station:$('#fStation').value.trim(), geo:fuelGeo });
     const car=carById(carId); if(car && odo>num(car.odo)) car.odo=odo;
     save(); closeSheet();
     if($('#modalRoot').innerHTML.indexOf('fullscreen')===-1) render(); else renderCarDetail(carId);
@@ -4141,6 +4419,7 @@ function openFuelDetail(id){
       <div class="row"><div class="rtitle"><b>${isEv?'Енергія з рахунку':'Об’єм'}</b></div><div class="rval tnum">${num(f.amount)} ${c?fuelUnit(c):'л'}</div></div>
       <div class="row"><div class="rtitle"><b>Вартість</b></div><div class="rval tnum neg">${money(f.cost)}</div></div>
       ${num(f.amount)>0?`<div class="row"><div class="rtitle"><b>Ціна за ${isEv?'кВт·год':'л'}</b></div><div class="rval tnum">${(num(f.cost)/num(f.amount)).toFixed(2)} ₴</div></div>`:''}
+      ${f.geo?`<div class="row"><div class="rtitle"><b>Локація</b></div><div class="rval">${mapLinkHtml(f.geo)}</div></div>`:''}
     </div>
     ${isEv?(()=>{ const loss = f.location==='public'?evPublicLoss(c):evHomeLoss(c); const actual=chargeActualKwh(c,f); const pctBat = c.batteryCapacity>0 ? (actual/num(c.batteryCapacity)*100) : null;
       return `<div class="group" style="margin-top:10px">
@@ -4679,6 +4958,25 @@ function renderSettingsGoals(){
   `;
   settingsPage('Цілі по прибутку', body);
 }
+function openAndroidSoundHelp(){
+  showSheet(`
+    <h3>Немає звуку на Android?</h3>
+    <div class="confirm-msg">Застосунок вмикає звук і вібрацію для кожного сповіщення, але Android дозволяє користувачу вимкнути це для окремого сайту через системний канал сповіщень. Якщо на вашому телефоні сповіщення приходять без звуку:</div>
+    <div class="group" style="margin-top:12px">
+      <div class="row"><div class="rtitle">1. Відкрийте Налаштування телефону → Застосунки → ${installedBrowserNameGuess()} (або Chrome)</div></div>
+      <div class="row"><div class="rtitle">2. Знайдіть «Сповіщення сайтів» → «Водій» (або адресу vova3639.github.io)</div></div>
+      <div class="row"><div class="rtitle">3. Переконайтесь, що канал не в режимі «Без звуку» — і що звук та вібрація увімкнені</div></div>
+    </div>
+    <div class="confirm-msg" style="margin-top:12px">Кастомний звук на кшталт «пілінь», як на iPhone, поставити з боку сайту технічно неможливо — це системне обмеження Web Push на всіх платформах.</div>
+  `);
+}
+function installedBrowserNameGuess(){
+  const ua=navigator.userAgent||'';
+  if(/SamsungBrowser/i.test(ua)) return 'Samsung Internet';
+  if(/Firefox/i.test(ua)) return 'Firefox';
+  if(/Edg\//i.test(ua)) return 'Edge';
+  return 'Chrome';
+}
 function renderSettingsNotifications(){
   const perm=('Notification' in window) ? Notification.permission : 'unsupported';
   const installed=isPwaInstalled();
@@ -4692,6 +4990,7 @@ function renderSettingsNotifications(){
         <div class="seg" style="width:auto"><button class="${!enabled?'on':''}" style="padding:6px 12px" onclick="disablePush()">Ні</button><button class="${enabled?'on':''}" style="padding:6px 12px" onclick="enablePush()">Так</button></div></div>
       ${!installed?`<div class="row"><div class="rtitle"><span class="sub">📱 На iPhone спершу встановіть застосунок на головний екран (кнопка «Поділитись» → «На екран Додому») — без цього сповіщення від Safari не працюють.</span></div></div>`:''}
       ${enabled?`<div class="row" onclick="sendTestPush()" style="cursor:pointer"><div class="rtitle"><b>Надіслати тестове сповіщення</b>${DB.push.lastSyncAt?`<div class="sub">Синхронізовано ${new Date(DB.push.lastSyncAt).toLocaleString('uk-UA')}</div>`:`<div class="sub">Ще не синхронізовано</div>`}</div><span class="chev">›</span></div>`:''}
+      ${enabled?`<div class="row" onclick="openAndroidSoundHelp()" style="cursor:pointer"><div class="rtitle"><b>Сповіщення без звуку на Android?</b><div class="sub">Як увімкнути звук і вібрацію</div></div><span class="chev">›</span></div>`:''}
     </div>
     ${enabled?`<div class="section-label" style="margin-top:16px">Що надсилатиметься (${items.length})</div><div class="group">${items.length?items.slice(0,10).map(it=>`<div class="row"><div class="rtitle"><b>${esc(it.label)}</b><div class="sub">${dueBadge(daysUntil(it.date))}</div></div></div>`).join(''):`<div class="empty">Поки немає найближчих дедлайнів</div>`}</div>`:''}
   `;
@@ -4740,7 +5039,7 @@ function renderSettingsContacts(){
   const body=`
     <div class="section-label">Контакти майстрів і СТО <button type="button" class="infob" onclick="alertSheet('Контакти майстрів і СТО','Зберігайте, хто обслуговує ваші авто — майстер, СТО, шиномонтаж. Коли відмічаєте роботу виконаною у вкладці «Обслуговування» авто, можна одразу вказати, хто її зробив — це збережеться в історії авто.')">i</button></div>
     <div class="group">
-      ${DB.contacts.length ? DB.contacts.map(ct=>`<div class="row" onclick="openContactForm('${ct.id}')" style="cursor:pointer"><div class="rtitle"><b>${esc(ct.name)}</b><div class="sub">${[ct.specialty,ct.phone].filter(Boolean).map(esc).join(' · ')}</div></div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає контактів</div>`}
+      ${DB.contacts.length ? DB.contacts.map(ct=>`<div class="row" onclick="openContactForm('${ct.id}')" style="cursor:pointer"><div class="rtitle"><b>${esc(ct.name)}</b><div class="sub">${[ct.specialty,ct.phone,ct.geo?'📍':''].filter(Boolean).map(esc).join(' · ')}</div></div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає контактів</div>`}
       <div class="row" onclick="openContactForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати контакт</span></div>
     </div>
   `;
@@ -4752,16 +5051,18 @@ function renderSettingsNotes(){
   const body=`
     <div class="section-label">Нотатки <button type="button" class="infob" onclick="alertSheet('Нотатки','Вільні нотатки — клієнти, адреси, ідеї, чорний список чи будь-що інше, що зручно тримати під рукою. Тег можна обрати з готових або написати свій.')">i</button></div>
     <div class="group">
-      ${notes.length ? notes.map(n=>`<div class="row" onclick="openNoteForm('${n.id}')" style="cursor:pointer">${n.tag==='Чорний список'?`<span class="dot" style="background:var(--red)"></span>`:''}<div class="rtitle"><b>${esc(n.text.slice(0,60))}${n.text.length>60?'…':''}</b>${n.tag?`<div class="sub">${esc(n.tag)}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нотаток</div>`}
+      ${notes.length ? notes.map(n=>`<div class="row" onclick="openNoteForm('${n.id}')" style="cursor:pointer">${n.tag==='Чорний список'?`<span class="dot" style="background:var(--red)"></span>`:''}<div class="rtitle"><b>${esc(n.text.slice(0,60))}${n.text.length>60?'…':''}</b>${n.tag||n.geo?`<div class="sub">${[esc(n.tag||''),n.geo?'📍':''].filter(Boolean).join(' · ')}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нотаток</div>`}
       <div class="row" onclick="openNoteForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нотатку</span></div>
     </div>
   `;
   settingsPage('Нотатки', body);
 }
 function noteById(id){ return (DB.notes||[]).find(x=>x.id===id); }
+let noteGeo=null;
 function openNoteForm(id){
   const n = id ? noteById(id) : null;
   let tag = n ? (n.tag||'') : '';
+  noteGeo = n ? (n.geo||null) : null;
   showSheet(`
     <h3>${n?'Редагувати нотатку':'Нова нотатка'}</h3>
     <div style="margin-top:14px">
@@ -4770,15 +5071,24 @@ function openNoteForm(id){
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px">
         ${NOTE_TAG_PRESETS.map(t=>`<button type="button" class="chip ${tag===t?'on':''}" onclick="$('#ntTag').value='${esc(t)}'">${esc(t)}</button>`).join('')}
       </div>
+      <div style="margin:-6px 0 14px">
+        <button type="button" class="infob" style="width:auto;height:26px;padding:0 10px;border-radius:13px;font-size:12px" onclick="captureNoteLocation()">📍 Прикріпити локацію</button>
+        <span class="sub" id="ntLocStatus">${noteGeo?'📍 Локацію збережено':''}</span>
+        ${noteGeo?`<div style="margin-top:4px">${mapLinkHtml(noteGeo)}</div>`:''}
+      </div>
       <button class="btn primary" onclick="saveNote(${id?`'${id}'`:'null'})">Зберегти</button>
       ${n?`<button class="btn danger" style="margin-top:10px" onclick="requestDeleteNote('${id}')">Видалити нотатку</button>`:''}
     </div>
   `);
 }
+window.captureNoteLocation=()=>{
+  const st=$('#ntLocStatus'); if(st) st.textContent='визначаємо…';
+  geoCapture(g=>{ noteGeo=g; if(st) st.textContent='📍 Локацію збережено'; }, ()=>{ if(st) st.textContent='не вдалось визначити'; });
+};
 function saveNote(id){
   const text=$('#ntText').value.trim();
   if(!text){ alertSheet('Порожня нотатка','Напишіть хоч щось — інакше нема що зберігати.'); return; }
-  const data={ text, tag:$('#ntTag').value.trim() };
+  const data={ text, tag:$('#ntTag').value.trim(), geo:noteGeo };
   DB.notes=DB.notes||[];
   if(id){ const n=noteById(id); if(n) Object.assign(n, data); }
   else DB.notes.push({ id:uid(), createdAt:Date.now(), ...data });
@@ -4816,6 +5126,19 @@ function renderSettingsData(){
       <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
     </div>
+    <div class="section-label">Анонімний бенчмарк <button type="button" class="infob" onclick="alertSheet('Анонімний бенчмарк','Якщо увімкнено, після кожної збереженої зміни на сервер надсилається лише округлене ₴/год по кожній платформі й анонімний ідентифікатор пристрою — без дат, сум доходу чи витрат, без прив’язки до вас особисто. За це можна побачити середній ₴/год серед інших водіїв, які теж це увімкнули.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Ділитись анонімною статистикою</b><div class="sub">Лише ₴/год по платформах, без сум і дат</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.benchmarkShare?'on':''}" style="padding:6px 12px" onclick="DB.settings.benchmarkShare=false;save();openSettings('data')">Ні</button><button class="${DB.settings.benchmarkShare?'on':''}" style="padding:6px 12px" onclick="DB.settings.benchmarkShare=true;save();openSettings('data')">Так</button></div></div>
+      <div class="row" onclick="openBenchmarkSheet()" style="cursor:pointer"><div class="rtitle"><b>Порівняти з іншими водіями</b></div><span class="chev">›</span></div>
+    </div>
+    <div class="section-label">Детальна статистика для адмінки <button type="button" class="infob" onclick="alertSheet('Детальна статистика','Якщо увімкнено, під час звичайної синхронізації на сервер надсилається ваш загальний дохід, кількість змін і годин, дохід по кожній платформі та кількість авто — щоб адмінка бачила загальну картину: скільки людей і на яких платформах працюють, який середній/найбільший/найменший дохід, що найпопулярніше. За замовчуванням це анонімно — прив’язано лише до випадкового ідентифікатора пристрою, без імені. Ім’я можна показати окремо, якщо хочете. Вимкнути можна будь-коли — попередньо надіслані дані видаляться з сервера.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Ділитись статистикою</b><div class="sub">Дохід, години, платформи — анонімно</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.statsShare?'on':''}" style="padding:6px 12px" onclick="DB.settings.statsShare=false;save();clearDetailedStats();openSettings('data')">Ні</button><button class="${DB.settings.statsShare?'on':''}" style="padding:6px 12px" onclick="DB.settings.statsShare=true;save();submitDetailedStats();openSettings('data')">Так</button></div></div>
+      ${DB.settings.statsShare?`<div class="row"><div class="rtitle"><b>Показувати моє ім’я</b><div class="sub">Інакше — анонімно, лише за пристроєм</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.statsShareName?'on':''}" style="padding:6px 12px" onclick="DB.settings.statsShareName=false;save();submitDetailedStats();openSettings('data')">Ні</button><button class="${DB.settings.statsShareName?'on':''}" style="padding:6px 12px" onclick="DB.settings.statsShareName=true;save();submitDetailedStats();openSettings('data')">Так</button></div></div>`:''}
+    </div>
     <div class="group" style="margin-top:10px">
       <div class="row" onclick="requestClearAll()" style="cursor:pointer"><div class="rtitle"><b style="color:var(--red)">Очистити всі дані</b><div class="sub">Незворотно видаляє все з цього телефону</div></div><span class="chev">›</span></div>
     </div>
@@ -4826,7 +5149,7 @@ function renderSettingsAbout(){
   const body=`
     <div class="section-label">Про застосунок</div>
     <div class="group">
-      <div class="row" onclick="openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>Версія</b><div class="sub">Історія оновлень</div></div><div class="rval">${APP_VERSION}${UPDATE_AVAILABLE?' <span style="color:var(--blue)">→ '+esc(UPDATE_AVAILABLE)+' є</span>':''}</div><span class="chev">›</span></div>
+      <div class="row" onclick="openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>Версія${hasUnseenChangelog()?' <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);vertical-align:middle;margin-left:2px"></span>':''}</b><div class="sub">Історія оновлень</div></div><div class="rval">${APP_VERSION}${UPDATE_AVAILABLE?' <span style="color:var(--blue)">→ '+esc(UPDATE_AVAILABLE)+' є</span>':''}</div><span class="chev">›</span></div>
       <div class="row"><div class="rtitle"><b>Де живуть дані</b><div class="sub">Лише в пам'яті цього браузера. Хмарної синхронізації ще немає — не очищайте дані сайту.</div></div></div>
       <div class="row" onclick="openInstallGuide()" style="cursor:pointer"><div class="rtitle"><b>📲 Встановити на головний екран</b><div class="sub">Щоб відкривався як окремий застосунок</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openDeveloperPage(true)" style="cursor:pointer"><div class="rtitle"><b>Про розробника</b><div class="sub">Контакт, ідеї та баги, донат, історія версій</div></div><span class="chev">›</span></div>
@@ -4896,7 +5219,7 @@ function openDeveloperPage(fromSettings){
         <div class="section-label">Зв'язок</div>
         <div class="group">
           ${DEV_INFO.contactUrl?`<div class="row"><div class="rtitle"><b>Написати напряму</b></div><a href="${esc(DEV_INFO.contactUrl)}" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">${esc(DEV_INFO.contactLabel)} →</a></div>`:`<div class="row"><div class="rtitle"><b>Написати напряму</b><div class="sub">Контакт ще не додано</div></div></div>`}
-          <div class="row" onclick="${DEV_INFO.feedbackUrl?`window.open('${esc(DEV_INFO.feedbackUrl)}','_blank')`:`alertSheet('Ідеї та баги','Канал для пропозицій і повідомлень про помилки ще не підключено — скоро з’явиться тут.')`}" style="cursor:pointer"><div class="rtitle"><b>💡 Ідея чи 🐞 баг</b><div class="sub">Розкажіть, що покращити або що не працює</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openFeedbackForm()" style="cursor:pointer"><div class="rtitle"><b>💡 Ідея чи 🐞 баг</b><div class="sub">Розкажіть, що покращити або що не працює</div></div><span class="chev">›</span></div>
         </div>
 
         <div class="section-label">Поділитись</div>
@@ -4945,8 +5268,10 @@ function changelogHtml(){
   return CHANGELOG.map(c=>`<div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:2px">v${esc(c.v)}${c.date?` <span style="font-weight:400;color:var(--tx2);font-size:12px">· ${esc(c.date)}</span>`:''}</div><ul style="margin:4px 0 0;padding-left:18px;color:var(--tx2);font-size:13px;line-height:1.6">${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
 }
 function openChangelogSheet(){
+  DB.settings.lastSeenChangelogVersion=APP_VERSION; save({skipPushSync:true});
   showSheet(`<h3>Історія версій</h3><div style="margin-top:12px">${changelogHtml()}</div>`);
 }
+function hasUnseenChangelog(){ return DB.settings.lastSeenChangelogVersion!==APP_VERSION; }
 function openPlatformForm(){
   const existingIds=new Set(DB.platforms.map(p=>p.id));
   const presets=PLATFORM_MASTER.filter(m=>!existingIds.has(m.id));
@@ -4985,8 +5310,10 @@ function requestDeletePlatform(id){
   }, ()=>openSettings('platforms'));
 }
 function contactById(id){ return DB.contacts.find(x=>x.id===id); }
+let contactGeo=null;
 function openContactForm(id){
   const ct = id ? contactById(id) : null;
+  contactGeo = ct ? (ct.geo||null) : null;
   showSheet(`
     <h3>${ct?'Редагувати контакт':'Новий контакт'}</h3>
     <div style="margin-top:14px">
@@ -4997,15 +5324,24 @@ function openContactForm(id){
         ${['Шиномонтаж','Електрик','СТО','Кузовний ремонт','Мийка','Діагностика','Заправка кондиціонера'].map(s=>`<button type="button" class="chip" style="padding:6px 11px;font-size:12.5px" onclick="$('#ctSpec').value='${esc(s)}'">${esc(s)}</button>`).join('')}
       </div>
       <div class="field"><label>Нотатка</label><textarea id="ctNote" placeholder="адреса, ціни, враження...">${esc(ct?ct.note||'':'')}</textarea></div>
+      <div style="margin:-6px 0 14px">
+        <button type="button" class="infob" style="width:auto;height:26px;padding:0 10px;border-radius:13px;font-size:12px" onclick="captureContactLocation()">📍 Прикріпити локацію</button>
+        <span class="sub" id="ctLocStatus">${contactGeo?'📍 Локацію збережено':''}</span>
+        ${contactGeo?`<div style="margin-top:4px">${mapLinkHtml(contactGeo)}</div>`:''}
+      </div>
       <button class="btn primary" onclick="saveContact(${id?`'${id}'`:'null'})">Зберегти</button>
       ${ct?`<button class="btn danger" style="margin-top:10px" onclick="requestDeleteContact('${id}')">Видалити контакт</button>`:''}
     </div>
   `);
 }
+window.captureContactLocation=()=>{
+  const st=$('#ctLocStatus'); if(st) st.textContent='визначаємо…';
+  geoCapture(g=>{ contactGeo=g; if(st) st.textContent='📍 Локацію збережено'; }, ()=>{ if(st) st.textContent='не вдалось визначити'; });
+};
 function saveContact(id){
   const name=$('#ctName').value.trim();
   if(!name){ alertSheet('Вкажіть ім’я','Дайте контакту коротку назву — ім’я майстра або СТО.'); return; }
-  const data={ name, phone:$('#ctPhone').value.trim(), specialty:$('#ctSpec').value.trim(), note:$('#ctNote').value.trim() };
+  const data={ name, phone:$('#ctPhone').value.trim(), specialty:$('#ctSpec').value.trim(), note:$('#ctNote').value.trim(), geo:contactGeo };
   if(id){ const ct=contactById(id); if(ct) Object.assign(ct, data); }
   else DB.contacts.push({ id:uid(), ...data });
   save(); closeSheet(); openSettings('contacts');
@@ -5568,6 +5904,13 @@ function normalizeDB(DB){
   if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
   if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
   if(DB.settings.isAdmin===undefined) DB.settings.isAdmin=false;
+  if(DB.settings.lastSeenChangelogVersion===undefined) DB.settings.lastSeenChangelogVersion='';
+  if(DB.settings.weeklySummaryEnabled===undefined) DB.settings.weeklySummaryEnabled=true;
+  if(DB.settings.lastWeeklySummaryWeek===undefined) DB.settings.lastWeeklySummaryWeek='';
+  if(DB.settings.shiftReminderHours===undefined) DB.settings.shiftReminderHours=10;
+  if(DB.settings.benchmarkShare===undefined) DB.settings.benchmarkShare=false;
+  if(DB.settings.statsShare===undefined) DB.settings.statsShare=false;
+  if(DB.settings.statsShareName===undefined) DB.settings.statsShareName=false;
   if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
   if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
   if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
@@ -6413,6 +6756,11 @@ function applyDeepLinkFromHash(){
     if(h.startsWith('settings-')){
       const tab=h.slice('settings-'.length);
       setTimeout(()=>openSettings(tab), 60);
+      return;
+    }
+    if(h.startsWith('poll-')){
+      const id=h.slice('poll-'.length);
+      setTimeout(()=>openPollSheet(id), 60);
     }
   }catch(e){}
 }
@@ -6433,6 +6781,7 @@ function init(){
   if(!DB.onboardingDone && !isDemo()) startWizard();
   if(DB.push && DB.push.enabled) syncPushItems();
   if(DB.onboardingDone) applyDeepLinkFromHash();
+  if(DB.onboardingDone){ maybeShowWeeklySummary(); maybeCheckShiftReminder(); }
 }
 init();
 if('serviceWorker' in navigator){

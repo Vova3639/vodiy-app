@@ -8,28 +8,35 @@
 <style>
   :root{
     --bg:#f2f2f7; --card:#ffffff; --tx:#111114; --tx2:#6b6b74; --sep:rgba(0,0,0,.08);
-    --blue:#0A84FF; --red:#FF3B30; --green:#2FAE60; --fill2:#f2f2f7;
+    --blue:#0A84FF; --red:#FF3B30; --green:#2FAE60; --orange:#FF9500; --fill2:#f2f2f7;
   }
   @media (prefers-color-scheme: dark){
     :root{ --bg:#000000; --card:#1c1c1e; --tx:#f2f2f7; --tx2:#9a9aa1; --sep:rgba(255,255,255,.1); --fill2:#2c2c2e; }
   }
-  *{box-sizing:border-box}
+  :root[data-theme="dark"]{ --bg:#000000; --card:#1c1c1e; --tx:#f2f2f7; --tx2:#9a9aa1; --sep:rgba(255,255,255,.1); --fill2:#2c2c2e; color-scheme:dark; }
+  :root[data-theme="light"]{ --bg:#f2f2f7; --card:#ffffff; --tx:#111114; --tx2:#6b6b74; --sep:rgba(0,0,0,.08); --fill2:#f2f2f7; color-scheme:light; }
+  *{box-sizing:border-box; min-width:0}
+  html,body{overflow-x:hidden; max-width:100%}
   body{
     margin:0; background:var(--bg); color:var(--tx);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);
+    padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
     min-height:100vh;
   }
-  .wrap{max-width:520px;margin:0 auto;padding:24px 0 60px}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 60px;overflow-x:hidden}
+  .topbar{padding:20px 0 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
   h1{font-size:22px;margin:0 0 4px}
-  .sub{color:var(--tx2);font-size:13px;margin:0 0 20px;line-height:1.5}
-  .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-  .card h2{font-size:15px;margin:0 0 12px;font-weight:700}
+  .sub{color:var(--tx2);font-size:13px;margin:0;line-height:1.5}
+  .iconbtn{background:var(--fill2);border:0.5px solid var(--sep);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--tx);flex:none}
+  .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);max-width:100%;overflow:hidden}
+  .card h2{font-size:15px;margin:0 0 12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .card h2 .tiny{font-size:11px;font-weight:600;color:var(--tx2);background:var(--fill2);padding:3px 8px;border-radius:7px}
   label{display:block;font-size:12.5px;color:var(--tx2);margin-bottom:6px;font-weight:600}
-  input[type=text], input[type=email], input[type=datetime-local], textarea, select{
-    width:100%;padding:11px 13px;border-radius:11px;border:0.5px solid var(--sep);
-    background:var(--fill2);color:var(--tx);font-size:15px;font-family:inherit;margin-bottom:12px
+  input[type=text], input[type=email], input[type=datetime-local], input[type=search], textarea, select{
+    width:100%;max-width:100%;min-width:0;padding:11px 13px;border-radius:11px;border:0.5px solid var(--sep);
+    background:var(--fill2);color:var(--tx);font-size:15px;font-family:inherit;margin-bottom:12px;-webkit-appearance:none;appearance:none
   }
+  input[type=datetime-local]{font-size:14px}
   textarea{min-height:100px;resize:vertical}
   .btn{
     display:block;width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:600;
@@ -38,45 +45,100 @@
   .btn.primary{background:var(--blue);color:#fff}
   .btn.danger{background:transparent;color:var(--red);border:0.5px solid var(--sep)}
   .btn.ghost{background:var(--fill2);color:var(--tx)}
+  .btn.small{width:auto;padding:9px 14px;font-size:13px;display:inline-block}
   .btn:disabled{opacity:.5;cursor:default}
   .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--sep)}
   .row:last-child{border-bottom:none}
-  .chip{background:var(--fill2);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+  .chip{background:var(--fill2);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;flex:none}
   .chip.tpl{color:var(--tx);text-align:left;max-width:100%}
+  .chip.filter{color:var(--tx2);font-weight:600}
+  .chip.filter.on{background:var(--blue);color:#fff}
   .muted{color:var(--tx2);font-size:13px}
-  .stat{font-size:28px;font-weight:800}
-  .statrow{display:flex;gap:18px}
+  .stat{font-size:26px;font-weight:800}
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+  .statbox{background:var(--fill2);border-radius:12px;padding:12px}
+  .statbox .muted{font-size:11.5px;margin-bottom:2px}
   #gsiBtn{display:flex;justify-content:center;margin-top:8px}
   #status{font-size:13px;padding:10px 0;text-align:center;color:var(--tx2)}
-  .hidden{display:none}
+  .hidden{display:none !important}
   #sendResult{margin-top:10px;font-size:13px}
   .counter{text-align:right;font-size:11px;color:var(--tx2);margin-top:-8px;margin-bottom:10px}
-  .seg{display:flex;gap:8px;margin-bottom:12px}
-  .seg button{flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx2);font-size:13px;cursor:pointer;font-weight:600}
+  .seg{display:flex;gap:8px;margin-bottom:12px;max-width:100%}
+  .seg button{flex:1;min-width:0;padding:9px 4px;border-radius:10px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx2);font-size:12.5px;cursor:pointer;font-weight:600}
   .seg button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
   .tplrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--sep)}
   .tplrow:last-child{border-bottom:none}
-  .tplrow .tplmain{flex:1;min-width:0;cursor:pointer}
+  .tplrow .tplmain{flex:1;min-width:0;cursor:pointer;display:flex;align-items:center;gap:8px}
+  .tplrow .tplemoji{font-size:18px;flex:none}
+  .tplrow .tpltext{min-width:0}
   .tplrow .tplmain b{display:block;font-size:14px}
   .tplrow .tplmain .tplbody{display:block;font-size:12.5px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tplrow .tplmain .tplcat{font-size:10.5px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
   .histrow{padding:10px 0;border-bottom:0.5px solid var(--sep)}
   .histrow:last-child{border-bottom:none}
-  .histrow .histhead{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);margin-bottom:3px}
+  .histrow .histhead{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:3px}
   .histrow b{font-size:14px}
   .histrow .histbody{font-size:13px;color:var(--tx2);margin-top:2px}
+  .histrow .histactions{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}
   .schrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--sep)}
   .schrow:last-child{border-bottom:none}
   .schrow .schmain{flex:1;min-width:0}
   .schrow .schmain b{display:block;font-size:14px}
   .schrow .schwhen{font-size:12px;color:var(--blue);font-weight:600}
-  .growwrap{overflow-x:auto}
-  .growsvg{display:block;min-width:100%}
+  .schrow .schbtns{display:flex;gap:6px;flex:none}
+  .growwrap{overflow-x:auto;max-width:100%}
+  .growsvg{display:block}
+  .preview{background:var(--fill2);border-radius:14px;padding:12px;margin:2px 0 14px;display:flex;gap:10px;align-items:flex-start}
+  .preview .pico{width:34px;height:34px;border-radius:9px;background:var(--blue);flex:none;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .preview .ptext{min-width:0;flex:1}
+  .preview .ptitle{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .preview .pbody{font-size:12.5px;color:var(--tx2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .plabel{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;font-weight:700}
+  .tabbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);display:flex;gap:6px;padding:6px 0 12px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tabbar button{flex:none;padding:9px 14px;border-radius:11px;border:0.5px solid var(--sep);background:var(--card);color:var(--tx2);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .tabbar button.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+  .barlist .barrow{margin-bottom:10px}
+  .barlist .barhead{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .barlist .bartrack{height:7px;background:var(--fill2);border-radius:4px;overflow:hidden}
+  .barlist .barfill{height:100%;background:var(--blue);border-radius:4px}
+  .toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:488px;margin:0 auto;background:var(--tx);color:var(--bg);padding:13px 16px;border-radius:13px;font-size:14px;font-weight:600;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:100;transition:opacity .25s,transform .25s;opacity:0;transform:translateY(10px);pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .modalover{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modalcard{background:var(--card);border-radius:16px;padding:20px;max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .modalcard h3{margin:0 0 8px;font-size:17px}
+  .modalcard p{margin:0 0 18px;font-size:14px;color:var(--tx2);line-height:1.5}
+  .modalcard .mbtns{display:flex;gap:8px}
+  .modalcard .mbtns .btn{margin:0}
+  .roleselect{padding:5px 8px;border-radius:8px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx);font-size:12px;margin-bottom:0}
+  .emojirow{display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 12px}
+  .emojirow button{width:36px;height:36px;border-radius:10px;border:0.5px solid var(--sep);background:var(--fill2);font-size:17px;cursor:pointer}
+  .emojirow button.on{background:var(--blue);border-color:var(--blue)}
+  .pollresrow{margin-bottom:8px}
+  .pollresrow .phead{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .pollrow{padding:10px 0;border-bottom:0.5px solid var(--sep)}
+  .pollrow:last-child{border-bottom:none}
+  .pollrow b{font-size:14px;display:block;margin-bottom:6px}
+  .actrow{padding:8px 0;border-bottom:0.5px solid var(--sep);font-size:12.5px}
+  .actrow:last-child{border-bottom:none}
+  .actrow .actwho{font-weight:700}
+  .actrow .actwhen{color:var(--tx2);float:right}
+  .fbrow{padding:9px 0;border-bottom:0.5px solid var(--sep)}
+  .fbrow:last-child{border-bottom:none}
+  .fbrow .fbwhen{font-size:11px;color:var(--tx2)}
+  .fbrow .fbtext{font-size:13.5px;margin-top:2px}
+  .fbrow .fbcontact{font-size:12px;color:var(--blue);margin-top:2px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Водій · Адмінка</h1>
-  <div class="sub">Надсилання push-сповіщень усім користувачам застосунку. Доступ — лише через Google-акаунти зі списку адміністраторів.</div>
+  <div class="topbar">
+    <div>
+      <h1>Водій · Адмінка</h1>
+      <div class="sub">Розсилки, опитування, статистика та керування доступом.</div>
+    </div>
+    <button class="iconbtn hidden" id="themeBtn" onclick="toggleTheme()" title="Тема">🌓</button>
+  </div>
 
   <div id="signedOut" class="card">
     <h2>Увійти</h2>
@@ -91,112 +153,291 @@
   </div>
 
   <div id="app" class="hidden">
-    <div class="card">
-      <div class="row">
-        <div>
-          <div class="muted">Увійшли як</div>
-          <div id="meEmail" style="font-weight:600"></div>
-        </div>
-        <button class="chip" style="color:var(--tx)" onclick="signOut()">Вийти</button>
-      </div>
-      <div class="row" style="border:none;padding-top:14px">
-        <div class="statrow">
+    <div class="tabbar" id="tabbar">
+      <button class="on" onclick="switchTab('overview')" data-tab="overview">Огляд</button>
+      <button onclick="switchTab('send')" data-tab="send">Розсилка</button>
+      <button onclick="switchTab('polls')" data-tab="polls">Опитування</button>
+      <button onclick="switchTab('history')" data-tab="history">Історія</button>
+      <button onclick="switchTab('stats')" data-tab="stats">Статистика</button>
+      <button onclick="switchTab('people')" data-tab="people">Люди</button>
+    </div>
+
+    <!-- ===== ОГЛЯД ===== -->
+    <div class="tabpanel" id="panel-overview">
+      <div class="card">
+        <div class="row">
           <div>
-            <div class="muted">Пристроїв</div>
-            <div class="stat" id="deviceCount">—</div>
+            <div class="muted">Увійшли як</div>
+            <div id="meEmail" style="font-weight:600"></div>
           </div>
-          <div>
-            <div class="muted">Активні (7 дн.)</div>
-            <div class="stat" id="active7dCount" style="font-size:22px;color:var(--tx2)">—</div>
-          </div>
+          <button class="chip" style="color:var(--tx)" onclick="signOut()">Вийти</button>
+        </div>
+        <div class="statgrid">
+          <div class="statbox"><div class="muted">Пристроїв</div><div class="stat" id="deviceCount">—</div></div>
+          <div class="statbox"><div class="muted">Активні (7 дн.)</div><div class="stat" id="active7dCount">—</div></div>
+          <div class="statbox"><div class="muted">Розсилок надіслано</div><div class="stat" id="totalSentCount">—</div></div>
+          <div class="statbox"><div class="muted">Сповіщень доставлено</div><div class="stat" id="totalDeliveredCount">—</div></div>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2>Заготовки повідомлень</h2>
-      <div class="muted" style="margin-bottom:8px" id="tplHint">Натисніть на заготовку, щоб підставити її в поля нижче.</div>
-      <div id="tplList"></div>
-    </div>
-
-    <div class="card">
-      <h2>Надіслати сповіщення</h2>
-      <div class="seg" id="segSeg">
-        <button class="on" onclick="setSegment('all')">Усім</button>
-        <button onclick="setSegment('inactive7d')">Неактивним 7+ дн.</button>
+      <div class="card">
+        <h2>Ріст користувачів</h2>
+        <div class="muted" style="margin-bottom:10px">Кількість зареєстрованих пристроїв по днях (останні 90).</div>
+        <div class="growwrap" id="growWrap"><div class="muted">Завантаження…</div></div>
       </div>
-      <label>Заголовок</label>
-      <input type="text" id="pushTitle" placeholder="Водій" maxlength="120" oninput="updCounters()">
-      <div class="counter" id="titleCounter">0 / 120</div>
-      <label>Текст</label>
-      <textarea id="pushBody" placeholder="Наприклад: у застосунку зʼявилась нова функція — перевірте налаштування!" maxlength="500" oninput="updCounters()"></textarea>
-      <div class="counter" id="bodyCounter">0 / 500</div>
-      <label>Куди веде натискання на сповіщення</label>
-      <select id="pushLink">
-        <option value="">Просто відкрити застосунок</option>
-        <option value="dash">Дашборд</option>
-        <option value="shifts">Зміни</option>
-        <option value="expenses">Витрати</option>
-        <option value="cars">Авто</option>
-        <option value="profile">Профіль</option>
-        <option value="settings-notifications">Налаштування → Сповіщення</option>
-        <option value="settings-reminders">Налаштування → Особисті нагадування</option>
-        <option value="settings-fop">Налаштування → ФОП і податки</option>
-        <option value="settings-data">Налаштування → Дані й звітність</option>
-        <option value="settings-about">Налаштування → Про застосунок</option>
-      </select>
-      <button class="btn primary" id="sendBtn" onclick="sendPush()">📤 Надіслати зараз</button>
-      <button class="btn ghost" style="margin-top:8px" onclick="saveAsTemplate()">💾 Зберегти як заготовку</button>
-      <div id="sendResult"></div>
 
-      <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--sep)">
-        <label>Або запланувати на потім</label>
-        <input type="datetime-local" id="scheduleAt">
-        <button class="btn ghost" id="scheduleBtn" onclick="createSchedule()">🕐 Запланувати</button>
+      <div class="card">
+        <h2>Платформи пристроїв</h2>
+        <div class="muted" style="margin-bottom:10px">З якого типу пристрою заходять користувачі.</div>
+        <div class="barlist" id="platformList"><div class="muted">Завантаження…</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Мертві підписки</h2>
+        <div class="muted" id="deadLogHint" style="margin-bottom:10px">Пристрої, з яких видалили застосунок чи вимкнули сповіщення — прибираються автоматично.</div>
+        <div id="deadLogList"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Заплановані розсилки</h2>
-      <div id="schList"><div class="muted">Завантаження…</div></div>
+    <!-- ===== РОЗСИЛКА ===== -->
+    <div class="tabpanel hidden" id="panel-send">
+      <div class="card">
+        <h2>Заготовки повідомлень</h2>
+        <div class="muted" style="margin-bottom:8px" id="tplHint">Натисніть на заготовку, щоб підставити її в поля нижче.</div>
+        <div id="tplCategoryFilter" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
+        <div id="tplList"></div>
+      </div>
+
+      <div class="card">
+        <h2 id="sendCardTitle">Надіслати сповіщення</h2>
+        <div class="seg" id="segSeg">
+          <button class="on" onclick="setSegment('all')">Усім</button>
+          <button onclick="setSegment('inactive7d')">Неактивним 7+ дн.</button>
+          <button onclick="setSegment('new7d')">Нові за 7 дн.</button>
+        </div>
+        <label>Заголовок</label>
+        <input type="text" id="pushTitle" placeholder="Водій" maxlength="120" oninput="onComposeInput()">
+        <div class="counter" id="titleCounter">0 / 120</div>
+        <label>Текст</label>
+        <textarea id="pushBody" placeholder="Наприклад: у застосунку зʼявилась нова функція — перевірте налаштування!" maxlength="500" oninput="onComposeInput()"></textarea>
+        <div class="counter" id="bodyCounter">0 / 500</div>
+        <label>Куди веде натискання на сповіщення</label>
+        <select id="pushLink" onchange="onComposeInput()">
+          <option value="">Просто відкрити застосунок</option>
+          <option value="dash">Дашборд</option>
+          <option value="shifts">Зміни</option>
+          <option value="expenses">Витрати</option>
+          <option value="cars">Авто</option>
+          <option value="profile">Профіль</option>
+          <option value="settings-notifications">Налаштування → Сповіщення</option>
+          <option value="settings-reminders">Налаштування → Особисті нагадування</option>
+          <option value="settings-fop">Налаштування → ФОП і податки</option>
+          <option value="settings-data">Налаштування → Дані й звітність</option>
+          <option value="settings-about">Налаштування → Про застосунок</option>
+        </select>
+
+        <div class="plabel">Прев'ю сповіщення</div>
+        <div class="preview">
+          <div class="pico">🚕</div>
+          <div class="ptext">
+            <div class="ptitle" id="prevTitle">Водій</div>
+            <div class="pbody" id="prevBody">Текст сповіщення з'явиться тут</div>
+          </div>
+        </div>
+
+        <button class="btn primary" id="sendBtn" onclick="sendPush()">📤 Надіслати зараз</button>
+        <div id="sendResult"></div>
+
+        <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--sep)">
+          <label>Заготовка: емодзі й категорія (необов'язково)</label>
+          <div class="emojirow" id="tplEmojiPick"></div>
+          <input type="text" id="tplCategoryInput" placeholder="Категорія, напр. «Оновлення»" maxlength="30">
+          <button class="btn ghost" onclick="saveAsTemplate()">💾 Зберегти як заготовку</button>
+        </div>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--sep)" id="scheduleBlock">
+          <label id="scheduleLabel">Або запланувати на потім</label>
+          <input type="datetime-local" id="scheduleAt">
+          <button class="btn ghost" id="scheduleBtn" onclick="createSchedule()">🕐 Запланувати</button>
+          <button class="btn ghost hidden" id="scheduleCancelEditBtn" style="margin-top:8px" onclick="cancelScheduleEdit()">Скасувати редагування</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Заплановані розсилки</h2>
+        <div id="schList"><div class="muted">Завантаження…</div></div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>Історія розсилок</h2>
-      <div id="histList"><div class="muted">Завантаження…</div></div>
+    <!-- ===== ОПИТУВАННЯ ===== -->
+    <div class="tabpanel hidden" id="panel-polls">
+      <div class="card">
+        <h2>Нове опитування</h2>
+        <div class="muted" style="margin-bottom:10px">Надсилається push-сповіщенням; натискання відкриває варіанти прямо в застосунку.</div>
+        <label>Питання</label>
+        <input type="text" id="pollQuestion" placeholder="Наприклад: якою платформою користуєтесь найчастіше?" maxlength="200">
+        <label>Варіанти відповіді (2–5)</label>
+        <div id="pollOptions"></div>
+        <button class="btn ghost small" onclick="addPollOption()" style="margin-bottom:12px">+ Варіант</button>
+        <div class="seg" id="pollSegSeg">
+          <button class="on" onclick="setPollSegment('all')">Усім</button>
+          <button onclick="setPollSegment('inactive7d')">Неактивним 7+ дн.</button>
+          <button onclick="setPollSegment('new7d')">Нові за 7 дн.</button>
+        </div>
+        <button class="btn primary" id="pollSendBtn" onclick="createPoll()">🗳 Надіслати опитування</button>
+        <div id="pollSendResult"></div>
+      </div>
+      <div class="card">
+        <h2>Опитування й результати</h2>
+        <div id="pollList"><div class="muted">Завантаження…</div></div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>Ріст користувачів</h2>
-      <div class="muted" style="margin-bottom:10px">Кількість зареєстрованих пристроїв по днях (останні 90).</div>
-      <div class="growwrap" id="growWrap"><div class="muted">Завантаження…</div></div>
+    <!-- ===== ІСТОРІЯ ===== -->
+    <div class="tabpanel hidden" id="panel-history">
+      <div class="card">
+        <h2>Історія розсилок <button class="btn small ghost" onclick="exportHistoryCsv()">⬇︎ CSV</button></h2>
+        <div style="margin-bottom:10px">
+          <input type="search" id="histSearch" placeholder="Пошук по заголовку чи тексту…" oninput="renderHistory()" style="margin-bottom:0">
+        </div>
+        <div id="histList"><div class="muted">Завантаження…</div></div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>Адміністратори</h2>
-      <div class="muted" style="margin-bottom:10px">Ці пошти можуть заходити в адмінку й надсилати сповіщення.</div>
-      <div id="adminList"></div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <input type="email" id="newAdminEmail" placeholder="пошта@gmail.com" style="margin-bottom:0;flex:1">
-        <button class="btn primary" style="width:auto;padding:11px 16px" onclick="addAdmin()">Додати</button>
+    <!-- ===== СТАТИСТИКА ВОДІЇВ ===== -->
+    <div class="tabpanel hidden" id="panel-stats">
+      <div class="card">
+        <h2>Хто ділиться статистикою <span class="tiny" id="statsDriversCount">—</span></h2>
+        <div class="muted" style="margin-bottom:10px">Опційна функція (Налаштування → Дані й звітність у застосунку). Дохід і години надсилаються лише якщо людина сама увімкнула це; ім'я — лише якщо окремо дозволила його показувати.</div>
+        <div class="statgrid">
+          <div class="statbox"><div class="muted">Середній дохід</div><div class="stat" id="statsAvgIncome">—</div></div>
+          <div class="statbox"><div class="muted">Найбільший</div><div class="stat" id="statsMaxIncome">—</div></div>
+          <div class="statbox"><div class="muted">Найменший</div><div class="stat" id="statsMinIncome">—</div></div>
+          <div class="statbox"><div class="muted">Всього змін</div><div class="stat" id="statsTotalShifts">—</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Платформи <span class="tiny" id="statsTopPlatform"></span></h2>
+        <div class="muted" style="margin-bottom:10px">Кількість водіїв на кожній платформі та їхній дохід — від найпопулярнішої.</div>
+        <div id="statsPlatformList"><div class="muted">Завантаження…</div></div>
+      </div>
+      <div class="card">
+        <h2>З іменем</h2>
+        <div class="muted" style="margin-bottom:10px">Ті, хто окремо дозволив показувати своє ім'я в адмінці — решта враховані вище анонімно.</div>
+        <div id="statsNamedList"><div class="muted">Завантаження…</div></div>
+      </div>
+    </div>
+
+    <!-- ===== ЛЮДИ ===== -->
+    <div class="tabpanel hidden" id="panel-people">
+      <div class="card">
+        <h2>Адміністратори</h2>
+        <div class="muted" style="margin-bottom:10px">«Власник» керує списком адмінів; «Відправник» лише надсилає розсилки й опитування.</div>
+        <div id="adminList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input type="email" id="newAdminEmail" placeholder="пошта@gmail.com" style="margin-bottom:0;flex:1">
+          <select id="newAdminRole" class="roleselect" style="margin-bottom:0">
+            <option value="sender">Відправник</option>
+            <option value="owner">Власник</option>
+          </select>
+          <button class="btn primary" style="width:auto;padding:11px 16px" onclick="addAdmin()">Додати</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Поділитися адмінкою</h2>
+        <div class="muted" style="margin-bottom:10px">Посилання можна надіслати новому адміністратору — увійти зможе лише той, чия пошта вже у списку вище.</div>
+        <button class="btn ghost" onclick="copyAdminLink()">🔗 Скопіювати посилання</button>
+      </div>
+      <div class="card">
+        <h2>Зворотний зв'язок від користувачів</h2>
+        <div class="muted" style="margin-bottom:10px">Повідомлення з форми «Ідея чи баг» у застосунку.</div>
+        <div id="feedbackList"><div class="muted">Завантаження…</div></div>
+      </div>
+      <div class="card">
+        <h2>Історія дій адмінів</h2>
+        <div id="actionLogList"><div class="muted">Завантаження…</div></div>
       </div>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
+<div id="modalRoot"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 const CLIENT_ID = '194714840278-n7imdnf3e9bd0knr8hubq170q5t9unsk.apps.googleusercontent.com';
 const WORKER_URL = 'https://vodiy-push.vova3639.workers.dev';
 const TOKEN_KEY = 'vodiy_admin_idtoken';
+const THEME_KEY = 'vodiy_admin_theme';
 
 let idToken = null;
+let myRole = null;
 
 function $(s){ return document.querySelector(s); }
 function setStatus(t){ $('#status').textContent = t || ''; }
 
 function show(id){
   ['signedOut','noAccess','app'].forEach(x=>$('#'+x).classList.toggle('hidden', x!==id));
+  $('#themeBtn').classList.toggle('hidden', id!=='app');
+}
+
+let overviewInterval=null;
+function switchTab(name){
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('hidden', p.id!=='panel-'+name));
+  document.querySelectorAll('#tabbar button').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+  clearInterval(overviewInterval);
+  if(name==='overview'){
+    overviewInterval=setInterval(()=>{ loadStats(); }, 30000);
+  }
+  if(name==='stats'){
+    loadDetailedStats();
+  }
+}
+
+// ===== Тема =====
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark' ? 'light' : (cur==='light' ? '' : 'dark');
+  if(next){ document.documentElement.setAttribute('data-theme', next); } else { document.documentElement.removeAttribute('data-theme'); }
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+}
+(function initTheme(){
+  let saved=null; try{ saved=localStorage.getItem(THEME_KEY); }catch(e){}
+  if(saved){ document.documentElement.setAttribute('data-theme', saved); }
+})();
+
+// ===== Toast =====
+let toastTimer=null;
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+// ===== Модальне підтвердження (замість confirm()) =====
+function confirmModal(title, msg, actionLabel, danger){
+  return new Promise(resolve=>{
+    const root = $('#modalRoot');
+    root.innerHTML = `
+      <div class="modalover" id="modalOver">
+        <div class="modalcard">
+          <h3>${escHtml(title)}</h3>
+          <p>${escHtml(msg)}</p>
+          <div class="mbtns">
+            <button class="btn ${danger?'danger':'primary'}" id="modalYes">${escHtml(actionLabel||'Так')}</button>
+            <button class="btn ghost" id="modalNo">Скасувати</button>
+          </div>
+        </div>
+      </div>`;
+    const cleanup=(val)=>{ root.innerHTML=''; resolve(val); };
+    $('#modalYes').onclick=()=>cleanup(true);
+    $('#modalNo').onclick=()=>cleanup(false);
+    $('#modalOver').onclick=(e)=>{ if(e.target.id==='modalOver') cleanup(false); };
+  });
 }
 
 async function api(path, extra){
@@ -228,18 +469,29 @@ async function checkAccess(){
     $('#noAccessMsg').textContent = `Акаунт ${data.email} не входить у список адміністраторів. Попросіть іншого адміністратора додати вашу пошту.`;
     show('noAccess'); return;
   }
-  $('#meEmail').textContent = data.email;
+  myRole = data.role;
+  $('#meEmail').textContent = data.email + (myRole==='sender' ? ' · відправник' : ' · власник');
   show('app');
+  switchTab('overview');
+  onComposeInput();
   loadStats();
   loadAdmins();
   loadTemplates();
   loadHistory();
   loadSchedule();
   loadGrowth();
+  loadDeadLog();
+  loadPolls();
+  loadFeedback();
+  loadActionLog();
+  loadDetailedStats();
+  resetPollOptions();
+  renderTplEmojiPick();
 }
 
 function signOut(){
-  idToken=null;
+  idToken=null; myRole=null;
+  clearInterval(overviewInterval);
   try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){}
   try{ google.accounts.id.disableAutoSelect(); }catch(e){}
   setStatus('');
@@ -250,16 +502,94 @@ async function loadStats(){
   const data = await api('/admin/stats').catch(()=>null);
   $('#deviceCount').textContent = (data && data.ok) ? data.devices : '—';
   $('#active7dCount').textContent = (data && data.ok) ? data.active7d : '—';
+  renderPlatforms(data && data.ok ? data.platforms : null);
+}
+
+function renderPlatforms(platforms){
+  const box = $('#platformList');
+  if(!platforms){ box.innerHTML = '<div class="muted">Дані ще не зібрані — зʼявляться в міру реєстрації пристроїв.</div>'; return; }
+  const entries = Object.entries(platforms).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){ box.innerHTML = '<div class="muted">Ще немає даних.</div>'; return; }
+  const max = Math.max(...entries.map(e=>e[1]));
+  box.innerHTML = entries.map(([name,count])=>`
+    <div class="barrow">
+      <div class="barhead"><span>${escHtml(name)}</span><span class="muted">${count}</span></div>
+      <div class="bartrack"><div class="barfill" style="width:${Math.round(count/max*100)}%"></div></div>
+    </div>
+  `).join('');
+}
+
+async function loadDetailedStats(){
+  const data = await api('/admin/detailed-stats').catch(()=>null);
+  if(!data || !data.ok){
+    $('#statsDriversCount').textContent='—';
+    $('#statsPlatformList').innerHTML='<div class="muted">Не вдалось завантажити.</div>';
+    $('#statsNamedList').innerHTML='<div class="muted">Не вдалось завантажити.</div>';
+    return;
+  }
+  const o=data.overall;
+  $('#statsDriversCount').textContent = o ? o.drivers+' водіїв' : '0 водіїв';
+  $('#statsAvgIncome').textContent = o ? money(o.avgIncome) : '—';
+  $('#statsMaxIncome').textContent = o ? money(o.maxIncome) : '—';
+  $('#statsMinIncome').textContent = o ? money(o.minIncome) : '—';
+  $('#statsTotalShifts').textContent = o ? o.totalShifts : '—';
+
+  const plats=data.platforms||[];
+  $('#statsTopPlatform').textContent = plats.length ? '🏆 '+escHtml(plats[0].name) : '';
+  if(!plats.length){
+    $('#statsPlatformList').innerHTML='<div class="muted">Ще немає даних — з’являться, коли хтось увімкне цю функцію.</div>';
+  } else {
+    const max=Math.max(...plats.map(p=>p.drivers));
+    $('#statsPlatformList').innerHTML = plats.map(p=>`
+      <div class="barrow">
+        <div class="barhead"><span>${escHtml(p.name)}</span><span class="muted">${p.drivers} водіїв</span></div>
+        <div class="bartrack"><div class="barfill" style="width:${Math.round(p.drivers/max*100)}%"></div></div>
+        <div class="muted" style="font-size:11.5px;margin-top:3px">середній ${money(p.avgIncome)} · макс ${money(p.maxIncome)} · мін ${money(p.minIncome)}</div>
+      </div>
+    `).join('');
+  }
+
+  const named=data.named||[];
+  if(!named.length){
+    $('#statsNamedList').innerHTML='<div class="muted">Поки ніхто не дозволив показувати ім’я.</div>';
+  } else {
+    $('#statsNamedList').innerHTML = named.map(n=>`
+      <div class="row">
+        <div><b>${escHtml(n.name)}</b><div class="muted" style="font-size:12px">${n.totalShifts} змін · ${n.totalHours} год · ${n.carsCount} авто</div></div>
+        <div class="stat" style="font-size:16px">${money(n.totalIncome)}</div>
+      </div>
+    `).join('');
+  }
+}
+function money(n){ return Math.round(n||0).toLocaleString('uk-UA')+' ₴'; }
+
+async function loadDeadLog(){
+  const data = await api('/admin/dead-log').catch(()=>null);
+  const box = $('#deadLogList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  $('#deadLogHint').textContent = `За останні 7 днів прибрано ${data.last7d} — пристрої, з яких видалили застосунок чи вимкнули сповіщення.`;
+  if(!data.log.length){ box.innerHTML='<div class="muted">Поки що жодної.</div>'; return; }
+  box.innerHTML = data.log.slice(0,10).map(l=>`<div class="row"><div class="muted">${new Date(l.at).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div></div>`).join('');
 }
 
 async function loadAdmins(){
   const data = await api('/admin/list').catch(()=>null);
   const box = $('#adminList');
   if(!data || !data.ok){ box.innerHTML = '<div class="muted">Не вдалося завантажити список.</div>'; return; }
-  box.innerHTML = data.admins.map(email => `
+  const owners = data.admins.filter(a=>a.role==='owner').length;
+  const canManage = myRole==='owner';
+  box.innerHTML = data.admins.map(a => `
     <div class="row">
-      <div>${email}</div>
-      <button class="chip" onclick="removeAdmin('${email.replace(/'/g,"\\'")}')" ${data.admins.length<=1?'disabled title="Не можна видалити останнього адміністратора"':''}>Прибрати</button>
+      <div>${escHtml(a.email)}</div>
+      ${canManage ? `
+        <div style="display:flex;gap:6px;align-items:center">
+          <select class="roleselect" onchange="setAdminRole('${a.email.replace(/'/g,"\\'")}', this.value)" ${a.role==='owner' && owners<=1 ? 'disabled title="Останній власник"' : ''}>
+            <option value="sender" ${a.role==='sender'?'selected':''}>Відправник</option>
+            <option value="owner" ${a.role==='owner'?'selected':''}>Власник</option>
+          </select>
+          <button class="chip" onclick="removeAdmin('${a.email.replace(/'/g,"\\'")}')" ${a.role==='owner' && owners<=1?'disabled title="Не можна видалити останнього власника"':''}>✕</button>
+        </div>
+      ` : `<span class="muted">${a.role==='owner'?'Власник':'Відправник'}</span>`}
     </div>
   `).join('') || '<div class="muted">Порожньо</div>';
 }
@@ -267,38 +597,85 @@ async function loadAdmins(){
 async function addAdmin(){
   const input = $('#newAdminEmail');
   const email = input.value.trim();
-  if(!email || !email.includes('@')){ alert('Вкажіть коректну пошту'); return; }
-  const data = await api('/admin/add', { email }).catch(()=>null);
-  if(!data || !data.ok){ alert('Не вдалося додати: '+(data&&data.error||'помилка мережі')); return; }
+  const role = $('#newAdminRole').value;
+  if(!email || !email.includes('@')){ toast('Вкажіть коректну пошту'); return; }
+  const data = await api('/admin/add', { email, role }).catch(()=>null);
+  if(!data || !data.ok){ toast('Не вдалося додати: '+(data&&data.error||'помилка мережі')); return; }
   input.value='';
+  toast('Адміністратора додано');
+  loadAdmins();
+}
+
+async function setAdminRole(email, role){
+  const data = await api('/admin/set-role', { email, role }).catch(()=>null);
+  if(!data || !data.ok){ toast('Не вдалося змінити роль: '+(data&&data.error||'помилка')); loadAdmins(); return; }
+  toast('Роль змінено');
   loadAdmins();
 }
 
 async function removeAdmin(email){
-  if(!confirm(`Прибрати доступ для ${email}?`)) return;
+  const ok = await confirmModal('Прибрати доступ?', `Прибрати доступ для ${email}?`, 'Прибрати', true);
+  if(!ok) return;
   const data = await api('/admin/remove', { email }).catch(()=>null);
-  if(!data || !data.ok){ alert('Не вдалося прибрати: '+(data&&data.error||'помилка мережі')); return; }
+  if(!data || !data.ok){ toast('Не вдалося прибрати: '+(data&&data.error||'помилка мережі')); return; }
+  toast('Доступ прибрано');
   loadAdmins();
+}
+
+function copyAdminLink(){
+  const url = location.href.split('#')[0].split('?')[0];
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(()=>toast('Посилання скопійовано'))
+    .catch(()=>{ prompt('Скопіюйте посилання:', url); });
+}
+
+async function loadFeedback(){
+  const data = await api('/admin/feedback').catch(()=>null);
+  const box = $('#feedbackList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(!data.feedback.length){ box.innerHTML='<div class="muted">Відгуків ще не було.</div>'; return; }
+  box.innerHTML = data.feedback.map(f=>`
+    <div class="fbrow">
+      <div class="fbwhen">${new Date(f.at).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
+      <div class="fbtext">${escHtml(f.text)}</div>
+      ${f.contact?`<div class="fbcontact">${escHtml(f.contact)}</div>`:''}
+    </div>
+  `).join('');
+}
+
+async function loadActionLog(){
+  const data = await api('/admin/action-log').catch(()=>null);
+  const box = $('#actionLogList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(!data.log.length){ box.innerHTML='<div class="muted">Дій ще не було.</div>'; return; }
+  const LABELS = { send:'надіслав розсилку', schedule_create:'запланував розсилку', schedule_update:'змінив розсилку', schedule_cancel:'скасував розсилку', admin_add:'додав адміністратора', admin_remove:'прибрав адміністратора', admin_role:'змінив роль', template_save:'зберіг заготовку', template_delete:'видалив заготовку', poll_create:'створив опитування' };
+  box.innerHTML = data.log.slice(0,30).map(a=>`
+    <div class="actrow"><span class="actwhen">${new Date(a.at).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span class="actwho">${escHtml(a.email)}</span> ${escHtml(LABELS[a.action]||a.action)}${a.details?' — '+escHtml(a.details):''}</div>
+  `).join('');
 }
 
 let currentSegment='all';
 function setSegment(seg){
   currentSegment=seg;
-  $('#segSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on', (i===0)===(seg==='all')));
+  const labels=['all','inactive7d','new7d'];
+  $('#segSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on', labels[i]===seg));
 }
 
-function updCounters(){
+function onComposeInput(){
   $('#titleCounter').textContent = $('#pushTitle').value.length+' / 120';
   $('#bodyCounter').textContent = $('#pushBody').value.length+' / 500';
+  $('#prevTitle').textContent = $('#pushTitle').value.trim() || 'Водій';
+  $('#prevBody').textContent = $('#pushBody').value.trim() || "Текст сповіщення з'явиться тут";
 }
 
 async function sendPush(){
   const title = $('#pushTitle').value.trim() || 'Водій';
   const body = $('#pushBody').value.trim();
   const link = $('#pushLink').value;
-  if(!body){ alert('Напишіть текст сповіщення'); return; }
-  const target = currentSegment==='inactive7d' ? 'неактивним 7+ днів користувачам' : `усім користувачам (${$('#deviceCount').textContent})`;
-  if(!confirm(`Надіслати це сповіщення ${target}?`)) return;
+  if(!body){ toast('Напишіть текст сповіщення'); return; }
+  const target = currentSegment==='inactive7d' ? 'неактивним 7+ днів користувачам' : currentSegment==='new7d' ? 'новим користувачам (7 дн.)' : `усім користувачам (${$('#deviceCount').textContent})`;
+  const ok = await confirmModal('Надіслати сповіщення?', `Надіслати це сповіщення ${target}?`, 'Надіслати');
+  if(!ok) return;
   const btn = $('#sendBtn');
   btn.disabled=true; btn.textContent='Надсилаємо…';
   const result = $('#sendResult');
@@ -308,50 +685,99 @@ async function sendPush(){
   if(!data || !data.ok){ result.style.color='var(--red)'; result.textContent='Помилка: '+(data&&data.error||'не вдалося звʼязатися з сервером'); return; }
   result.style.color='var(--green)';
   result.textContent = `Готово: надіслано ${data.sent}${data.failed?`, не вдалось ${data.failed}`:''}${data.skipped?`, пропущено (не підпадають під сегмент) ${data.skipped}`:''}.`;
-  loadHistory();
+  toast('Сповіщення надіслано');
+  loadHistory(); loadStats();
+}
+
+function resendFromHistory(idx){
+  const h = historyCache[idx]; if(!h) return;
+  $('#pushTitle').value = h.title || '';
+  $('#pushBody').value = h.body || '';
+  $('#pushLink').value = h.url && [...$('#pushLink').options].some(o=>o.value===h.url) ? h.url : '';
+  setSegment(h.segment==='inactive7d' ? 'inactive7d' : h.segment==='new7d' ? 'new7d' : 'all');
+  onComposeInput();
+  switchTab('send');
+  toast('Підставлено в форму — перевірте й надішліть');
 }
 
 // ===== Заплановані розсилки =====
+let editingScheduleId=null;
 async function createSchedule(){
   const title = $('#pushTitle').value.trim() || 'Водій';
   const body = $('#pushBody').value.trim();
   const link = $('#pushLink').value;
   const atStr = $('#scheduleAt').value;
-  if(!body){ alert('Напишіть текст сповіщення'); return; }
-  if(!atStr){ alert('Вкажіть дату й час розсилки'); return; }
+  if(!body){ toast('Напишіть текст сповіщення'); return; }
+  if(!atStr){ toast('Вкажіть дату й час розсилки'); return; }
   const sendAt = new Date(atStr).getTime();
-  if(!sendAt || sendAt<=Date.now()){ alert('Час має бути в майбутньому'); return; }
+  if(!sendAt || sendAt<=Date.now()){ toast('Час має бути в майбутньому'); return; }
   const btn = $('#scheduleBtn');
-  btn.disabled=true; btn.textContent='Плануємо…';
-  const data = await api('/admin/schedule/create', { title, body, segment: currentSegment, url: link, sendAt }).catch(()=>null);
-  btn.disabled=false; btn.textContent='🕐 Запланувати';
-  if(!data || !data.ok){ alert('Не вдалося запланувати: '+(data&&data.error||'помилка мережі')); return; }
+  btn.disabled=true; btn.textContent = editingScheduleId ? 'Зберігаємо…' : 'Плануємо…';
+  const path = editingScheduleId ? '/admin/schedule/update' : '/admin/schedule/create';
+  const payload = editingScheduleId ? { id: editingScheduleId, title, body, segment: currentSegment, url: link, sendAt } : { title, body, segment: currentSegment, url: link, sendAt };
+  const data = await api(path, payload).catch(()=>null);
+  btn.disabled=false;
+  if(!data || !data.ok){ btn.textContent = editingScheduleId ? '💾 Зберегти зміни' : '🕐 Запланувати'; toast('Не вдалося зберегти: '+(data&&data.error||'помилка мережі')); return; }
   $('#scheduleAt').value='';
+  cancelScheduleEdit();
   loadSchedule();
-  alert('Заплановано.');
+  toast('Заплановано');
 }
+function editSchedule(id){
+  const s = scheduledCache.find(x=>x.id===id); if(!s) return;
+  editingScheduleId = id;
+  $('#pushTitle').value = s.title || '';
+  $('#pushBody').value = s.body || '';
+  $('#pushLink').value = s.url || '';
+  setSegment(s.segment || 'all');
+  onComposeInput();
+  const d = new Date(s.sendAt);
+  const pad=n=>String(n).padStart(2,'0');
+  $('#scheduleAt').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  $('#sendCardTitle').textContent = 'Редагування запланованої розсилки';
+  $('#scheduleLabel').textContent = 'Новий час розсилки';
+  $('#scheduleBtn').textContent = '💾 Зберегти зміни';
+  $('#scheduleCancelEditBtn').classList.remove('hidden');
+  switchTab('send');
+  window.scrollTo({top:document.querySelector('#scheduleBlock').offsetTop-10, behavior:'smooth'});
+}
+function cancelScheduleEdit(){
+  editingScheduleId=null;
+  $('#sendCardTitle').textContent = 'Надіслати сповіщення';
+  $('#scheduleLabel').textContent = 'Або запланувати на потім';
+  $('#scheduleBtn').textContent = '🕐 Запланувати';
+  $('#scheduleCancelEditBtn').classList.add('hidden');
+}
+let scheduledCache=[];
 async function loadSchedule(){
   const data = await api('/admin/schedule/list').catch(()=>null);
   const box = $('#schList');
   if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
-  if(!data.scheduled.length){ box.innerHTML='<div class="muted">Запланованих розсилок немає.</div>'; return; }
-  box.innerHTML = data.scheduled.map(s => {
+  scheduledCache = data.scheduled;
+  if(!scheduledCache.length){ box.innerHTML='<div class="muted">Запланованих розсилок немає.</div>'; return; }
+  box.innerHTML = scheduledCache.map(s => {
     const d = new Date(s.sendAt);
     const dateStr = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-    const segLabel = s.segment==='inactive7d' ? 'неактивним 7+ дн.' : 'усім';
+    const segLabel = s.segment==='inactive7d' ? 'неактивним 7+ дн.' : s.segment==='new7d' ? 'новим 7 дн.' : 'усім';
     return `<div class="schrow">
       <div class="schmain">
         <div class="schwhen">${dateStr} · ${escHtml(segLabel)}</div>
         <b>${escHtml(s.title)}</b>
       </div>
-      <button class="chip" onclick="cancelSchedule('${s.id}')">Скасувати</button>
+      <div class="schbtns">
+        <button class="chip tpl" onclick="editSchedule('${s.id}')">✎</button>
+        <button class="chip" onclick="cancelSchedule('${s.id}')">✕</button>
+      </div>
     </div>`;
   }).join('');
 }
 async function cancelSchedule(id){
-  if(!confirm('Скасувати цю заплановану розсилку?')) return;
+  const ok = await confirmModal('Скасувати розсилку?', 'Цю заплановану розсилку буде скасовано.', 'Скасувати розсилку', true);
+  if(!ok) return;
   const data = await api('/admin/schedule/cancel', { id }).catch(()=>null);
-  if(!data || !data.ok){ alert('Не вдалося скасувати.'); return; }
+  if(!data || !data.ok){ toast('Не вдалося скасувати.'); return; }
+  if(editingScheduleId===id) cancelScheduleEdit();
+  toast('Скасовано');
   loadSchedule();
 }
 
@@ -364,7 +790,8 @@ async function loadGrowth(){
   box.innerHTML = renderGrowthSvg(data.growth);
 }
 function renderGrowthSvg(points){
-  const w=Math.max(320, points.length*26), h=140, padL=30, padB=22, padT=10, padR=10;
+  const availW = Math.min(488, (document.querySelector('.wrap')||document.body).clientWidth - 36 - 2);
+  const w=Math.max(availW>0?availW:280, Math.min(points.length*26, 640)), h=140, padL=30, padB=22, padT=10, padR=10;
   const max=Math.max(1, ...points.map(p=>p.count));
   const min=Math.min(0, ...points.map(p=>p.count));
   const xw=(w-padL-padR)/(points.length-1||1);
@@ -374,7 +801,7 @@ function renderGrowthSvg(points){
   const areaPath = path + ` L${xFor(points.length-1).toFixed(1)},${(h-padB).toFixed(1)} L${xFor(0).toFixed(1)},${(h-padB).toFixed(1)} Z`;
   const lastLabelEvery = Math.max(1, Math.ceil(points.length/6));
   const labels = points.map((p,i)=> (i%lastLabelEvery===0 || i===points.length-1) ? `<text x="${xFor(i).toFixed(1)}" y="${h-6}" font-size="9" fill="var(--tx2)" text-anchor="middle">${p.date.slice(5)}</text>` : '').join('');
-  return `<svg class="growsvg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+  return `<svg class="growsvg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMinYMid meet">
     <line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="var(--sep)" stroke-width="1"/>
     <path d="${areaPath}" fill="var(--blue)" opacity="0.12" stroke="none"/>
     <path d="${path}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -385,62 +812,187 @@ function renderGrowthSvg(points){
 
 // ===== Заготовки =====
 let templatesCache=[];
+let tplCategoryActive='';
+const TPL_EMOJIS = ['📢','🎉','🔧','💡','⚠️','🚕','💸','🆕'];
 async function loadTemplates(){
   const data = await api('/admin/templates/list').catch(()=>null);
   const box = $('#tplList');
   if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
   templatesCache = data.templates;
+  renderTplCategoryFilter();
+  renderTemplates();
+}
+function renderTplCategoryFilter(){
+  const cats = [...new Set(templatesCache.map(t=>t.category).filter(Boolean))];
+  const box = $('#tplCategoryFilter');
+  if(!cats.length){ box.innerHTML=''; return; }
+  box.innerHTML = `<button class="chip filter ${tplCategoryActive===''?'on':''}" onclick="setTplCategory('')">Усі</button>` +
+    cats.map(c=>`<button class="chip filter ${tplCategoryActive===c?'on':''}" onclick="setTplCategory('${c.replace(/'/g,"\\'")}')">${escHtml(c)}</button>`).join('');
+}
+function setTplCategory(c){ tplCategoryActive=c; renderTplCategoryFilter(); renderTemplates(); }
+function renderTemplates(){
+  const box = $('#tplList');
+  const list = tplCategoryActive ? templatesCache.filter(t=>t.category===tplCategoryActive) : templatesCache;
   if(!templatesCache.length){ box.innerHTML='<div class="muted">Заготовок ще немає — напишіть повідомлення нижче й натисніть «Зберегти як заготовку».</div>'; return; }
-  box.innerHTML = templatesCache.map(t => `
+  if(!list.length){ box.innerHTML='<div class="muted">У цій категорії поки порожньо.</div>'; return; }
+  box.innerHTML = list.map(t => `
     <div class="tplrow">
       <div class="tplmain" onclick="useTemplate('${t.id}')">
-        <b>${escHtml(t.title || '(без заголовка)')}</b>
-        <span class="tplbody">${escHtml(t.body)}</span>
+        ${t.emoji?`<span class="tplemoji">${escHtml(t.emoji)}</span>`:''}
+        <div class="tpltext">
+          ${t.category?`<span class="tplcat">${escHtml(t.category)}</span>`:''}
+          <b>${escHtml(t.title || '(без заголовка)')}</b>
+          <span class="tplbody">${escHtml(t.body)}</span>
+        </div>
       </div>
       <button class="chip" onclick="deleteTemplate('${t.id}')">✕</button>
     </div>
   `).join('');
 }
+let tplEmojiActive='';
+function renderTplEmojiPick(){
+  $('#tplEmojiPick').innerHTML = TPL_EMOJIS.map(e=>`<button type="button" class="${tplEmojiActive===e?'on':''}" onclick="pickTplEmoji('${e}')">${e}</button>`).join('');
+}
+function pickTplEmoji(e){ tplEmojiActive = (tplEmojiActive===e) ? '' : e; renderTplEmojiPick(); }
 function useTemplate(id){
   const t = templatesCache.find(x=>x.id===id); if(!t) return;
   $('#pushTitle').value = t.title || '';
   $('#pushBody').value = t.body || '';
-  updCounters();
+  tplEmojiActive = t.emoji || '';
+  $('#tplCategoryInput').value = t.category || '';
+  renderTplEmojiPick();
+  onComposeInput();
   window.scrollTo({top:document.querySelector('#pushTitle').closest('.card').offsetTop-10, behavior:'smooth'});
 }
 async function saveAsTemplate(){
   const title = $('#pushTitle').value.trim();
   const body = $('#pushBody').value.trim();
-  if(!title && !body){ alert('Спершу напишіть заголовок або текст.'); return; }
-  const data = await api('/admin/templates/save', { title, body }).catch(()=>null);
-  if(!data || !data.ok){ alert('Не вдалося зберегти заготовку.'); return; }
+  if(!title && !body){ toast('Спершу напишіть заголовок або текст.'); return; }
+  const category = $('#tplCategoryInput').value.trim();
+  const data = await api('/admin/templates/save', { title, body, emoji: tplEmojiActive, category }).catch(()=>null);
+  if(!data || !data.ok){ toast('Не вдалося зберегти заготовку.'); return; }
   templatesCache = data.templates;
-  loadTemplates();
+  toast('Заготовку збережено');
+  renderTplCategoryFilter(); renderTemplates();
 }
 async function deleteTemplate(id){
-  if(!confirm('Видалити цю заготовку?')) return;
+  const ok = await confirmModal('Видалити заготовку?', 'Цю заготовку буде видалено назавжди.', 'Видалити', true);
+  if(!ok) return;
   const data = await api('/admin/templates/delete', { id }).catch(()=>null);
-  if(!data || !data.ok){ alert('Не вдалося видалити.'); return; }
+  if(!data || !data.ok){ toast('Не вдалося видалити.'); return; }
   templatesCache = data.templates;
-  loadTemplates();
+  renderTplCategoryFilter(); renderTemplates();
+}
+
+// ===== Опитування =====
+let pollOptionsCount=2;
+function resetPollOptions(){
+  pollOptionsCount=2;
+  $('#pollOptions').innerHTML = `
+    <input type="text" class="pollopt" placeholder="Варіант 1" maxlength="60">
+    <input type="text" class="pollopt" placeholder="Варіант 2" maxlength="60">
+  `;
+}
+function addPollOption(){
+  if(pollOptionsCount>=5){ toast('Максимум 5 варіантів'); return; }
+  pollOptionsCount++;
+  const input=document.createElement('input');
+  input.type='text'; input.className='pollopt'; input.maxLength=60;
+  input.placeholder='Варіант '+pollOptionsCount;
+  $('#pollOptions').appendChild(input);
+}
+let currentPollSegment='all';
+function setPollSegment(seg){
+  currentPollSegment=seg;
+  const labels=['all','inactive7d','new7d'];
+  $('#pollSegSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on', labels[i]===seg));
+}
+async function createPoll(){
+  const question = $('#pollQuestion').value.trim();
+  const options = [...document.querySelectorAll('.pollopt')].map(el=>el.value.trim()).filter(Boolean);
+  if(!question){ toast('Напишіть питання'); return; }
+  if(options.length<2){ toast('Потрібно щонайменше 2 варіанти'); return; }
+  const ok = await confirmModal('Надіслати опитування?', `Питання «${question}» піде як push-сповіщення.`, 'Надіслати');
+  if(!ok) return;
+  const btn = $('#pollSendBtn');
+  btn.disabled=true; btn.textContent='Надсилаємо…';
+  const data = await api('/admin/poll/create', { question, options, segment: currentPollSegment }).catch(()=>null);
+  btn.disabled=false; btn.textContent='🗳 Надіслати опитування';
+  const result = $('#pollSendResult');
+  if(!data || !data.ok){ result.style.color='var(--red)'; result.textContent='Помилка: '+(data&&data.error||'не вдалося звʼязатися з сервером'); return; }
+  result.style.color='var(--green)';
+  result.textContent = `Готово: надіслано ${data.sent}${data.failed?`, не вдалось ${data.failed}`:''}.`;
+  $('#pollQuestion').value=''; resetPollOptions();
+  toast('Опитування надіслано');
+  loadPolls();
+}
+async function loadPolls(){
+  const data = await api('/admin/poll/list').catch(()=>null);
+  const box = $('#pollList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(!data.polls.length){ box.innerHTML='<div class="muted">Опитувань ще не було.</div>'; return; }
+  box.innerHTML = data.polls.map(p=>`<div class="pollrow" id="poll-${p.id}"><b>${escHtml(p.question)}</b><div class="muted" style="margin-bottom:6px">${new Date(p.createdAt).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div><div id="pollres-${p.id}" class="muted">Завантаження результатів…</div></div>`).join('');
+  data.polls.forEach(p=>loadPollResults(p));
+}
+async function loadPollResults(poll){
+  const data = await api('/admin/poll/results', { id: poll.id }).catch(()=>null);
+  const box = document.getElementById('pollres-'+poll.id);
+  if(!box) return;
+  if(!data || !data.ok){ box.textContent='Не вдалося завантажити результати.'; return; }
+  const total = data.total || 0;
+  if(!total){ box.textContent='Поки без відповідей.'; return; }
+  box.innerHTML = poll.options.map((opt,i)=>{
+    const c = (data.counts && data.counts[i]) || 0;
+    const pct = total ? Math.round(c/total*100) : 0;
+    return `<div class="pollresrow"><div class="phead"><span>${escHtml(opt)}</span><span class="muted">${c} · ${pct}%</span></div><div class="bartrack"><div class="barfill" style="width:${pct}%"></div></div></div>`;
+  }).join('') + `<div class="muted" style="margin-top:4px">Усього відповідей: ${total}</div>`;
 }
 
 // ===== Історія =====
+let historyCache=[];
 async function loadHistory(){
   const data = await api('/admin/history').catch(()=>null);
+  if(!data || !data.ok){ $('#histList').innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  historyCache = data.history;
+  let sent=0, delivered=0;
+  historyCache.forEach(h=>{ sent++; delivered += (h.sent||0); });
+  $('#totalSentCount').textContent = sent;
+  $('#totalDeliveredCount').textContent = delivered;
+  renderHistory();
+}
+function renderHistory(){
   const box = $('#histList');
-  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
-  if(!data.history.length){ box.innerHTML='<div class="muted">Розсилок ще не було.</div>'; return; }
-  box.innerHTML = data.history.map(h => {
+  const q = ($('#histSearch') && $('#histSearch').value || '').trim().toLowerCase();
+  const list = q ? historyCache.filter(h => (h.title||'').toLowerCase().includes(q) || (h.body||'').toLowerCase().includes(q)) : historyCache;
+  if(!list.length){ box.innerHTML = `<div class="muted">${q?'Нічого не знайдено.':'Розсилок ще не було.'}</div>`; return; }
+  box.innerHTML = list.map(h => {
+    const idx = historyCache.indexOf(h);
     const d = new Date(h.sentAt);
     const dateStr = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-    const segLabel = h.segment==='inactive7d' ? 'неактивним 7+ дн.' : 'усім';
+    const segLabel = h.segment==='inactive7d' ? 'неактивним 7+ дн.' : h.segment==='new7d' ? 'новим 7 дн.' : 'усім';
+    const ctr = h.sent ? Math.round((h.clicks||0)/h.sent*100) : null;
     return `<div class="histrow">
-      <div class="histhead"><span>${dateStr} · ${escHtml(segLabel)}</span><span>✓${h.sent}${h.failed?' · ✕'+h.failed:''}</span></div>
+      <div class="histhead"><span>${dateStr} · ${escHtml(segLabel)}${h.scheduled?' · за розкладом':''}${h.poll?' · опитування':''}</span><span>✓${h.sent}${h.failed?' · ✕'+h.failed:''}</span></div>
       <b>${escHtml(h.title)}</b>
       <div class="histbody">${escHtml(h.body)}</div>
+      ${ctr!==null?`<div class="muted" style="margin-top:3px">Відкрито: ${h.clicks||0} з ${h.sent} (${ctr}%)</div>`:''}
+      <div class="histactions">${h.poll?'':`<button class="btn small ghost" onclick="resendFromHistory(${idx})">🔁 Надіслати ще раз</button>`}</div>
     </div>`;
   }).join('');
+}
+function exportHistoryCsv(){
+  if(!historyCache.length){ toast('Історія порожня'); return; }
+  const rows = [['Дата','Заголовок','Текст','Сегмент','Надіслано','Не вдалось','Відкрито']];
+  historyCache.forEach(h=>{
+    const d = new Date(h.sentAt).toLocaleString('uk-UA');
+    rows.push([d, h.title||'', h.body||'', h.segment||'all', h.sent||0, h.failed||0, h.clicks||0]);
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vodiy-rozsylky-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 function escHtml(s){
