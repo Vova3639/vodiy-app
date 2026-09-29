@@ -477,7 +477,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.11';
+const APP_VERSION='0.9.13';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -487,12 +487,15 @@ const DEV_INFO={
   donateCard:'4874 1000 3367 8577',
   feedbackUrl:'https://t.me/+Cm7sx7py8BViZjAy'
 };
+const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
 /* Версії: бампаємо APP_VERSION і додаємо запис у CHANGELOG лише для «нормальних» оновлень
    (помітний новий функціонал). Дрібні правки/фікси йдуть без нової версії — просто в код,
    і описуються списком у наступному нормальному оновленні. Формат date: 'ДД.MM.РРРР ГГ:ХХ'.
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.13', date:'29.09.2026 11:24', items:['Демо-режим оновлено під усі нові функції: приклади документів і полісів з номером/компанією у Clio й Honda, три різні схеми кредиту/лізингу (щомісячно з прогресом, щотижневий викуп у доларах, свій графік), приклади нотаток (чорний список, адреса, клієнт, ідея), ім’я в профілі']},
+  {v:'0.9.12', date:'29.09.2026 11:19', items:['Після завершення зміни показує, наскільки цей дохід кращий чи гірший за вашу середню зміну','Порівняння «цей тиждень vs минулий» на дашборді тепер із наочними смужками, і його можна вимкнути в Налаштування → Вигляд','Кілька нових пресетів у швидких шаблонах витрат (мийка самообслуговування, незамерзайка, шиномонтаж)','Документи авто: при фотографуванні одразу обираєте тип (техпаспорт, права, ОСЦПВ, КАСКО тощо) замість автоназви','Страхування: додано поля «Страхова компанія» і «Номер полісу», можна прикріпити фото поліса','Кредит/лізинг: три схеми платежів на вибір — щомісячно (як було, тепер ще й з прогресом «виплачено X з Y»), щотижневий викуп (у гривнях чи доларах, з вказаним курсом), або свій довільний графік платежів — усе враховується в точці беззбитковості','«Поділитись застосунком» — у «Профілі» та в «Про розробника», з подякою й пропозицією підтримати донатом після поширення','Нові «Нотатки» в налаштуваннях — клієнти, адреси, чорний список чи будь-що своє, з тегами','Початок зміни тепер підказує платформу за часом доби, якщо є історія змін у цей час']},
   {v:'0.9.11', date:'29.09.2026 10:59', items:['У вкладці «Профіль»: кнопка «Усі налаштування» перенесена вище — одразу під швидкими перемикачами, а не в самому низу','Поруч із версією застосунку у «Профілі» — кнопка «Оновити»: перевіряє, чи є нова версія, і одразу пропонує оновитись, якщо є','Контакти майстрів і СТО: додано швидкі кнопки типових спеціалізацій (шиномонтаж, електрик, СТО, кузовний ремонт, мийка, діагностика) — не тільки вільний текст']},
   {v:'0.9.10', date:'29.09.2026 10:53', items:['Додавання платформи в Налаштування → Платформи: тепер зверху готові кнопки (Uklon, OnTaxi, Glovo, Bolt Food, iPost) — дотик одразу додає платформу з правильним типом і посиланням, а не лише вручну через назву']},
   {v:'0.9.9', date:'29.09.2026 10:20', items:['Ряд швидких кнопок на дашборді («Почати зміну», «Чи вигідне?», «Витрата», «Заправка») тепер акуратною сіткою 2×2 — усі видно одразу, без прокрутки вбік','Нагадування «Ще не робили резервну копію» більше не притискається впритул до плиток статистики нижче','Дотик на нагадування про резервну копію тепер відкриває вибір: зробити копію або приховати нагадування на 7 чи 30 днів — потім воно з’явиться знову']},
@@ -616,8 +619,9 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:''},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true},
     contacts:[],
+    notes:[],
     goals:{daily:0, weekly:0, monthly:0},
     reminders:[],
     referralLinks: REFERRAL_LINKS_DEFAULT.map(r=>({...r})),
@@ -649,6 +653,8 @@ function load(){
     if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
     if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
     if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
+    if(DB.settings.showWeekCompare===undefined) DB.settings.showWeekCompare=true;
+    if(!DB.notes) DB.notes=[];
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -869,6 +875,10 @@ function renderProfile(){
       ${PLATFORM_MASTER.filter(m=>m.url).map(m=>refCardHtml(m.name, m.url, m.refNote, m.refCode)).join('')}
       ${(DB.referralLinks||[]).map(r=>refCardHtml(r.name, r.url, r.note, r.code)).join('')}
     </div>
+
+    <div class="group" style="margin-top:10px">
+      <div class="row" onclick="shareApp()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('gift',17)}</div><div class="rtitle"><b>Поділитись застосунком</b><div class="sub">Розкажи іншому водію</div></div><span class="chev">›</span></div>
+    </div>
   `;
   $('#main').innerHTML=html;
 }
@@ -921,6 +931,7 @@ function profitForRange(fromDate, toDate){
   return income-exp;
 }
 function weekCompareHtml(){
+  if(DB.settings.showWeekCompare===false) return '';
   const now=new Date(today()+'T00:00:00');
   const d0=new Date(now); d0.setDate(d0.getDate()-6);
   const thisFrom=toLocalISO(d0), thisTo=today();
@@ -930,15 +941,22 @@ function weekCompareHtml(){
   const cur=profitForRange(thisFrom,thisTo);
   const prev=profitForRange(prevFrom,prevTo);
   if(cur===0 && prev===0) return '';
-  let arrow, color, txt;
+  let arrow, color, txt, barHtml='';
   if(prev===0){
     arrow='▲'; color='var(--green)'; txt=`${money(cur)} за останні 7 дн. — попередні 7 дн. без записів`;
   }else{
     const pct=Math.round((cur-prev)/Math.abs(prev)*100);
     arrow=pct>=0?'▲':'▼'; color=pct>=0?'var(--green)':'var(--red)';
     txt=`${pct>=0?'+':''}${pct}% за 7 дн. проти попередніх 7 дн.`;
+    const maxAbs=Math.max(Math.abs(cur),Math.abs(prev),1);
+    const curPct=Math.max(4,Math.round(Math.abs(cur)/maxAbs*100));
+    const prevPct=Math.max(4,Math.round(Math.abs(prev)/maxAbs*100));
+    barHtml=`<div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+      <div style="display:flex;align-items:center;gap:6px"><span style="width:38px;font-size:10px;color:rgba(255,255,255,0.6)">цей</span><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.12)"><div style="width:${curPct}%;height:100%;border-radius:3px;background:${color}"></div></div></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="width:38px;font-size:10px;color:rgba(255,255,255,0.6)">минул.</span><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.12)"><div style="width:${prevPct}%;height:100%;border-radius:3px;background:rgba(255,255,255,0.4)"></div></div></div>
+    </div>`;
   }
-  return `<div class="sub" style="margin-top:5px"><span style="color:${color};font-weight:700">${arrow}</span> ${txt}</div>`;
+  return `<div class="sub" style="margin-top:5px"><span style="color:${color};font-weight:700">${arrow}</span> ${txt}</div>${barHtml}`;
 }
 function todayIncomeSoFar(){ return DB.shifts.filter(s=>s.date===today()).reduce((a,s)=>a+shiftIncome(s),0); }
 function periodDaysCount(){
@@ -991,7 +1009,7 @@ function dashData(){
   const platShiftCount={};
   shifts.forEach(s=>(s.entries||[]).forEach(e=>{ platShiftCount[e.platformId]=(platShiftCount[e.platformId]||0)+1; }));
 
-  const totalMonthlyFixed=activeCars().reduce((a,c)=>a+num(c.loan&&c.loan.monthlyPayment)+carInsurances(c).reduce((s,ins)=>s+num(ins.monthly),0),0) + num(DB.profile.esvMonthly) + (DB.profile.fop==='group2'?num(DB.profile.taxGroup2Fixed):0);
+  const totalMonthlyFixed=activeCars().reduce((a,c)=>a+loanMonthlyEquivalent(c)+carInsurances(c).reduce((s,ins)=>s+num(ins.monthly),0),0) + num(DB.profile.esvMonthly) + (DB.profile.fop==='group2'?num(DB.profile.taxGroup2Fixed):0);
   const periodDays=periodDaysCount();
   const fixedForPeriod=totalMonthlyFixed/30*periodDays;
   const breakevenTotal=fixedForPeriod+expTotal;
@@ -1151,7 +1169,7 @@ function renderDash(){
     <div class="group">`;
     upcoming.forEach(p=>{
       const days=daysUntil(p.date);
-      html+=`<div class="row" onclick="openPaymentsList()" style="cursor:pointer"><div class="rtitle"><b>${esc(p.carName)} · ${esc(p.label)}</b><div class="sub">${dueBadge(days)}</div></div><div class="rval tnum">${money(p.amount)}</div></div>`;
+      html+=`<div class="row" onclick="openPaymentsList()" style="cursor:pointer"><div class="rtitle"><b>${esc(p.carName)} · ${esc(p.label)}</b><div class="sub">${dueBadge(days)}</div></div><div class="rval tnum">${p.amountLabel||money(p.amount)}</div></div>`;
     });
     html+=`</div>
     <div class="group" style="margin-top:6px"><button class="btn add" style="padding:10px 14px" onclick="openPaymentsList()">Усі платежі${payments.length>upcoming.length?' ('+payments.length+')':''}</button></div>`;
@@ -1239,7 +1257,7 @@ function openDashProfitDetail(){
 function openDashBreakevenDetail(){
   const d=dashData();
   const ok=d.breakevenDelta>=0;
-  const carsWithFinance=activeCars().filter(c=>num(c.loan&&c.loan.monthlyPayment)>0||carInsurances(c).some(ins=>num(ins.monthly)>0));
+  const carsWithFinance=activeCars().filter(c=>loanMonthlyEquivalent(c)>0||carInsurances(c).some(ins=>num(ins.monthly)>0));
   let html=`<h3>Точка беззбитковості</h3><div class="confirm-msg">${ok?'Вже в плюсі на '+money(d.breakevenDelta):'Ще потрібно заробити '+money(-d.breakevenDelta)}</div>`;
   html+=`<div class="field"><label>Розрахунок за період (${d.periodDays} дн.)</label><div class="group">
     <div class="row"><div class="rtitle"><b>Фіксовані витрати (кредит/лізинг + страхування)</b><div class="sub">${money(d.totalMonthlyFixed)}/міс · пропорційно періоду</div></div><div class="rval tnum neg">${money(d.fixedForPeriod)}</div></div>
@@ -1883,10 +1901,24 @@ function lastFinishedShift(){
   if(!DB.shifts.length) return null;
   return [...DB.shifts].sort((a,b)=>b.date.localeCompare(a.date)||String(b.id).localeCompare(String(a.id)))[0];
 }
+function shiftTimeBucket(h){ return h>=6&&h<11?'morning': h>=11&&h<17?'day': h>=17&&h<22?'evening':'night'; }
+function suggestedPlatformIds(){
+  const nowBucket=shiftTimeBucket(new Date().getHours());
+  const counts={};
+  DB.shifts.forEach(s=>{
+    if(!s.startTime) return;
+    if(shiftTimeBucket(new Date(s.startTime).getHours())!==nowBucket) return;
+    (s.entries||[]).forEach(e=>{ if(e.platformId) counts[e.platformId]=(counts[e.platformId]||0)+1; });
+  });
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length) return [];
+  const total=entries.reduce((a,[,c])=>a+c,0);
+  return entries.filter(([,c])=>c/total>=0.3).map(([id])=>id).filter(id=>DB.platforms.some(p=>p.id===id)).slice(0,2);
+}
 function openStartShiftForm(){
   if(!activeCars().length){ showSheet(`<h3>Спершу додайте авто</h3><div class="confirm-msg">Зміну потрібно прив'язати до активного авто. Перейдіть у вкладку «Авто» (можливо, усі ваші авто зараз в архіві).</div><button class="btn ghost" onclick="closeSheet()">Зрозуміло</button>`); return; }
   const activeIds=activeCars().map(c=>c.id);
-  let sel=[];
+  let sel=suggestedPlatformIds();
   const draft=loadStartDraft();
   const lastCarId = DB.lastUsed && DB.lastUsed.carId && activeIds.includes(DB.lastUsed.carId) ? DB.lastUsed.carId : '';
   const lastShift = lastFinishedShift();
@@ -1897,7 +1929,7 @@ function openStartShiftForm(){
     ${canRepeat?`<button class="btn ghost" style="margin-bottom:10px" onclick="repeatLastShift()">🔁 Повторити останню зміну (авто + платформи)</button>`:''}
     <div style="margin-top:4px">
       <div class="field"><label>Авто</label><select id="stCar" onchange="saveStartDraft(collectStartDraft())">${activeCars().map(c=>`<option value="${c.id}" ${c.id===lastCarId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
-      <div class="field"><label>Де працюєте зараз</label><div id="stChips">${platformChips(sel,'toggleStPlat')}</div></div>
+      <div class="field"><label>Де працюєте зараз${sel.length?` <span class="sub" style="font-weight:400">· підказано за часом доби</span>`:''}</label><div id="stChips">${platformChips(sel,'toggleStPlat')}</div></div>
       <div class="field"><label>Одометр на старті, км (необов'язково)</label><input type="number" inputmode="decimal" id="stOdo" oninput="saveStartDraft(collectStartDraft())"></div>
       <div class="field"><label>Готівка при собі зараз, ₴ <button type="button" class="infob" onclick="alertSheet('Готівка при собі','Скільки готівки у вас на руках на момент початку зміни. Допомагає звірити суму в кінці зміни, якщо частина замовлень оплачена готівкою.')">i</button></label><input type="number" inputmode="decimal" id="stCash" placeholder="0" oninput="saveStartDraft(collectStartDraft())"></div>
       <button class="btn green" onclick="doStartShift()">▶ Почати зміну</button>
@@ -2123,8 +2155,29 @@ function openFinishShiftForm(){
     const endTime=Date.now();
     const s={ id:uid(), date:today(), carId:as.carId, entries:finalEntries, hours, platformHours:computePlatformHours(as,endTime), km, startOdo:as.startOdo, endOdo, startCash:as.startCash||0, startTime:as.startTime, endTime, checkins:as.checkins||[], note:$('#fNote').value.trim(), log:[] };
     const car=carById(s.carId); if(car && endOdo>num(car.odo)) car.odo=endOdo;
-    DB.shifts.push(s); DB.activeShift=null; save(); haptic('success'); closeSheet(); render(); manageTimerLoop();
+    const avgBefore=shiftAverageIncome();
+    DB.shifts.push(s); DB.activeShift=null; save(); haptic('success'); render(); manageTimerLoop();
+    openShiftSavedSheet(s, avgBefore);
   };
+}
+function shiftAverageIncome(){
+  if(!DB.shifts.length) return null;
+  return DB.shifts.reduce((a,x)=>a+shiftIncome(x),0)/DB.shifts.length;
+}
+function openShiftSavedSheet(s, avg){
+  const income=shiftIncome(s);
+  let cmpHtml='';
+  if(avg!==null && avg>0){
+    const pct=Math.round((income-avg)/avg*100);
+    const better=pct>=0;
+    cmpHtml=`<div class="confirm-msg" style="margin-top:10px"><span style="color:${better?'var(--green)':'var(--red)'};font-weight:700">${better?'▲':'▼'} ${better?'+':''}${pct}%</span> ${better?'краще':'гірше'} за вашу середню зміну (${money(avg)})</div>`;
+  }
+  showSheet(`
+    <h3>Зміну збережено ✅</h3>
+    <div class="confirm-msg">Дохід зміни: ${money(income)}</div>
+    ${cmpHtml}
+    <button class="btn primary" style="margin-top:14px" onclick="closeSheet()">Готово</button>
+  `, {center:true});
 }
 function openManualShiftForm(){
   if(!activeCars().length){ showSheet(`<h3>Спершу додайте авто</h3><div class="confirm-msg">Зміну потрібно прив'язати до активного авто. Перейдіть у вкладку «Авто» (можливо, усі ваші авто зараз в архіві).</div><button class="btn ghost" onclick="closeSheet()">Зрозуміло</button>`); return; }
@@ -2356,10 +2409,13 @@ function renderExpenses(){
 }
 const EXPENSE_TEMPLATES=[
   {name:'Мийка', cat:'onshift', amount:120, work:true, payment:'cash'},
+  {name:'Мийка самообслуговування', cat:'onshift', amount:80, work:true, payment:'cash'},
   {name:'Паркінг', cat:'onshift', amount:50, work:true, payment:'cash'},
   {name:'Перекус', cat:'onshift', amount:60, work:true, payment:'cash'},
+  {name:'Незамерзайка', cat:'onshift', amount:100, work:true, payment:'cash'},
   {name:'Штраф', cat:'fines', amount:0, work:true},
-  {name:'Дрібний ремонт', cat:'service', amount:0, work:true}
+  {name:'Дрібний ремонт', cat:'service', amount:0, work:true},
+  {name:'Шиномонтаж', cat:'service', amount:0, work:true}
 ];
 function allExpenseTemplates(){ return [...EXPENSE_TEMPLATES, ...(DB.settings.customTemplates||[])]; }
 function openCustomTemplatesSheet(){
@@ -2822,17 +2878,32 @@ function carDocumentsHtml(c){
   return html;
 }
 function pickCarDocument(carId){ const inp=$('#carDocInput'); if(inp){ inp.dataset.car=carId; inp.click(); } }
+const DOC_TYPE_PRESETS=['Техпаспорт','Права водія','ОСЦПВ','КАСКО','Чек СТО','Інше'];
 function onCarDocumentChosen(inputEl){
   const carId=inputEl.dataset.car;
   const file=inputEl.files&&inputEl.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=()=>{
-    const c=carById(carId); if(!c) return;
-    c.documents=c.documents||[];
-    c.documents.push({ id:uid(), name:'Документ '+(c.documents.length+1), date:today(), dataUrl:reader.result });
-    save(); renderCarDetail(carId);
-  };
+  reader.onload=()=>{ window.__pendingDocDataUrl=reader.result; openDocumentTypeSheet(carId, reader.result); };
   reader.readAsDataURL(file);
+}
+function openDocumentTypeSheet(carId, dataUrl){
+  showSheet(`
+    <h3>Тип документа</h3>
+    <img src="${dataUrl}" style="width:100%;border-radius:var(--r-md);margin:10px 0;max-height:220px;object-fit:cover">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      ${DOC_TYPE_PRESETS.map(t=>`<button type="button" class="chip" onclick="saveNewCarDocument('${carId}','${esc(t)}')">${esc(t)}</button>`).join('')}
+    </div>
+    <div class="field"><label>Або своя назва</label><input type="text" id="docTypeCustom" placeholder="напр. Страховий поліс №123"></div>
+    <button class="btn primary" onclick="saveNewCarDocument('${carId}', $('#docTypeCustom').value.trim()||'Документ')">Зберегти</button>
+  `);
+}
+function saveNewCarDocument(carId, name){
+  const c=carById(carId); if(!c) return;
+  const dataUrl=window.__pendingDocDataUrl; if(!dataUrl) return;
+  c.documents=c.documents||[];
+  c.documents.push({ id:uid(), name, date:today(), dataUrl });
+  window.__pendingDocDataUrl=null;
+  save(); closeSheet(); renderCarDetail(carId);
 }
 function openDocumentView(carId,docId){
   const c=carById(carId); if(!c) return;
@@ -3075,11 +3146,18 @@ function nextTaxDueDate(day){
 }
 function daysUntil(dateStr){ if(!dateStr) return null; const d=new Date(dateStr+'T00:00:00'); const t=new Date(today()+'T00:00:00'); return Math.round((d-t)/86400000); }
 function dueBadge(days){ if(days===null) return ''; if(days<0) return `<span class="dot r"></span> прострочено на ${-days} дн.`; if(days<=3) return `<span class="dot r"></span> через ${days} дн.`; if(days<=10) return `<span class="dot y"></span> через ${days} дн.`; return `<span class="dot g"></span> через ${days} дн.`; }
+function moneyCur(amount, currency){ return currency==='USD' ? '$'+num(amount).toLocaleString('uk-UA',{maximumFractionDigits:2}) : money(amount); }
 function allPayments(){
   const items=[];
   activeCars().forEach(c=>{
-    if(c.loan && num(c.loan.monthlyPayment)>0 && c.loan.nextDate){
-      items.push({ carId:c.id, carName:c.name, kind:'loan', label:'Кредит / лізинг', amount:num(c.loan.monthlyPayment), date:c.loan.nextDate });
+    const loan=c.loan, ltype=loan&&(loan.scheduleType||'monthly');
+    if(loan && ltype==='weekly' && num(loan.weeklyAmount)>0 && loan.nextDate){
+      items.push({ carId:c.id, carName:c.name, kind:'loan', label:'Викуп (щотижнево)', amount:num(loan.weeklyAmount), amountLabel:moneyCur(loan.weeklyAmount, loan.currency), date:loan.nextDate });
+    }else if(loan && ltype==='custom' && (loan.customPayments||[]).length){
+      const upcoming=[...loan.customPayments].filter(p=>p.date>=today()).sort((a,b)=>a.date.localeCompare(b.date))[0];
+      if(upcoming) items.push({ carId:c.id, carName:c.name, kind:'loan', label:'Кредит / лізинг'+(upcoming.note?' · '+upcoming.note:''), amount:num(upcoming.amount), date:upcoming.date });
+    }else if(loan && num(loan.monthlyPayment)>0 && loan.nextDate){
+      items.push({ carId:c.id, carName:c.name, kind:'loan', label:'Кредит / лізинг', amount:num(loan.monthlyPayment), date:loan.nextDate });
     }
     carInsurances(c).forEach(ins=>{
       if(!ins.renewDate) return;
@@ -3101,7 +3179,7 @@ function openPaymentsList(){
     const days=daysUntil(p.date);
     html+=`<div class="row" onclick="closeSheet();openCarDetail('${p.carId}')" style="cursor:pointer">
       <div class="rtitle"><b>${esc(p.carName)} · ${esc(p.label)}</b><div class="sub">${fmtDate(p.date)} · ${dueBadge(days)}</div></div>
-      <div class="rval tnum">${money(p.amount)}</div><span class="chev">›</span>
+      <div class="rval tnum">${p.amountLabel||money(p.amount)}</div><span class="chev">›</span>
     </div>`;
   });
   html+=`</div>`;
@@ -3125,17 +3203,125 @@ function openPaymentsList(){
   }
   showSheet(html);
 }
-function carFinanceHtml(c){
+function loanMonthlyEquivalent(c){
+  const loan=c.loan; if(!loan) return 0;
+  const type=loan.scheduleType||'monthly';
+  if(type==='weekly'){
+    const uah = loan.currency==='USD' ? num(loan.weeklyAmount)*(num(loan.usdRate)||0) : num(loan.weeklyAmount);
+    return uah*4.345;
+  }
+  if(type==='custom'){
+    const list=loan.customPayments||[];
+    if(!list.length) return 0;
+    const from=today();
+    const toD=new Date(from+'T00:00:00'); toD.setMonth(toD.getMonth()+12);
+    const to=toLocalISO(toD);
+    const sum=list.filter(p=>p.date>=from && p.date<=to).reduce((a,p)=>a+num(p.amount),0);
+    return sum/12;
+  }
+  return num(loan.monthlyPayment);
+}
+function loanScheduleLabel(loan){
+  const type=(loan&&loan.scheduleType)||'monthly';
+  if(type==='weekly') return 'Щотижневий викуп';
+  if(type==='custom') return 'Свій графік платежів';
+  return 'Щомісячний платіж';
+}
+function loanFieldsHtml(c, type){
   const loan=c.loan||{};
   const loanDays=daysUntil(loan.nextDate);
-  const inss=carInsurances(c);
-  let html=`<div class="section-label">Кредит / лізинг <button type="button" class="infob" onclick="alertSheet('Кредит або лізинг','Щомісячний платіж враховується як фіксована витрата в розрахунку точки беззбитковості на дашборді. Дата наступного платежу — лише нагадування, автоматично нічого не списується.')">i</button></div>
-  <div class="group" style="padding:2px 0">
+  if(type==='weekly'){
+    return `
+    <div class="row2">
+      <div class="field"><label>Сума щотижня</label><input type="number" inputmode="decimal" value="${loan.weeklyAmount||''}" id="lnWeekly"></div>
+      <div class="field"><label>Валюта</label><div class="seg" id="lnCurSeg"><button class="${(loan.currency||'UAH')==='UAH'?'on':''}" onclick="setLoanCur('UAH')">₴ UAH</button><button class="${loan.currency==='USD'?'on':''}" onclick="setLoanCur('USD')">$ USD</button></div></div>
+    </div>
+    <div id="lnRateWrap" style="${loan.currency==='USD'?'':'display:none'}" class="row"><div class="field" style="flex:1;margin:0"><label>Курс USD→UAH (вручну)</label><input type="number" inputmode="decimal" placeholder="напр. 42" value="${loan.usdRate||''}" id="lnUsdRate"></div></div>
+    <div class="row"><div class="field" style="flex:1;margin:0"><label>Дата наступного платежу ${loanDays!==null?dueBadge(loanDays):''}</label><input type="date" value="${loan.nextDate||''}" id="lnDate"></div></div>
+    `;
+  }
+  if(type==='custom'){
+    const list=loan.customPayments||[];
+    const next=[...list].filter(p=>p.date>=today()).sort((a,b)=>a.date.localeCompare(b.date))[0];
+    return `<div class="row"><div class="rtitle"><div class="sub">${list.length?`${list.length} запланованих платежів${next?', найближчий '+fmtDate(next.date)+' · '+money(num(next.amount)):''}`:'Ще немає жодного запланованого платежу — додайте нижче кнопкою «Керувати платежами»'}</div></div></div>`;
+  }
+  return `
     <div class="row"><div class="field" style="flex:1;margin:0"><label>Щомісячний платіж, ₴</label><input type="number" inputmode="decimal" value="${loan.monthlyPayment||''}" id="lnMonthly"></div></div>
     <div class="row"><div class="field" style="flex:1;margin:0"><label>Дата наступного платежу ${loanDays!==null?dueBadge(loanDays):''}</label><input type="date" value="${loan.nextDate||''}" id="lnDate"></div></div>
-    <div class="row"><div class="field" style="flex:1;margin:0"><label>Залишилось платежів</label><input type="number" inputmode="decimal" placeholder="напр. 18" value="${loan.remainingMonths||''}" id="lnRemain"></div></div>
+    <div class="row2">
+      <div class="field"><label>Залишилось платежів</label><input type="number" inputmode="decimal" placeholder="напр. 18" value="${loan.remainingMonths||''}" id="lnRemain"></div>
+      <div class="field"><label>Загалом місяців</label><input type="number" inputmode="decimal" placeholder="напр. 60" value="${loan.totalMonths||''}" id="lnTotal"></div>
+    </div>
+    ${(num(loan.totalMonths)>0 && loan.remainingMonths!==undefined && loan.remainingMonths!=='')?(()=>{ const paid=Math.max(0,num(loan.totalMonths)-num(loan.remainingMonths)); const pct=Math.min(100,Math.round(paid/num(loan.totalMonths)*100)); return `<div class="row" style="display:block"><div class="sub" style="margin-bottom:6px">Виплачено ${paid} з ${num(loan.totalMonths)} (${pct}%)</div><div class="btrack"><div class="bfill" style="width:${pct}%;background:var(--teal)"></div></div></div>`; })():''}
+  `;
+}
+function setLoanType(carId, type){
+  const c=carById(carId); if(!c) return;
+  c.loan=c.loan||{};
+  c.loan.scheduleType=type;
+  save(); renderCarDetail(carId);
+}
+function setLoanCur(cur){
+  const seg=document.getElementById('lnCurSeg'); if(seg) seg.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',(i===0)===(cur==='UAH')));
+  const rw=document.getElementById('lnRateWrap'); if(rw) rw.style.display = cur==='USD'?'':'none';
+}
+function openCustomLoanPayments(carId){
+  const c=carById(carId); if(!c) return;
+  c.loan=c.loan||{}; c.loan.customPayments=c.loan.customPayments||[];
+  const list=[...c.loan.customPayments].sort((a,b)=>a.date.localeCompare(b.date));
+  let html=`<h3>Графік платежів · ${esc(c.name)}</h3><div class="confirm-msg">Додайте кожен платіж окремо — дату й суму.</div>`;
+  html+=`<div class="group" style="margin-top:10px">`;
+  html+= list.length ? list.map(p=>`<div class="row" onclick="openCustomLoanPaymentForm('${carId}','${p.id}')" style="cursor:pointer"><div class="rtitle"><b>${fmtDate(p.date)}</b>${p.note?`<div class="sub">${esc(p.note)}</div>`:''}</div><div class="rval tnum">${money(num(p.amount))}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає платежів</div>`;
+  html+=`</div><div class="group" style="margin-top:10px"><button class="btn add" style="padding:12px 14px" onclick="openCustomLoanPaymentForm('${carId}')">+ Додати платіж</button></div>`;
+  html+=`<button class="btn ghost" style="margin-top:10px" onclick="closeSheet();renderCarDetail('${carId}')">Готово</button>`;
+  showSheet(html);
+}
+function openCustomLoanPaymentForm(carId, payId){
+  const c=carById(carId); if(!c) return;
+  c.loan=c.loan||{}; c.loan.customPayments=c.loan.customPayments||[];
+  const p = payId ? c.loan.customPayments.find(x=>x.id===payId) : null;
+  showSheet(`
+    <h3>${p?'Редагувати платіж':'Новий платіж'}</h3>
+    <div style="margin-top:14px">
+      <div class="field"><label>Дата</label><input type="date" id="clpDate" value="${p?p.date:today()}"></div>
+      <div class="field"><label>Сума, ₴</label><input type="number" inputmode="decimal" id="clpAmount" value="${p?p.amount:''}"></div>
+      <div class="field"><label>Нотатка</label><input type="text" id="clpNote" value="${esc(p?p.note||'':'')}"></div>
+      <button class="btn primary" onclick="saveCustomLoanPayment('${carId}',${payId?`'${payId}'`:'null'})">Зберегти</button>
+      ${p?`<button class="btn danger" style="margin-top:10px" onclick="deleteCustomLoanPayment('${carId}','${payId}')">Видалити</button>`:''}
+    </div>
+  `);
+}
+function saveCustomLoanPayment(carId, payId){
+  const c=carById(carId); if(!c) return;
+  c.loan=c.loan||{}; c.loan.customPayments=c.loan.customPayments||[];
+  const date=$('#clpDate').value, amount=num($('#clpAmount').value), note=$('#clpNote').value.trim();
+  if(!date || !amount){ alertSheet('Заповніть поля','Вкажіть дату і суму платежу.'); return; }
+  if(payId){ const p=c.loan.customPayments.find(x=>x.id===payId); if(p) Object.assign(p,{date,amount,note}); }
+  else c.loan.customPayments.push({id:uid(), date, amount, note});
+  save(); openCustomLoanPayments(carId);
+}
+function deleteCustomLoanPayment(carId, payId){
+  const c=carById(carId); if(!c) return;
+  confirmDelete('Видалити платіж?','Цю дію не можна скасувати.', ()=>{
+    c.loan.customPayments=(c.loan.customPayments||[]).filter(x=>x.id!==payId);
+    save(); openCustomLoanPayments(carId);
+  }, ()=>openCustomLoanPaymentForm(carId,payId));
+}
+function carFinanceHtml(c){
+  const loan=c.loan||{};
+  const loanType=loan.scheduleType||'monthly';
+  const loanDays=daysUntil(loan.nextDate);
+  const inss=carInsurances(c);
+  let html=`<div class="section-label">Кредит / лізинг <button type="button" class="infob" onclick="alertSheet('Кредит або лізинг','Обирайте схему платежів, яка відповідає вашому договору. Щомісячний — звичайний кредит чи лізинг з фіксованим платежем. Щотижневий викуп — оренда з викупом, коли платите фіксовану суму щотижня (у гривнях чи доларах). Свій графік — якщо суми чи дати платежів нерегулярні, вказуйте кожен платіж окремо. Усе враховується в розрахунку точки беззбитковості на дашборді (щотижневе й нерегулярне — приблизно, як середньомісячний еквівалент).')">i</button></div>
+  <div class="group" style="padding:2px 0">
+    <div class="row"><div class="field" style="flex:1;margin:0"><label>Схема платежів</label><div class="seg" id="lnTypeSeg">
+      <button class="${loanType==='monthly'?'on':''}" onclick="setLoanType('${c.id}','monthly')">Щомісячно</button>
+      <button class="${loanType==='weekly'?'on':''}" onclick="setLoanType('${c.id}','weekly')">Щотижнево</button>
+      <button class="${loanType==='custom'?'on':''}" onclick="setLoanType('${c.id}','custom')">Свій графік</button>
+    </div></div></div>
+    <div id="lnFieldsWrap">${loanFieldsHtml(c, loanType)}</div>
     <div class="row"><div class="field" style="flex:1;margin:0"><label>Нотатка</label><textarea id="lnNote">${esc(loan.note||'')}</textarea></div></div>
-    <div style="padding:0 14px 14px"><button class="btn primary" onclick="saveLoanFinance('${c.id}')">Зберегти</button></div>
+    <div style="padding:0 14px 14px">${loanType==='custom'?`<button class="btn add" style="margin-bottom:8px" onclick="saveLoanFinance('${c.id}');openCustomLoanPayments('${c.id}')">Керувати платежами (${(loan.customPayments||[]).length})</button>`:''}<button class="btn primary" onclick="saveLoanFinance('${c.id}')">Зберегти</button></div>
   </div>
   <div class="section-label">Страхування <button type="button" class="infob" onclick="alertSheet('Страхування','ОСЦПВ — обов’язкове для всіх авто. КАСКО — за бажанням, страхує саме авто від ДТП, викрадення тощо. КАСКО військових ризиків — окремий поліс на випадок наслідків бойових дій, оформлюється й діє паралельно зі звичайним КАСКО. Можна додати кілька полісів одночасно — усі враховуються в розрахунку точки беззбитковості.')">i</button></div>
   <div class="group">`;
@@ -3147,7 +3333,8 @@ function carFinanceHtml(c){
       ? `${money(num(ins.totalCost))} за ${insTermLabel(ins.periodMonths)} · ≈${money(num(ins.monthly))}/міс`
       : `${money(num(ins.monthly))}/міс`;
     html+=`<div class="row" onclick="openInsuranceForm('${c.id}',${i})" style="cursor:pointer">
-      <div class="rtitle"><b>${esc(t.label)}</b><div class="sub">${costLbl}${days!==null?' · '+dueBadge(days):''}</div></div>
+      ${ins.photo?`<img src="${ins.photo}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0">`:''}
+      <div class="rtitle"><b>${esc(t.label)}${ins.company?' · '+esc(ins.company):''}</b><div class="sub">${costLbl}${days!==null?' · '+dueBadge(days):''}</div></div>
       <span class="chev">›</span>
     </div>`;
   });
@@ -3157,7 +3344,18 @@ function carFinanceHtml(c){
 }
 function saveLoanFinance(id){
   const c=carById(id); if(!c) return;
-  c.loan={ monthlyPayment:num($('#lnMonthly').value), nextDate:$('#lnDate').value||'', remainingMonths:num($('#lnRemain').value), note:$('#lnNote').value.trim() };
+  const old=c.loan||{};
+  const type=old.scheduleType||'monthly';
+  const note=$('#lnNote')?.value.trim()||'';
+  let patch={ note };
+  if(type==='weekly'){
+    const curSeg=$('#lnCurSeg');
+    const currency = curSeg && curSeg.children[1] && curSeg.children[1].classList.contains('on') ? 'USD' : 'UAH';
+    patch={ ...patch, weeklyAmount:num($('#lnWeekly')?.value), currency, usdRate:num($('#lnUsdRate')?.value), nextDate:$('#lnDate')?.value||'' };
+  }else if(type!=='custom'){
+    patch={ ...patch, monthlyPayment:num($('#lnMonthly')?.value), nextDate:$('#lnDate')?.value||'', remainingMonths:num($('#lnRemain')?.value), totalMonths:num($('#lnTotal')?.value) };
+  }
+  c.loan=Object.assign({}, old, patch);
   save(); renderCarDetail(id);
 }
 const INS_TERMS=[['1','1 місяць'],['3','3 місяці'],['6','6 місяців'],['12','12 місяців'],['custom','Свій термін']];
@@ -3171,7 +3369,7 @@ function insTermLabel(months){
 function openInsuranceForm(carId, idx){
   const c=carById(carId); if(!c) return;
   const inss=carInsurances(c);
-  const ins = idx>=0 ? inss[idx] : {type:'kasko', mode:'monthly', monthly:0, periodMonths:12, totalCost:0, renewDate:'', note:''};
+  const ins = idx>=0 ? inss[idx] : {type:'kasko', mode:'monthly', monthly:0, periodMonths:12, totalCost:0, renewDate:'', note:'', company:'', policyNumber:'', photo:''};
   const mode = ins.mode || 'monthly';
   const knownTerm = ['1','3','6','12'].includes(String(ins.periodMonths));
   showSheet(`
@@ -3193,11 +3391,28 @@ function openInsuranceForm(carId, idx){
         <div class="sub" id="insHint" style="margin:-6px 0 10px"></div>
       </div>
       <div class="field"><label>Дата продовження</label><input type="date" id="insDate" value="${ins.renewDate||''}"></div>
-      <div class="field"><label>Нотатка</label><textarea id="insNote" placeholder="Страхова компанія, номер полісу, покриття...">${esc(ins.note||'')}</textarea></div>
+      <div class="row2">
+        <div class="field"><label>Страхова компанія</label><input type="text" id="insCompany" placeholder="напр. USG" value="${esc(ins.company||'')}"></div>
+        <div class="field"><label>Номер полісу</label><input type="text" id="insPolicyNum" placeholder="напр. AI1234567" value="${esc(ins.policyNumber||'')}"></div>
+      </div>
+      <div class="field"><label>Нотатка</label><textarea id="insNote" placeholder="покриття, деталі...">${esc(ins.note||'')}</textarea></div>
+      <div class="field"><label>Фото поліса (необов'язково)</label>
+        <div id="insPhotoWrap">${ins.photo?`<img src="${ins.photo}" style="width:100%;border-radius:var(--r-md);margin-bottom:8px;max-height:180px;object-fit:cover">`:''}</div>
+        <button type="button" class="btn add" style="padding:10px 14px" onclick="pickInsurancePhoto()">${ins.photo?'Замінити фото':'+ Додати фото'}</button>
+        <input type="file" accept="image/*" capture="environment" id="insPhotoInput" style="display:none" onchange="onInsurancePhotoChosen(this)">
+      </div>
       <button class="btn primary" onclick="saveInsuranceForm('${carId}',${idx})">Зберегти</button>
       ${idx>=0?`<button class="btn danger" style="margin-top:10px" onclick="requestDeleteInsurance('${carId}',${idx})">Видалити поліс</button>`:''}
     </div>
   `);
+  window.__insPhoto=ins.photo||'';
+  window.pickInsurancePhoto=()=>{ const inp=$('#insPhotoInput'); if(inp) inp.click(); };
+  window.onInsurancePhotoChosen=(inputEl)=>{
+    const file=inputEl.files&&inputEl.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{ window.__insPhoto=reader.result; $('#insPhotoWrap').innerHTML=`<img src="${reader.result}" style="width:100%;border-radius:var(--r-md);margin-bottom:8px;max-height:180px;object-fit:cover">`; };
+    reader.readAsDataURL(file);
+  };
   const sel=$('#insType'); if(sel) sel.addEventListener('change', ()=>{ const sub=$('#insTypeSub'); if(sub) sub.textContent=(INSURANCE_TYPES[sel.value]||{}).sub||''; });
   const term=$('#insTerm'); if(term) term.addEventListener('change', ()=>{ const cw=$('#insCustomWrap'); if(cw) cw.style.display = term.value==='custom' ? '' : 'none'; updInsHint(); });
   window.setInsMode=(m)=>{
@@ -3221,14 +3436,15 @@ function saveInsuranceForm(carId, idx){
   const inss=carInsurances(c);
   const mode = window.__insMode || 'monthly';
   let entry;
+  const common={ company:$('#insCompany').value.trim(), policyNumber:$('#insPolicyNum').value.trim(), photo:window.__insPhoto||'' };
   if(mode==='period'){
     const t=$('#insTerm').value;
     const months = t==='custom' ? num($('#insCustomMonths').value) : num(t);
     const totalCost=num($('#insTotalCost').value);
     const monthly = months>0 ? totalCost/months : 0;
-    entry={ type:$('#insType').value, mode:'period', periodMonths:months, totalCost, monthly, renewDate:$('#insDate').value||'', note:$('#insNote').value.trim() };
+    entry={ type:$('#insType').value, mode:'period', periodMonths:months, totalCost, monthly, renewDate:$('#insDate').value||'', note:$('#insNote').value.trim(), ...common };
   }else{
-    entry={ type:$('#insType').value, mode:'monthly', monthly:num($('#insMonthly').value), periodMonths:0, totalCost:0, renewDate:$('#insDate').value||'', note:$('#insNote').value.trim() };
+    entry={ type:$('#insType').value, mode:'monthly', monthly:num($('#insMonthly').value), periodMonths:0, totalCost:0, renewDate:$('#insDate').value||'', note:$('#insNote').value.trim(), ...common };
   }
   if(idx>=0) inss[idx]=Object.assign({},inss[idx],entry); else inss.push(Object.assign({id:uid()},entry));
   save(); closeSheet(); renderCarDetail(carId);
@@ -3767,7 +3983,7 @@ function openSettings(tab){
   renderSettingsCurrent();
 }
 function renderSettingsCurrent(){
-  const pages={ profile:renderSettingsProfile, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, data:renderSettingsData, about:renderSettingsAbout };
+  const pages={ profile:renderSettingsProfile, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, notes:renderSettingsNotes, data:renderSettingsData, about:renderSettingsAbout };
   if(SETTINGS_TAB && pages[SETTINGS_TAB]) pages[SETTINGS_TAB]();
   else renderSettingsRoot();
 }
@@ -3803,6 +4019,7 @@ function renderSettingsRoot(){
           <div class="row" onclick="openSettings('platforms')" style="cursor:pointer"><div class="icobadge" style="background:var(--teal)">${icon('bolt',17)}</div><div class="rtitle"><b>Платформи</b><div class="sub">${DB.platforms.length} підключено</div></div><span class="chev">›</span></div>
           <div class="row" onclick="openSettings('referrals')" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('gift',17)}</div><div class="rtitle"><b>Бонуси за реєстрацію</b></div><span class="chev">›</span></div>
           <div class="row" onclick="openSettings('contacts')" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('wrench',17)}</div><div class="rtitle"><b>Контакти майстрів і СТО</b>${DB.contacts.length?`<div class="sub">${DB.contacts.length}</div>`:''}</div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('notes')" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('clip',17)}</div><div class="rtitle"><b>Нотатки</b><div class="sub">Клієнти, адреси, чорний список — усе своє</div></div>${(DB.notes||[]).length?`<div class="sub">${(DB.notes||[]).length}</div>`:''}<span class="chev">›</span></div>
         </div>
         <div class="group" style="margin-top:10px">
           <div class="row" onclick="openSettings('data')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('box',17)}</div><div class="rtitle"><b>Дані й звітність</b><div class="sub">Експорт, резервна копія, демо-режим</div></div><span class="chev">›</span></div>
@@ -3861,6 +4078,8 @@ function renderSettingsAppearance(){
         <div class="seg" style="width:auto"><button class="${!DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.showKopecks?'on':''}" style="padding:6px 12px" onclick="DB.settings.showKopecks=true;save();openSettings('appearance')">Так</button></div></div>
       <div class="row"><div class="rtitle"><b>Подвійне підтвердження</b><div class="sub">Питати двічі перед видаленням</div></div>
         <div class="seg" style="width:auto"><button class="${!DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.doubleConfirm?'on':''}" style="padding:6px 12px" onclick="DB.settings.doubleConfirm=true;save();openSettings('appearance')">Так</button></div></div>
+      <div class="row"><div class="rtitle"><b>Порівняння з минулим тижнем</b><div class="sub">Рядок під чистим прибутком на дашборді</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.settings.showWeekCompare?'on':''}" style="padding:6px 12px" onclick="DB.settings.showWeekCompare=false;save();openSettings('appearance')">Ні</button><button class="${DB.settings.showWeekCompare?'on':''}" style="padding:6px 12px" onclick="DB.settings.showWeekCompare=true;save();openSettings('appearance')">Так</button></div></div>
     </div>
     <div class="group" style="margin-top:10px;padding:12px 14px">
       <div class="rtitle" style="margin-bottom:8px"><b>Тема застосунку</b><div class="sub">Готовий набір кольорів у стилі платформи, з якою працюєте</div></div>
@@ -3972,6 +4191,49 @@ function renderSettingsContacts(){
   `;
   settingsPage('Контакти майстрів і СТО', body);
 }
+const NOTE_TAG_PRESETS=['Чорний список','Клієнт','Адреса','Ідея'];
+function renderSettingsNotes(){
+  const notes=[...(DB.notes||[])].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const body=`
+    <div class="section-label">Нотатки <button type="button" class="infob" onclick="alertSheet('Нотатки','Вільні нотатки — клієнти, адреси, ідеї, чорний список чи будь-що інше, що зручно тримати під рукою. Тег можна обрати з готових або написати свій.')">i</button></div>
+    <div class="group">
+      ${notes.length ? notes.map(n=>`<div class="row" onclick="openNoteForm('${n.id}')" style="cursor:pointer">${n.tag==='Чорний список'?`<span class="dot" style="background:var(--red)"></span>`:''}<div class="rtitle"><b>${esc(n.text.slice(0,60))}${n.text.length>60?'…':''}</b>${n.tag?`<div class="sub">${esc(n.tag)}</div>`:''}</div><span class="chev">›</span></div>`).join('') : `<div class="empty">Ще немає нотаток</div>`}
+      <div class="row" onclick="openNoteForm()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">+ Додати нотатку</span></div>
+    </div>
+  `;
+  settingsPage('Нотатки', body);
+}
+function noteById(id){ return (DB.notes||[]).find(x=>x.id===id); }
+function openNoteForm(id){
+  const n = id ? noteById(id) : null;
+  let tag = n ? (n.tag||'') : '';
+  showSheet(`
+    <h3>${n?'Редагувати нотатку':'Нова нотатка'}</h3>
+    <div style="margin-top:14px">
+      <div class="field"><label>Текст</label><textarea id="ntText" placeholder="напр. адреса клієнта, номер авто, ідея...">${esc(n?n.text:'')}</textarea></div>
+      <div class="field"><label>Тег (необов'язково)</label><input type="text" id="ntTag" placeholder="свій тег" value="${esc(tag)}"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px">
+        ${NOTE_TAG_PRESETS.map(t=>`<button type="button" class="chip ${tag===t?'on':''}" onclick="$('#ntTag').value='${esc(t)}'">${esc(t)}</button>`).join('')}
+      </div>
+      <button class="btn primary" onclick="saveNote(${id?`'${id}'`:'null'})">Зберегти</button>
+      ${n?`<button class="btn danger" style="margin-top:10px" onclick="requestDeleteNote('${id}')">Видалити нотатку</button>`:''}
+    </div>
+  `);
+}
+function saveNote(id){
+  const text=$('#ntText').value.trim();
+  if(!text){ alertSheet('Порожня нотатка','Напишіть хоч щось — інакше нема що зберігати.'); return; }
+  const data={ text, tag:$('#ntTag').value.trim() };
+  DB.notes=DB.notes||[];
+  if(id){ const n=noteById(id); if(n) Object.assign(n, data); }
+  else DB.notes.push({ id:uid(), createdAt:Date.now(), ...data });
+  save(); closeSheet(); openSettings('notes');
+}
+function requestDeleteNote(id){
+  confirmDelete('Видалити нотатку?', 'Цю дію не можна скасувати.', ()=>{
+    DB.notes=(DB.notes||[]).filter(x=>x.id!==id); save(); closeSheet(); openSettings('notes');
+  }, ()=>openNoteForm(id));
+}
 function renderSettingsData(){
   const body=`
     <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
@@ -4074,6 +4336,9 @@ function openDeveloperPage(){
           <div class="row" onclick="${DEV_INFO.feedbackUrl?`window.open('${esc(DEV_INFO.feedbackUrl)}','_blank')`:`alertSheet('Ідеї та баги','Канал для пропозицій і повідомлень про помилки ще не підключено — скоро з’явиться тут.')`}" style="cursor:pointer"><div class="rtitle"><b>💡 Ідея чи 🐞 баг</b><div class="sub">Розкажіть, що покращити або що не працює</div></div><span class="chev">›</span></div>
         </div>
 
+        <div class="section-label">Поділитись</div>
+        <div class="group"><div class="row" onclick="shareApp()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('gift',17)}</div><div class="rtitle"><b>Поділитись застосунком</b><div class="sub">Розкажи іншому водію — раптом йому теж стане зручніше</div></div><span class="chev">›</span></div></div>
+
         <div class="section-label">Підтримати розробку <button type="button" class="infob" onclick="alertSheet('Підтримати розробку','Застосунок безкоштовний і робиться в вільний час. Якщо він заощадив вам час чи гроші — можна підтримати донатом, повністю за бажанням.')">i</button></div>
         <div class="group">
           ${DEV_INFO.donateUrl?`<div class="ctacard"><div class="rtitle"><b style="color:var(--orange)">☕ Банка на monobank</b></div><a href="${esc(DEV_INFO.donateUrl)}" target="_blank" rel="noopener" class="ctabtn">Відкрити →</a></div>`:`<div class="row"><div class="rtitle"><b>Задонатити</b><div class="sub">Посилання на донат ще не додано</div></div></div>`}
@@ -4093,6 +4358,25 @@ function openDeveloperPage(){
 
       </div>
     </div>`;
+}
+function shareApp(){
+  const url=APP_SHARE_URL;
+  const text='«Водій» — зручний облік прибутку таксі та доставки для водіїв в Україні. Спробуй:';
+  if(navigator.share){
+    navigator.share({title:'Водій', text, url}).then(()=>showShareThanksSheet()).catch(()=>{});
+  }else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>{ showShareThanksSheet(); }).catch(()=>alertSheet('Посилання на застосунок', url));
+  }else{
+    alertSheet('Посилання на застосунок', url);
+  }
+}
+function showShareThanksSheet(){
+  showSheet(`
+    <h3>Дякую, що ділишся! 🙏</h3>
+    <div class="confirm-msg">Кожна людина, яка дізнається про застосунок завдяки тобі, — додаткова мотивація робити його краще. Якщо є бажання, можна ще й підтримати розробку.</div>
+    ${DEV_INFO.donateUrl?`<a href="${esc(DEV_INFO.donateUrl)}" target="_blank" rel="noopener" class="btn primary" style="display:block;text-align:center;margin-top:12px;text-decoration:none">☕ Підтримати донатом</a>`:''}
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Закрити</button>
+  `, {center:true});
 }
 function changelogHtml(){
   return CHANGELOG.map(c=>`<div style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:2px">v${esc(c.v)}${c.date?` <span style="font-weight:400;color:var(--tx2);font-size:12px">· ${esc(c.date)}</span>`:''}</div><ul style="margin:4px 0 0;padding-left:18px;color:var(--tx2);font-size:13px;line-height:1.6">${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
@@ -4655,6 +4939,8 @@ function tryApplyBackup(text){
       if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
       if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
       if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
+      if(DB.settings.showWeekCompare===undefined) DB.settings.showWeekCompare=true;
+      if(!DB.notes) DB.notes=[];
       if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
       if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
@@ -4665,10 +4951,14 @@ function tryApplyBackup(text){
 }
 
 /* ============ DEMO DATA ============ */
+function demoDocImg(label){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><rect width="320" height="200" fill="#dfe3e8"/><text x="160" y="108" font-size="18" text-anchor="middle" fill="#6b7280" font-family="sans-serif">${label}</text></svg>`;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
 function buildDemoDB(){
   const DB2=defaultDB();
   DB2.onboardingDone=true;
-  DB2.profile={workType:'both', fop:'group3', taxGroup2Fixed:1417, taxGroup3Rate:5, esvMonthly:1760};
+  DB2.profile={workType:'both', fop:'group3', taxGroup2Fixed:1417, taxGroup3Rate:5, esvMonthly:1760, name:'Олексій', taxReminderEnabled:true, taxReminderDay:15};
   DB2.platforms=PLATFORM_MASTER.map(p=>({...p, commissionPct: p.id==='uklon'?15:p.id==='ontaxi'?12:p.id==='glovo'?20:0}));
   const clio='demo-clio', honda='demo-honda', skoda='demo-skoda';
   DB2.cars=[
@@ -4753,17 +5043,32 @@ function buildDemoDB(){
   DB2.fuel.push({ id:uid(), carId:skoda, date:toLocalISO(new Date(Date.now()-100*86400000)), odo:skodaOdoStart, amount:34, cost:1200, full:true });
   DB2.fuel.push({ id:uid(), carId:skoda, date:toLocalISO(new Date(Date.now()-92*86400000)), odo:DB2.cars.find(x=>x.id===skoda).odo, amount:30, cost:1000, full:true });
 
-  DB2.cars.find(x=>x.id===honda).loan = { monthlyPayment:4200, nextDate:toLocalISO(new Date(Date.now()+12*86400000)), remainingMonths:14, note:'Кредит у банку «Приклад», щомісяця 5 числа' };
+  DB2.cars.find(x=>x.id===honda).loan = { scheduleType:'monthly', monthlyPayment:4200, nextDate:toLocalISO(new Date(Date.now()+12*86400000)), remainingMonths:14, totalMonths:60, note:'Кредит у банку «Приклад», щомісяця 5 числа' };
+  DB2.cars.find(x=>x.id===clio).loan = { scheduleType:'weekly', weeklyAmount:80, currency:'USD', usdRate:42, nextDate:toLocalISO(new Date(Date.now()+4*86400000)), note:'Оренда з викупом, платіж щоп’ятниці' };
+  DB2.cars.find(x=>x.id===skoda).loan = { scheduleType:'custom', customPayments:[
+    { id:uid(), date:toLocalISO(new Date(Date.now()-70*86400000)), amount:6000, note:'Перший внесок за оренду' },
+    { id:uid(), date:toLocalISO(new Date(Date.now()-40*86400000)), amount:3000, note:'Другий платіж' }
+  ], note:'Оренду вже повернули, графік закритий' };
   DB2.cars.find(x=>x.id===clio).insurances = [
-    { id:uid(), type:'oscpv', mode:'monthly', monthly:180, periodMonths:0, totalCost:0, renewDate:toLocalISO(new Date(Date.now()+40*86400000)), note:'' }
+    { id:uid(), type:'oscpv', mode:'monthly', monthly:180, periodMonths:0, totalCost:0, renewDate:toLocalISO(new Date(Date.now()+40*86400000)), note:'', company:'USG', policyNumber:'AI7734521', photo:demoDocImg('ОСЦПВ · Clio') }
   ];
   DB2.cars.find(x=>x.id===honda).insurances = [
-    { id:uid(), type:'oscpv', mode:'monthly', monthly:200, periodMonths:0, totalCost:0, renewDate:toLocalISO(new Date(Date.now()+2*86400000)), note:'' },
-    { id:uid(), type:'kasko', mode:'period', periodMonths:12, totalCost:14400, monthly:1200, renewDate:toLocalISO(new Date(Date.now()+200*86400000)), note:'Страхова «Приклад», каско' },
+    { id:uid(), type:'oscpv', mode:'monthly', monthly:200, periodMonths:0, totalCost:0, renewDate:toLocalISO(new Date(Date.now()+2*86400000)), note:'', company:'ІНГО', policyNumber:'AM1123980' },
+    { id:uid(), type:'kasko', mode:'period', periodMonths:12, totalCost:14400, monthly:1200, renewDate:toLocalISO(new Date(Date.now()+200*86400000)), note:'Страхова «Приклад», каско', company:'ІНГО', policyNumber:'KS4409211' },
     { id:uid(), type:'kasko_war', mode:'period', periodMonths:6, totalCost:3600, monthly:600, renewDate:toLocalISO(new Date(Date.now()+9*86400000)), note:'Окремий поліс на воєнні ризики' }
   ];
   DB2.cars.find(x=>x.id===skoda).insurances = [
     { id:uid(), type:'oscpv', mode:'monthly', monthly:170, periodMonths:0, totalCost:0, renewDate:toLocalISO(new Date(Date.now()-30*86400000)), note:'Поліс закінчився після повернення оренди' }
+  ];
+
+  DB2.cars.find(x=>x.id===clio).documents = [
+    { id:uid(), name:'Техпаспорт', date:toLocalISO(new Date(Date.now()-200*86400000)), dataUrl:demoDocImg('Техпаспорт · Clio') },
+    { id:uid(), name:'ОСЦПВ', date:toLocalISO(new Date(Date.now()-40*86400000)), dataUrl:demoDocImg('ОСЦПВ · Clio') }
+  ];
+  DB2.cars.find(x=>x.id===honda).documents = [
+    { id:uid(), name:'Техпаспорт', date:toLocalISO(new Date(Date.now()-300*86400000)), dataUrl:demoDocImg('Техпаспорт · Honda') },
+    { id:uid(), name:'КАСКО', date:toLocalISO(new Date(Date.now()-60*86400000)), dataUrl:demoDocImg('КАСКО · Honda') },
+    { id:uid(), name:'Чек СТО', date:toLocalISO(new Date(Date.now()-40*86400000)), dataUrl:demoDocImg('Чек СТО · Honda') }
   ];
 
   DB2.cars.find(x=>x.id===clio).serviceLog = [
@@ -4802,6 +5107,13 @@ function buildDemoDB(){
     { id:uid(), text:'Здати звіт ФОП за квартал', date:toLocalISO(new Date(Date.now()+11*86400000)), done:false },
     { id:uid(), text:'Замінити склоочисники', date:toLocalISO(new Date(Date.now()-2*86400000)), done:false },
     { id:uid(), text:'Подзвонити в банк щодо кредиту', date:'', done:true }
+  ];
+
+  DB2.notes = [
+    { id:uid(), text:'Пасажир з вул. Гагаріна 14 — постійно скасовує замовлення після подачі', tag:'Чорний список', createdAt:Date.now()-20*86400000 },
+    { id:uid(), text:'ЖК «Комфорт Таун», в’їзд з боку Регенераторної — шлагбаум, треба дзвонити на рецепцію', tag:'Адреса', createdAt:Date.now()-14*86400000 },
+    { id:uid(), text:'Клієнтка Марина — постійно замовляє по п’ятницях увечері, дає добрі чайові', tag:'Клієнт', createdAt:Date.now()-9*86400000 },
+    { id:uid(), text:'Спробувати возити воду в бардачку влітку — часто просять', tag:'Ідея', createdAt:Date.now()-3*86400000 }
   ];
 
   return DB2;
