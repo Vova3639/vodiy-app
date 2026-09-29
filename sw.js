@@ -1,4 +1,4 @@
-const CACHE = 'vodiy-v37';
+const CACHE = 'vodiy-v38';
 const ASSETS = [
   './',
   './index.html',
@@ -61,6 +61,30 @@ self.addEventListener('fetch', (e) => {
         }
         return res;
       });
+    })
+  );
+});
+
+// Push-сповіщення (від vodiy-push worker на Cloudflare).
+self.addEventListener('push', (e) => {
+  let data = { title: 'Водій', body: '' };
+  try { if (e.data) data = e.data.json(); } catch (err) {}
+  const opts = {
+    body: data.body || '',
+    icon: './icon-192.png',
+    badge: './icon-32.png',
+    tag: data.tag || 'vodiy',
+    data: { url: './' }
+  };
+  e.waitUntil(self.registration.showNotification(data.title || 'Водій', opts));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) { if ('focus' in c) return c.focus(); }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
     })
   );
 });
