@@ -484,7 +484,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.28';
+const APP_VERSION='0.9.30';
 const PUSH_WORKER_URL='https://vodiy-push.vova3639.workers.dev';
 const VAPID_PUBLIC_KEY='BPsqd992FWBsMOxbVnU6mv81urUPfACv4HJqJS3aMgtgJ8EjK4vhlHX34GMyhlpi2sqQmJxZexIyaVLYzvGAmGo';
 const PUSH_APP_SECRET='-Ir0ChVhJ90OTvNo6wrdbiTzsJNxkCMR';
@@ -504,6 +504,8 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.30', date:'29.09.2026 16:15', items:['У Профілі зʼявляється прихована кнопка «Адмінка» — але лише для акаунтів з білого списку адміністраторів, і тільки після успішної синхронізації з Google Диском (застосунок сам, без жодних дій, перевіряє вашу пошту на сервері)']},
+  {v:'0.9.29', date:'29.09.2026 16:05', items:['Push-сповіщення від розробника (з адмінки) тепер можуть вести на конкретний розділ застосунку — натиснув сповіщення, і одразу відкрилось потрібне місце, а не просто головний екран']},
   {v:'0.9.28', date:'29.09.2026 15:16', items:['Справжні push-сповіщення про дедлайни — податки, страховку, ТО, кредит і особисті нагадування — тепер приходять навіть коли застосунок закритий, на iPhone (після встановлення на головний екран) і Android','Новий розділ «Сповіщення» в Профілі й Налаштуваннях: вмикається одним перемикачем, є кнопка тестового сповіщення і список того, що саме надсилатиметься','На сервер передаються лише короткі підписи й дати найближчих подій — без сум доходу, витрат чи інших фінансових деталей; вимикається будь-коли']},
   {v:'0.9.27', date:'29.09.2026 14:09', items:['Вкладка «Профіль» переробена: тепер там швидкий доступ одразу до всіх розділів налаштувань (Профіль, ФОП, Вигляд, Цілі, Нагадування, Платформи, Контакти, Нотатки, Дані), а не лише посилання «Усі налаштування»','Новий окремий розділ «ФОП і податки» — консультація простими словами, коли й скільки платити для вашої групи, офіційний податковий календар і суми, конверт на податки, звітність','Новий «Особистий ритм відкладання» — нагадування собі готувати гроші на податки заздалегідь у зручному темпі (щомісяця чи щокварталу), незалежно від офіційних строків','Кнопку «Підтримати розробника» додано на видне місце — у вкладку «Профіль» і в корінь «Налаштувань», а не тільки на сторінці «Про застосунок»']},
   {v:'0.9.26', date:'29.09.2026 14:01', items:['Новий режим «Особисте авто» — для тих, хто просто хоче рахувати витрати по своєму авто, без заробітку. Вимикає «Зміни», дохід, платформи, ФОП/податки й конверт на податки — залишає тільки витрати, пальне/зарядку, обслуговування, платежі й нагадування','Вибір режиму додано першим кроком у майстер налаштування при першому запуску — «Заробляю на авто» чи «Особисте авто»','Перемкнути режим можна будь-коли в Профілі чи Налаштуваннях → Профіль і податки — нічого зі старих записів не зникає, вимкнені розділи просто ховаються']},
@@ -644,7 +646,7 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true, gdriveClientId:'', gdriveLastSyncAt:null, gdriveLastSyncEmail:'',
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true, gdriveClientId:'', gdriveLastSyncAt:null, gdriveLastSyncEmail:'', isAdmin:false,
     shareBannerStyle:'minimal', shareBannerOpts:{income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false}},
     contacts:[],
     notes:[],
@@ -684,6 +686,7 @@ function load(){
     if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
     if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
     if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
+    if(DB.settings.isAdmin===undefined) DB.settings.isAdmin=false;
     if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
     if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
     if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
@@ -903,6 +906,8 @@ function renderProfile(){
     <div class="seg" style="margin-bottom:14px">
       ${[['driver','Заробляю на авто'],['personal','Особисте авто']].map(w=>`<button class="${DB.profile.workMode===w[0]?'on':''}" onclick="setWorkMode('${w[0]}')">${w[1]}</button>`).join('')}
     </div>
+
+    ${DB.settings.isAdmin?`<div class="group" style="margin-bottom:10px"><div class="row" onclick="window.open('${esc(APP_SHARE_URL)}admin.html','_blank')" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('wrench',17)}</div><div class="rtitle"><b>Адмінка</b><div class="sub">Розсилки push-сповіщень усім користувачам</div></div><span class="chev">›</span></div></div>`:''}
 
     <div class="section-label">Швидкий доступ</div>
     <div class="group">
@@ -5562,6 +5567,7 @@ function normalizeDB(DB){
   if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
   if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
   if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
+  if(DB.settings.isAdmin===undefined) DB.settings.isAdmin=false;
   if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
   if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
   if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
@@ -5642,7 +5648,26 @@ function gdriveEnsureToken(cb, errCb, forceChooser){
 function gdriveFetchEmail(token){
   return fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers:{Authorization:'Bearer '+token} })
     .then(r=>r.ok?r.json():null)
-    .then(d=>{ gdriveAccountEmail=(d&&d.email)||null; });
+    .then(d=>{ gdriveAccountEmail=(d&&d.email)||null; checkAdminAccess(token); });
+}
+// Після синхронізації з Google Диском перевіряємо на сервері (Worker), чи входить
+// щойно підтверджена пошта в білий список адміністраторів — і якщо так, у Профілі
+// зʼявляється прихований раніше рядок «Адмінка». Сама кнопка нічого не відкриває
+// напряму — веде на окрему сторінку адмінки, яка перевіряє права ще раз сама.
+async function checkAdminAccess(accessToken){
+  try{
+    const resp=await fetch(PUSH_WORKER_URL+'/admin/check-access', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-App-Secret':PUSH_APP_SECRET},
+      body:JSON.stringify({ accessToken })
+    });
+    const data=await resp.json();
+    DB.settings.isAdmin = !!(data && data.ok && data.isAdmin);
+  }catch(e){
+    // мережа підвела — не скидаємо попередньо відомий статус
+  }
+  save({skipPushSync:true});
+  if(TAB==='profile') renderProfile();
 }
 function gdriveApi(path, token, opts){
   opts=opts||{};
@@ -6376,6 +6401,21 @@ function storageInfoLabel(){
     return kb<1024 ? Math.round(kb)+' КБ' : (kb/1024).toFixed(1)+' МБ';
   }catch(e){ return '—'; }
 }
+// Клік по push-сповіщенню від адмінки може вести на конкретний розділ —
+// приходить як #dash, #cars, #settings-notifications тощо (див. Worker).
+function applyDeepLinkFromHash(){
+  try{
+    const h=(location.hash||'').replace('#','');
+    if(!h) return;
+    history.replaceState(null,'',location.pathname+location.search);
+    const TABS=['dash','shifts','expenses','cars','profile'];
+    if(TABS.includes(h)){ setTab(h); return; }
+    if(h.startsWith('settings-')){
+      const tab=h.slice('settings-'.length);
+      setTimeout(()=>openSettings(tab), 60);
+    }
+  }catch(e){}
+}
 function init(){
   applyTheme(getTheme());
   applyAccent();
@@ -6392,6 +6432,7 @@ function init(){
   scheduleUpdateChecks();
   if(!DB.onboardingDone && !isDemo()) startWizard();
   if(DB.push && DB.push.enabled) syncPushItems();
+  if(DB.onboardingDone) applyDeepLinkFromHash();
 }
 init();
 if('serviceWorker' in navigator){
