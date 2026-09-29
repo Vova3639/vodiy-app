@@ -38,6 +38,13 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* Це застосунок для перегляду й швидкого введення даних, не для читання довгих текстів —
+   вимикаємо виділення/спливне меню "Копіювати" при натисканні й утриманні всюди,
+   крім полів вводу й текстових областей (їм воно потрібне, зокрема в розділі «Експорт»). */
+*{ -webkit-user-select:none; -moz-user-select:none; user-select:none; -webkit-touch-callout:none; }
+input, textarea, [contenteditable="true"], [contenteditable=""]{
+  -webkit-user-select:text; -moz-user-select:text; user-select:text; -webkit-touch-callout:default;
+}
 html{ touch-action:manipulation }
 body{
   margin:0; background:var(--bg); color:var(--tx);
@@ -477,7 +484,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.17';
+const APP_VERSION='0.9.18';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -494,6 +501,7 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.18', date:'29.09.2026 12:47', items:['Виправлено рядок «Google Диск» у Даних і звітності — кнопка «Синхр-ти» більше не наїжджає на текст статусу','Виділення й меню «Копіювати» при натисканні й утриманні тепер вимкнено по всьому застосунку (крім полів вводу й розділу «Експорт», де це навпаки потрібно) — це застосунок для перегляду даних, а не для читання тексту','PDF-звіт тепер формується як справжній PDF-файл і одразу відкриває системне меню «Поділитись» (Telegram, Файли, AirDrop, друк) — замість системного друку, який не працював у встановленому на головний екран застосунку на iPhone']},
   {v:'0.9.17', date:'29.09.2026 12:32', items:['Синхронізація з Google Диском тепер розумна: перед відновленням застосунок порівнює дані на телефоні з копією на Диску й показує різницю (скільки нових записів де), а далі на вибір — обʼєднати без втрат і дублів, взяти тільки з Диску, чи тільки з телефону','Кнопка «Синхронізувати» перенесена у верх розділу «Дані й звітність», одразу під «Дані збережено на пристрої»']},
   {v:'0.9.16', date:'29.09.2026 12:04', items:['Вхід у Google Диск тепер завжди показує вибір акаунта (щоб не переплутати, якщо на пристрої авторизовано кілька Google-акаунтів) і показує пошту акаунта, з яким синхронізовано — плюс кнопка «Змінити акаунт» у налаштуваннях синхронізації']},
   {v:'0.9.15', date:'29.09.2026 11:51', items:['Синхронізація з Google Диском тепер не питає Client ID — достатньо просто увійти своїм Google-акаунтом і натиснути «Синхронізувати», все налаштовано наперед']},
@@ -4246,8 +4254,13 @@ function renderSettingsData(){
     <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
     <div class="group">
       <div class="row"><div class="icobadge" style="background:var(--green)">${icon('box',17)}</div><div class="rtitle"><b>Дані збережено на пристрої</b><div class="sub">Займають ${storageInfoLabel()}</div></div></div>
-      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">☁️</div><div class="rtitle"><b>Google Диск</b><div class="sub">${DB.settings.gdriveLastSyncAt?'Синхронізовано '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA')+(DB.settings.gdriveLastSyncEmail?' · '+esc(DB.settings.gdriveLastSyncEmail):''):'Не синхронізовано — натисніть, щоб увімкнути'}</div></div>
-        <button type="button" class="infob" style="background:var(--blue);color:#fff" onclick="event.stopPropagation();gdriveSyncNow(false)">Синхронізувати</button>
+      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer">
+        <div class="icobadge" style="background:var(--blue)">☁️</div>
+        <div class="rtitle" style="min-width:0">
+          <b>Google Диск</b>
+          <div class="sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${DB.settings.gdriveLastSyncAt?'Синхр. '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA')+(DB.settings.gdriveLastSyncEmail?' · '+esc(DB.settings.gdriveLastSyncEmail):''):'Не синхронізовано'}</div>
+        </div>
+        <button type="button" id="gdQuickSyncBtn" class="infob" style="width:auto;height:26px;padding:0 12px;border-radius:13px;font-size:12px;white-space:nowrap;background:var(--blue);color:#fff;flex-shrink:0" onclick="event.stopPropagation();gdriveQuickSync(this)">Синхр-ти</button>
       </div>
       <div class="row"><div class="rtitle"><b>Нагадувати про резервну копію</b><div class="sub">Якщо давно не зберігали — нагадаємо на дашборді</div></div>
         <select style="max-width:110px" onchange="DB.settings.autoBackupDays=+this.value;save()">${[7,14,30,60].map(d=>`<option value="${d}" ${+DB.settings.autoBackupDays===d?'selected':''}>${d} дн.</option>`).join('')}</select>
@@ -4688,6 +4701,46 @@ function buildPdfReportHtml(fromDate, toDate, label){
   html+=`</div>`;
   return html;
 }
+function loadPdfLibs(){
+  if(window.jspdf && window.html2canvas) return Promise.resolve();
+  if(window.__pdfLibsPromise) return window.__pdfLibsPromise;
+  const loadScript=(src)=>new Promise((res,rej)=>{
+    const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('load-fail'));
+    document.head.appendChild(s);
+  });
+  window.__pdfLibsPromise = loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+    .then(()=>loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'));
+  return window.__pdfLibsPromise;
+}
+// Малює звіт у прихований блок, знімає "скріншот" через html2canvas і клеїть його
+// сторінками у справжній PDF-файл — надійніше за window.print(), який на iOS не
+// працює у встановленому (standalone) застосунку на головному екрані.
+async function buildReportPdfBlob(fromDate, toDate, label){
+  await loadPdfLibs();
+  const area=$('#printArea');
+  area.innerHTML=`<div id="pdfCaptureRoot" style="width:760px;background:#fff;padding:26px">${buildPdfReportHtml(fromDate, toDate, label)}</div>`;
+  area.style.display='block'; area.style.position='fixed'; area.style.left='-9999px'; area.style.top='0'; area.style.zIndex='-1';
+  await new Promise(r=>setTimeout(r,80));
+  const target=$('#pdfCaptureRoot');
+  const canvas=await html2canvas(target, {scale:2, backgroundColor:'#ffffff'});
+  area.style.display=''; area.style.position=''; area.style.left=''; area.style.top=''; area.style.zIndex='';
+  area.innerHTML='';
+  const { jsPDF }=window.jspdf;
+  const pdf=new jsPDF({unit:'pt', format:'a4'});
+  const pageW=pdf.internal.pageSize.getWidth(), pageH=pdf.internal.pageSize.getHeight();
+  const imgW=pageW, imgH=canvas.height*(imgW/canvas.width);
+  const imgData=canvas.toDataURL('image/jpeg', 0.92);
+  let heightLeft=imgH, y=0;
+  pdf.addImage(imgData, 'JPEG', 0, y, imgW, imgH);
+  heightLeft-=pageH;
+  while(heightLeft>0){
+    y=heightLeft-imgH;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, y, imgW, imgH);
+    heightLeft-=pageH;
+  }
+  return pdf.output('blob');
+}
 function openPdfReportSheet(){
   const periods=[['month','Цей місяць'],['year','Цей рік'],['all','Весь час']];
   let pRange='month';
@@ -4701,11 +4754,35 @@ function openPdfReportSheet(){
   }
   function bodyHtml(){
     return `<div class="seg" style="margin-bottom:12px">${periods.map(p=>`<button class="${pRange===p[0]?'on':''}" onclick="pdfSetRange('${p[0]}')">${p[1]}</button>`).join('')}</div>
-    <div class="confirm-msg">Відкриє системний друк — там можна обрати «Зберегти як PDF» замість реального принтера.</div>
-    <button class="btn primary" onclick="pdfPrint()">🖨️ Друк / зберегти як PDF</button>`;
+    <div class="confirm-msg">Готовий PDF-файл можна одразу переслати в Telegram, зберегти у Файли чи надрукувати — через системне меню «Поділитись».</div>
+    <button class="btn primary" id="pdfGenBtn" onclick="pdfGenerate()">📤 Поділитись PDF-звітом</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="pdfPrint()">🖨️ Друк (інший спосіб)</button>`;
   }
   showSheet(`<h3>PDF-звіт</h3><div id="pdfWrap">${bodyHtml()}</div>`);
   window.pdfSetRange=(p)=>{ pRange=p; $('#pdfWrap').innerHTML=bodyHtml(); };
+  window.pdfGenerate=async ()=>{
+    const btn=$('#pdfGenBtn');
+    if(btn){ btn.textContent='Готуємо PDF…'; btn.disabled=true; }
+    const r=rangeDates();
+    try{
+      const blob=await buildReportPdfBlob(r.from, r.to, r.label);
+      const filename='vodiy-zvit-'+today()+'.pdf';
+      const file=new File([blob], filename, {type:'application/pdf'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:'Звіт «Водій»', text:r.label});
+      }else{
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download=filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(url), 4000);
+      }
+    }catch(e){
+      if(!(e && e.name==='AbortError')){
+        alertSheet('Не вдалося створити PDF','Спробуйте ще раз, або скористайтесь кнопкою «Друк» нижче.');
+      }
+    }
+    if(btn){ btn.textContent='📤 Поділитись PDF-звітом'; btn.disabled=false; }
+  };
   window.pdfPrint=()=>{
     const r=rangeDates();
     const area=$('#printArea');
@@ -5152,6 +5229,17 @@ function gdriveResolve(mode){
     gdriveSyncNow(true);
     alertSheet('Обʼєднано','Дані з телефону та Google Диску об’єднано без дублів і збережено. Оновлену копію також відправлено назад на Диск.');
   }
+}
+function gdriveQuickSync(btn){
+  if(btn){ btn.textContent='…'; btn.disabled=true; }
+  gdriveEnsureToken(token=>{
+    gdriveFindFileId(token).then(f=>gdriveUpload(token, f&&f.id)).then(()=>{
+      DB.settings.gdriveLastSyncAt=Date.now();
+      DB.settings.gdriveLastSyncEmail=gdriveAccountEmail||'';
+      markBackupDone();
+      renderSettingsData();
+    }).catch(err=>{ if(btn){ btn.textContent='Синхр-ти'; btn.disabled=false; } gdriveErrorSheet(err); });
+  }, err=>{ if(btn){ btn.textContent='Синхр-ти'; btn.disabled=false; } gdriveAuthErrorSheet(err); });
 }
 function gdriveChangeAccount(){
   gdriveSignOut();
