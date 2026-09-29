@@ -1,4 +1,4 @@
-const CACHE = 'vodiy-v38';
+const CACHE = 'vodiy-v39';
 const ASSETS = [
   './',
   './index.html',
@@ -74,17 +74,26 @@ self.addEventListener('push', (e) => {
     icon: './icon-192.png',
     badge: './icon-32.png',
     tag: data.tag || 'vodiy',
-    data: { url: './' }
+    data: { url: data.url || './' }
   };
   e.waitUntil(self.registration.showNotification(data.title || 'Водій', opts));
 });
 
+// Клік по сповіщенню — фокусує вже відкриту вкладку (і переводить її на
+// потрібний розділ, якщо адмінка вказала url), або відкриває нову.
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
+  const rel = (e.notification.data && e.notification.data.url) || './';
+  const targetUrl = new URL(rel, self.registration.scope).href;
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const c of list) { if ('focus' in c) return c.focus(); }
-      if (self.clients.openWindow) return self.clients.openWindow('./');
+      for (const c of list) {
+        if ('focus' in c) {
+          if ('navigate' in c) { c.navigate(targetUrl).catch(() => {}); }
+          return c.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
     })
   );
 });

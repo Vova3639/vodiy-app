@@ -26,7 +26,7 @@
   .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .card h2{font-size:15px;margin:0 0 12px;font-weight:700}
   label{display:block;font-size:12.5px;color:var(--tx2);margin-bottom:6px;font-weight:600}
-  input[type=text], input[type=email], textarea{
+  input[type=text], input[type=email], input[type=datetime-local], textarea, select{
     width:100%;padding:11px 13px;border-radius:11px;border:0.5px solid var(--sep);
     background:var(--fill2);color:var(--tx);font-size:15px;font-family:inherit;margin-bottom:12px
   }
@@ -42,12 +42,35 @@
   .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--sep)}
   .row:last-child{border-bottom:none}
   .chip{background:var(--fill2);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+  .chip.tpl{color:var(--tx);text-align:left;max-width:100%}
   .muted{color:var(--tx2);font-size:13px}
   .stat{font-size:28px;font-weight:800}
+  .statrow{display:flex;gap:18px}
   #gsiBtn{display:flex;justify-content:center;margin-top:8px}
   #status{font-size:13px;padding:10px 0;text-align:center;color:var(--tx2)}
   .hidden{display:none}
   #sendResult{margin-top:10px;font-size:13px}
+  .counter{text-align:right;font-size:11px;color:var(--tx2);margin-top:-8px;margin-bottom:10px}
+  .seg{display:flex;gap:8px;margin-bottom:12px}
+  .seg button{flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx2);font-size:13px;cursor:pointer;font-weight:600}
+  .seg button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .tplrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--sep)}
+  .tplrow:last-child{border-bottom:none}
+  .tplrow .tplmain{flex:1;min-width:0;cursor:pointer}
+  .tplrow .tplmain b{display:block;font-size:14px}
+  .tplrow .tplmain .tplbody{display:block;font-size:12.5px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .histrow{padding:10px 0;border-bottom:0.5px solid var(--sep)}
+  .histrow:last-child{border-bottom:none}
+  .histrow .histhead{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);margin-bottom:3px}
+  .histrow b{font-size:14px}
+  .histrow .histbody{font-size:13px;color:var(--tx2);margin-top:2px}
+  .schrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--sep)}
+  .schrow:last-child{border-bottom:none}
+  .schrow .schmain{flex:1;min-width:0}
+  .schrow .schmain b{display:block;font-size:14px}
+  .schrow .schwhen{font-size:12px;color:var(--blue);font-weight:600}
+  .growwrap{overflow-x:auto}
+  .growsvg{display:block;min-width:100%}
 </style>
 </head>
 <body>
@@ -77,19 +100,76 @@
         <button class="chip" style="color:var(--tx)" onclick="signOut()">Вийти</button>
       </div>
       <div class="row" style="border:none;padding-top:14px">
-        <div class="muted">Зареєстрованих пристроїв</div>
-        <div class="stat" id="deviceCount">—</div>
+        <div class="statrow">
+          <div>
+            <div class="muted">Пристроїв</div>
+            <div class="stat" id="deviceCount">—</div>
+          </div>
+          <div>
+            <div class="muted">Активні (7 дн.)</div>
+            <div class="stat" id="active7dCount" style="font-size:22px;color:var(--tx2)">—</div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Надіслати сповіщення всім</h2>
+      <h2>Заготовки повідомлень</h2>
+      <div class="muted" style="margin-bottom:8px" id="tplHint">Натисніть на заготовку, щоб підставити її в поля нижче.</div>
+      <div id="tplList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Надіслати сповіщення</h2>
+      <div class="seg" id="segSeg">
+        <button class="on" onclick="setSegment('all')">Усім</button>
+        <button onclick="setSegment('inactive7d')">Неактивним 7+ дн.</button>
+      </div>
       <label>Заголовок</label>
-      <input type="text" id="pushTitle" placeholder="Водій" maxlength="120">
+      <input type="text" id="pushTitle" placeholder="Водій" maxlength="120" oninput="updCounters()">
+      <div class="counter" id="titleCounter">0 / 120</div>
       <label>Текст</label>
-      <textarea id="pushBody" placeholder="Наприклад: у застосунку зʼявилась нова функція — перевірте налаштування!" maxlength="500"></textarea>
-      <button class="btn primary" id="sendBtn" onclick="sendPush()">📤 Надіслати всім</button>
+      <textarea id="pushBody" placeholder="Наприклад: у застосунку зʼявилась нова функція — перевірте налаштування!" maxlength="500" oninput="updCounters()"></textarea>
+      <div class="counter" id="bodyCounter">0 / 500</div>
+      <label>Куди веде натискання на сповіщення</label>
+      <select id="pushLink">
+        <option value="">Просто відкрити застосунок</option>
+        <option value="dash">Дашборд</option>
+        <option value="shifts">Зміни</option>
+        <option value="expenses">Витрати</option>
+        <option value="cars">Авто</option>
+        <option value="profile">Профіль</option>
+        <option value="settings-notifications">Налаштування → Сповіщення</option>
+        <option value="settings-reminders">Налаштування → Особисті нагадування</option>
+        <option value="settings-fop">Налаштування → ФОП і податки</option>
+        <option value="settings-data">Налаштування → Дані й звітність</option>
+        <option value="settings-about">Налаштування → Про застосунок</option>
+      </select>
+      <button class="btn primary" id="sendBtn" onclick="sendPush()">📤 Надіслати зараз</button>
+      <button class="btn ghost" style="margin-top:8px" onclick="saveAsTemplate()">💾 Зберегти як заготовку</button>
       <div id="sendResult"></div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--sep)">
+        <label>Або запланувати на потім</label>
+        <input type="datetime-local" id="scheduleAt">
+        <button class="btn ghost" id="scheduleBtn" onclick="createSchedule()">🕐 Запланувати</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Заплановані розсилки</h2>
+      <div id="schList"><div class="muted">Завантаження…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Історія розсилок</h2>
+      <div id="histList"><div class="muted">Завантаження…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Ріст користувачів</h2>
+      <div class="muted" style="margin-bottom:10px">Кількість зареєстрованих пристроїв по днях (останні 90).</div>
+      <div class="growwrap" id="growWrap"><div class="muted">Завантаження…</div></div>
     </div>
 
     <div class="card">
@@ -152,6 +232,10 @@ async function checkAccess(){
   show('app');
   loadStats();
   loadAdmins();
+  loadTemplates();
+  loadHistory();
+  loadSchedule();
+  loadGrowth();
 }
 
 function signOut(){
@@ -165,6 +249,7 @@ function signOut(){
 async function loadStats(){
   const data = await api('/admin/stats').catch(()=>null);
   $('#deviceCount').textContent = (data && data.ok) ? data.devices : '—';
+  $('#active7dCount').textContent = (data && data.ok) ? data.active7d : '—';
 }
 
 async function loadAdmins(){
@@ -196,20 +281,170 @@ async function removeAdmin(email){
   loadAdmins();
 }
 
+let currentSegment='all';
+function setSegment(seg){
+  currentSegment=seg;
+  $('#segSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on', (i===0)===(seg==='all')));
+}
+
+function updCounters(){
+  $('#titleCounter').textContent = $('#pushTitle').value.length+' / 120';
+  $('#bodyCounter').textContent = $('#pushBody').value.length+' / 500';
+}
+
 async function sendPush(){
   const title = $('#pushTitle').value.trim() || 'Водій';
   const body = $('#pushBody').value.trim();
+  const link = $('#pushLink').value;
   if(!body){ alert('Напишіть текст сповіщення'); return; }
-  if(!confirm(`Надіслати це сповіщення всім користувачам (${$('#deviceCount').textContent})?`)) return;
+  const target = currentSegment==='inactive7d' ? 'неактивним 7+ днів користувачам' : `усім користувачам (${$('#deviceCount').textContent})`;
+  if(!confirm(`Надіслати це сповіщення ${target}?`)) return;
   const btn = $('#sendBtn');
   btn.disabled=true; btn.textContent='Надсилаємо…';
   const result = $('#sendResult');
   result.textContent='';
-  const data = await api('/admin/send', { title, body }).catch(()=>null);
-  btn.disabled=false; btn.textContent='📤 Надіслати всім';
+  const data = await api('/admin/send', { title, body, segment: currentSegment, url: link }).catch(()=>null);
+  btn.disabled=false; btn.textContent='📤 Надіслати зараз';
   if(!data || !data.ok){ result.style.color='var(--red)'; result.textContent='Помилка: '+(data&&data.error||'не вдалося звʼязатися з сервером'); return; }
   result.style.color='var(--green)';
-  result.textContent = `Готово: надіслано ${data.sent}${data.failed?`, не вдалось ${data.failed}`:''}.`;
+  result.textContent = `Готово: надіслано ${data.sent}${data.failed?`, не вдалось ${data.failed}`:''}${data.skipped?`, пропущено (не підпадають під сегмент) ${data.skipped}`:''}.`;
+  loadHistory();
+}
+
+// ===== Заплановані розсилки =====
+async function createSchedule(){
+  const title = $('#pushTitle').value.trim() || 'Водій';
+  const body = $('#pushBody').value.trim();
+  const link = $('#pushLink').value;
+  const atStr = $('#scheduleAt').value;
+  if(!body){ alert('Напишіть текст сповіщення'); return; }
+  if(!atStr){ alert('Вкажіть дату й час розсилки'); return; }
+  const sendAt = new Date(atStr).getTime();
+  if(!sendAt || sendAt<=Date.now()){ alert('Час має бути в майбутньому'); return; }
+  const btn = $('#scheduleBtn');
+  btn.disabled=true; btn.textContent='Плануємо…';
+  const data = await api('/admin/schedule/create', { title, body, segment: currentSegment, url: link, sendAt }).catch(()=>null);
+  btn.disabled=false; btn.textContent='🕐 Запланувати';
+  if(!data || !data.ok){ alert('Не вдалося запланувати: '+(data&&data.error||'помилка мережі')); return; }
+  $('#scheduleAt').value='';
+  loadSchedule();
+  alert('Заплановано.');
+}
+async function loadSchedule(){
+  const data = await api('/admin/schedule/list').catch(()=>null);
+  const box = $('#schList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(!data.scheduled.length){ box.innerHTML='<div class="muted">Запланованих розсилок немає.</div>'; return; }
+  box.innerHTML = data.scheduled.map(s => {
+    const d = new Date(s.sendAt);
+    const dateStr = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+    const segLabel = s.segment==='inactive7d' ? 'неактивним 7+ дн.' : 'усім';
+    return `<div class="schrow">
+      <div class="schmain">
+        <div class="schwhen">${dateStr} · ${escHtml(segLabel)}</div>
+        <b>${escHtml(s.title)}</b>
+      </div>
+      <button class="chip" onclick="cancelSchedule('${s.id}')">Скасувати</button>
+    </div>`;
+  }).join('');
+}
+async function cancelSchedule(id){
+  if(!confirm('Скасувати цю заплановану розсилку?')) return;
+  const data = await api('/admin/schedule/cancel', { id }).catch(()=>null);
+  if(!data || !data.ok){ alert('Не вдалося скасувати.'); return; }
+  loadSchedule();
+}
+
+// ===== Графік росту =====
+async function loadGrowth(){
+  const data = await api('/admin/growth').catch(()=>null);
+  const box = $('#growWrap');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(data.growth.length<2){ box.innerHTML='<div class="muted">Даних поки замало — знімок додається щодня автоматично.</div>'; return; }
+  box.innerHTML = renderGrowthSvg(data.growth);
+}
+function renderGrowthSvg(points){
+  const w=Math.max(320, points.length*26), h=140, padL=30, padB=22, padT=10, padR=10;
+  const max=Math.max(1, ...points.map(p=>p.count));
+  const min=Math.min(0, ...points.map(p=>p.count));
+  const xw=(w-padL-padR)/(points.length-1||1);
+  const yFor=v=> padT + (h-padT-padB) * (1 - (v-min)/((max-min)||1));
+  const xFor=i=> padL + i*xw;
+  const path = points.map((p,i)=>`${i===0?'M':'L'}${xFor(i).toFixed(1)},${yFor(p.count).toFixed(1)}`).join(' ');
+  const areaPath = path + ` L${xFor(points.length-1).toFixed(1)},${(h-padB).toFixed(1)} L${xFor(0).toFixed(1)},${(h-padB).toFixed(1)} Z`;
+  const lastLabelEvery = Math.max(1, Math.ceil(points.length/6));
+  const labels = points.map((p,i)=> (i%lastLabelEvery===0 || i===points.length-1) ? `<text x="${xFor(i).toFixed(1)}" y="${h-6}" font-size="9" fill="var(--tx2)" text-anchor="middle">${p.date.slice(5)}</text>` : '').join('');
+  return `<svg class="growsvg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="var(--sep)" stroke-width="1"/>
+    <path d="${areaPath}" fill="var(--blue)" opacity="0.12" stroke="none"/>
+    <path d="${path}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="${padL}" y="14" font-size="11" fill="var(--tx)" font-weight="700">${points[points.length-1].count}</text>
+    ${labels}
+  </svg>`;
+}
+
+// ===== Заготовки =====
+let templatesCache=[];
+async function loadTemplates(){
+  const data = await api('/admin/templates/list').catch(()=>null);
+  const box = $('#tplList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  templatesCache = data.templates;
+  if(!templatesCache.length){ box.innerHTML='<div class="muted">Заготовок ще немає — напишіть повідомлення нижче й натисніть «Зберегти як заготовку».</div>'; return; }
+  box.innerHTML = templatesCache.map(t => `
+    <div class="tplrow">
+      <div class="tplmain" onclick="useTemplate('${t.id}')">
+        <b>${escHtml(t.title || '(без заголовка)')}</b>
+        <span class="tplbody">${escHtml(t.body)}</span>
+      </div>
+      <button class="chip" onclick="deleteTemplate('${t.id}')">✕</button>
+    </div>
+  `).join('');
+}
+function useTemplate(id){
+  const t = templatesCache.find(x=>x.id===id); if(!t) return;
+  $('#pushTitle').value = t.title || '';
+  $('#pushBody').value = t.body || '';
+  updCounters();
+  window.scrollTo({top:document.querySelector('#pushTitle').closest('.card').offsetTop-10, behavior:'smooth'});
+}
+async function saveAsTemplate(){
+  const title = $('#pushTitle').value.trim();
+  const body = $('#pushBody').value.trim();
+  if(!title && !body){ alert('Спершу напишіть заголовок або текст.'); return; }
+  const data = await api('/admin/templates/save', { title, body }).catch(()=>null);
+  if(!data || !data.ok){ alert('Не вдалося зберегти заготовку.'); return; }
+  templatesCache = data.templates;
+  loadTemplates();
+}
+async function deleteTemplate(id){
+  if(!confirm('Видалити цю заготовку?')) return;
+  const data = await api('/admin/templates/delete', { id }).catch(()=>null);
+  if(!data || !data.ok){ alert('Не вдалося видалити.'); return; }
+  templatesCache = data.templates;
+  loadTemplates();
+}
+
+// ===== Історія =====
+async function loadHistory(){
+  const data = await api('/admin/history').catch(()=>null);
+  const box = $('#histList');
+  if(!data || !data.ok){ box.innerHTML='<div class="muted">Не вдалося завантажити.</div>'; return; }
+  if(!data.history.length){ box.innerHTML='<div class="muted">Розсилок ще не було.</div>'; return; }
+  box.innerHTML = data.history.map(h => {
+    const d = new Date(h.sentAt);
+    const dateStr = d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+    const segLabel = h.segment==='inactive7d' ? 'неактивним 7+ дн.' : 'усім';
+    return `<div class="histrow">
+      <div class="histhead"><span>${dateStr} · ${escHtml(segLabel)}</span><span>✓${h.sent}${h.failed?' · ✕'+h.failed:''}</span></div>
+      <b>${escHtml(h.title)}</b>
+      <div class="histbody">${escHtml(h.body)}</div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 window.addEventListener('load', ()=>{
