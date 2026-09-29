@@ -504,7 +504,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.25';
+const APP_VERSION='0.9.27';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -521,6 +521,8 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.27', date:'29.09.2026 14:09', items:['Вкладка «Профіль» переробена: тепер там швидкий доступ одразу до всіх розділів налаштувань (Профіль, ФОП, Вигляд, Цілі, Нагадування, Платформи, Контакти, Нотатки, Дані), а не лише посилання «Усі налаштування»','Новий окремий розділ «ФОП і податки» — консультація простими словами, коли й скільки платити для вашої групи, офіційний податковий календар і суми, конверт на податки, звітність','Новий «Особистий ритм відкладання» — нагадування собі готувати гроші на податки заздалегідь у зручному темпі (щомісяця чи щокварталу), незалежно від офіційних строків','Кнопку «Підтримати розробника» додано на видне місце — у вкладку «Профіль» і в корінь «Налаштувань», а не тільки на сторінці «Про застосунок»']},
+  {v:'0.9.26', date:'29.09.2026 14:01', items:['Новий режим «Особисте авто» — для тих, хто просто хоче рахувати витрати по своєму авто, без заробітку. Вимикає «Зміни», дохід, платформи, ФОП/податки й конверт на податки — залишає тільки витрати, пальне/зарядку, обслуговування, платежі й нагадування','Вибір режиму додано першим кроком у майстер налаштування при першому запуску — «Заробляю на авто» чи «Особисте авто»','Перемкнути режим можна будь-коли в Профілі чи Налаштуваннях → Профіль і податки — нічого зі старих записів не зникає, вимкнені розділи просто ховаються']},
   {v:'0.9.25', date:'29.09.2026 13:49', items:['Новий «Податковий календар» для ФОП у Профілі: точні дати подання декларацій і сплати єдиного податку, військового збору та ЄСВ — окремо для 2 та 3 групи, за чинними на 2026 рік строками (з переносом, якщо дата випадає на вихідний)','Додано облік військового збору (ВЗ) окремо від єдиного податку — і в розрахунку за період, і в PDF-звіті, і в точці беззбитковості','Податкові строки тепер показуються серед «Найближчих платежів» на дашборді разом з кредитами й страховками, а не окремим рядком у нагадуваннях','При виборі групи ФОП суми податків, ВЗ і ЄСВ підставляються автоматично за чинними ставками 2026 року — можна підправити вручну за потреби']},
   {v:'0.9.24', date:'29.09.2026 13:33', items:['Виправлено навігацію «Назад»: якщо відкрили якийсь розділ налаштувань чи «Про розробника» напряму ярликом (з Дашборду, зі «Швидких дій» тощо), кнопка «Назад» тепер одразу закриває вікно туди, звідки й зайшли — а не кидає в корінь «Налаштувань», де довелось би тицяти «Назад»/«Готово» ще кілька разів']},
   {v:'0.9.23', date:'29.09.2026 13:21', items:['У «Огляді» авто — нова секція «Терміни та поліси»: наочна шкала для кожного страхового поліса, платежу за кредит/лізинг і перевзування шин — чим ближче термін, тим повніша й червоніша шкала; для полісів на певний термін шкала показує, скільки його вже минуло']},
@@ -651,7 +653,7 @@ function defaultDB(){
   return {
     v:2,
     onboardingDone:false,
-    profile:{ workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0, name:'' },
+    profile:{ workMode:'driver', workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0, name:'' },
     cars:[],
     platforms:[],
     shifts:[],
@@ -701,7 +703,8 @@ function load(){
     if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
     if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
     if(!DB.notes) DB.notes=[];
-    if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0};
+    if(!DB.profile) DB.profile={workMode:'driver', workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0};
+    if(DB.profile.workMode===undefined) DB.profile.workMode='driver';
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
     if(DB.profile.taxGroup2VZFixed===undefined) DB.profile.taxGroup2VZFixed=0;
     if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -709,6 +712,7 @@ function load(){
     if(DB.profile.esvMonthly===undefined) DB.profile.esvMonthly=0;
     if(DB.profile.taxReminderEnabled===undefined) DB.profile.taxReminderEnabled=false;
     if(DB.profile.taxReminderDay===undefined) DB.profile.taxReminderDay=15;
+    if(DB.profile.taxReminderFreq===undefined) DB.profile.taxReminderFreq='monthly';
     if(DB.profile.name===undefined) DB.profile.name='';
     if(DB.onboardingDone===undefined) DB.onboardingDone=false;
     if(DB.activeShift===undefined) DB.activeShift=null;
@@ -821,8 +825,12 @@ const TAB_INFO={
   profile:'Ваш профіль: фото, ім’я, тип роботи й ФОП, бонуси за реєстрацію на платформах і сервісах, а також швидкий перехід у повні налаштування.'
 };
 function setTab(t){
+  if(isPersonalMode() && t==='shifts') t='dash';
   TAB=t;
-  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+  document.querySelectorAll('.tabbar button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.tab===t);
+    if(b.dataset.tab==='shifts') b.hidden=isPersonalMode();
+  });
   $('#hdrEyebrow').textContent=TITLES[t][0];
   $('#hdrTitle').innerHTML=esc(TITLES[t][1])+(TAB_INFO[t]?` <button type="button" class="infob" onclick="alertSheet('${esc(TITLES[t][1])}','${TAB_INFO[t].replace(/'/g,"\\'")}')">i</button>`:'');
   $('#fab').hidden = false;
@@ -853,11 +861,12 @@ function onFab(){
   else if(TAB==='dash') openQuickAddSheet();
 }
 function openQuickAddSheet(){
+  const shiftRow = isPersonalMode() ? '' : `<div class="row" onclick="closeSheet();setTab('shifts');${DB.activeShift?'openCheckinForm()':'openStartShiftForm()'}" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('play',17)}</div><div class="rtitle"><b>${DB.activeShift?'Запис у зміні, що триває':'Почати зміну'}</b></div><span class="chev">›</span></div>
+      <div class="row" onclick="closeSheet();openManualShiftForm()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('history',17)}</div><div class="rtitle"><b>Минула зміна вручну</b></div><span class="chev">›</span></div>`;
   showSheet(`
     <h3>Швидко додати</h3>
     <div class="group" style="margin-top:12px">
-      <div class="row" onclick="closeSheet();setTab('shifts');${DB.activeShift?'openCheckinForm()':'openStartShiftForm()'}" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('play',17)}</div><div class="rtitle"><b>${DB.activeShift?'Запис у зміні, що триває':'Почати зміну'}</b></div><span class="chev">›</span></div>
-      <div class="row" onclick="closeSheet();openManualShiftForm()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('history',17)}</div><div class="rtitle"><b>Минула зміна вручну</b></div><span class="chev">›</span></div>
+      ${shiftRow}
       <div class="row" onclick="closeSheet();openExpenseForm()" style="cursor:pointer"><div class="icobadge" style="background:var(--red)">${icon('cart',17)}</div><div class="rtitle"><b>Витрата</b></div><span class="chev">›</span></div>
       <div class="row" onclick="quickAddFuel()" style="cursor:pointer"><div class="icobadge" style="background:var(--orange)">${icon('fuel',17)}</div><div class="rtitle"><b>Заправка / зарядка</b></div><span class="chev">›</span></div>
       <div class="row" onclick="closeSheet();openReminderForm()" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('bell',17)}</div><div class="rtitle"><b>Нагадування</b></div><span class="chev">›</span></div>
@@ -894,21 +903,26 @@ function renderProfile(){
       <div class="caravatar-lg" onclick="pickProfilePhoto('profileTabPhotoInput')" style="cursor:pointer">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
       <input type="file" accept="image/*" id="profileTabPhotoInput" style="display:none" onchange="onProfilePhotoChosen(this)">
       <input type="text" value="${esc(DB.profile.name||'')}" placeholder="Ваше ім’я" maxlength="40" style="text-align:center;font-size:17px;font-weight:700;background:transparent;border:0;border-bottom:1px solid var(--sep);padding:6px 4px;width:80%;margin:2px auto 4px;color:var(--tx)" onchange="DB.profile.name=this.value.trim();save();renderProfile()">
-      <div class="sub" style="color:var(--tx2);font-size:13px">${esc(WORK_LABELS[DB.profile.workType]||'')} · ${esc(FOP_LABELS[DB.profile.fop]||'')}</div>
+      <div class="sub" style="color:var(--tx2);font-size:13px">${isPersonalMode()?'Особисте авто':esc(WORK_LABELS[DB.profile.workType]||'')+' · '+esc(FOP_LABELS[DB.profile.fop]||'')}</div>
     </div>
 
-    <div class="section-label">Де працюєте</div>
+    <div class="section-label">Режим використання <button type="button" class="infob" onclick="alertSheet('Режим використання','«Заробляю на авто» — повний облік доходу, змін, платформ і податків. «Особисте авто» — спрощений інтерфейс лише для витрат, пального й обслуговування, без розділу «Зміни». Перемкнути можна будь-коли, дані нікуди не зникають.')">i</button></div>
     <div class="seg" style="margin-bottom:14px">
-      ${[['taxi','Таксі'],['delivery','Доставка'],['both','Обидва']].map(w=>`<button class="${DB.profile.workType===w[0]?'on':''}" onclick="DB.profile.workType='${w[0]}';save();renderProfile()">${w[1]}</button>`).join('')}
+      ${[['driver','Заробляю на авто'],['personal','Особисте авто']].map(w=>`<button class="${DB.profile.workMode===w[0]?'on':''}" onclick="setWorkMode('${w[0]}')">${w[1]}</button>`).join('')}
     </div>
 
-    <div class="section-label">ФОП</div>
-    <div class="seg" style="margin-bottom:14px">
-      ${[['none','Немає'],['group2','2 група'],['group3','3 група']].map(w=>`<button class="${DB.profile.fop===w[0]?'on':''}" onclick="DB.profile.fop='${w[0]}';applyFopDefaults();save();renderProfile()">${w[1]}</button>`).join('')}
-    </div>
-
+    <div class="section-label">Швидкий доступ</div>
     <div class="group">
-      <div class="row" onclick="openSettings()" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('info',17)}</div><div class="rtitle"><b>Усі налаштування</b><div class="sub">Вигляд, цілі, нагадування, дані й ще</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openSettings('profile')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('person',17)}</div><div class="rtitle"><b>Профіль</b><div class="sub">Де працюєте, фото, ім'я</div></div><span class="chev">›</span></div>
+      ${!isPersonalMode()?`<div class="row" onclick="openSettings('fop')" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('info',17)}</div><div class="rtitle"><b>ФОП і податки</b><div class="sub">${esc(FOP_LABELS[DB.profile.fop]||'Немає')}${DB.profile.fop!=='none'?' · календар і консультації':''}</div></div><span class="chev">›</span></div>`:''}
+      <div class="row" onclick="openSettings('appearance')" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('palette',17)}</div><div class="rtitle"><b>Вигляд</b><div class="sub">Тема, акцентний колір, розмір тексту</div></div><span class="chev">›</span></div>
+      ${!isPersonalMode()?`<div class="row" onclick="openSettings('goals')" style="cursor:pointer"><div class="icobadge" style="background:var(--red)">${icon('target',17)}</div><div class="rtitle"><b>Цілі по прибутку</b></div><span class="chev">›</span></div>`:''}
+      <div class="row" onclick="openSettings('reminders')" style="cursor:pointer"><div class="icobadge" style="background:var(--orange)">${icon('bell',17)}</div><div class="rtitle"><b>Особисті нагадування</b>${DB.reminders.length?`<div class="sub">${DB.reminders.length}</div>`:''}</div><span class="chev">›</span></div>
+      ${!isPersonalMode()?`<div class="row" onclick="openSettings('platforms')" style="cursor:pointer"><div class="icobadge" style="background:var(--teal)">${icon('bolt',17)}</div><div class="rtitle"><b>Платформи</b><div class="sub">${DB.platforms.length} підключено</div></div><span class="chev">›</span></div>`:''}
+      <div class="row" onclick="openSettings('contacts')" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('wrench',17)}</div><div class="rtitle"><b>Контакти майстрів і СТО</b>${DB.contacts.length?`<div class="sub">${DB.contacts.length}</div>`:''}</div><span class="chev">›</span></div>
+      <div class="row" onclick="openSettings('notes')" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('clip',17)}</div><div class="rtitle"><b>Нотатки</b></div><span class="chev">›</span></div>
+      <div class="row" onclick="openSettings('data')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('box',17)}</div><div class="rtitle"><b>Дані й звітність</b><div class="sub">Експорт, резервна копія, демо-режим</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openSettings()" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('info',17)}</div><div class="rtitle"><b>Усі налаштування</b></div><span class="chev">›</span></div>
     </div>
 
     <div class="group" style="margin-top:10px">
@@ -917,6 +931,8 @@ function renderProfile(){
         <button type="button" class="infob" style="width:auto;height:24px;padding:0 10px;border-radius:10px;font-size:11.5px;background:${UPDATE_AVAILABLE?'var(--blue)':'var(--fill)'};color:${UPDATE_AVAILABLE?'#fff':'var(--tx2)'}" onclick="event.stopPropagation();checkForUpdate(true)">${UPDATE_AVAILABLE?'Оновити 🎉':esc(APP_VERSION)+' · Оновити'}</button>
       </div>
     </div>
+
+    ${donateCardHtml()}
 
     <div class="section-label">Знижки та бонуси <button type="button" class="infob" onclick="alertSheet('Знижки та бонуси','Реферальні посилання на платформи й сервіси, якими сам користуюсь. Перехід і реєстрація за ними — за бажанням, і зазвичай дає бонус і вам.')">i</button></div>
     <div class="group">
@@ -1135,7 +1151,102 @@ function renderProfitTrendSvg(buckets){
     ${bars}${labels}
   </svg>`;
 }
+function renderDashPersonal(){
+  const d=dashData();
+  const { expenses, fuelCost, otherExp, expTotal, km, byCar } = d;
+  const periods=[['today','Сьогодні'],['7d','7 днів'],['month','Місяць'],['year','Рік'],['all','Весь час']];
+
+  let html=`<div class="qarow">
+    <button class="qapill ghost" onclick="openExpenseForm()">${icon('cart',16)} Витрата</button>
+    <button class="qapill ghost" onclick="quickAddFuel()">${icon('fuel',16)} Заправка / зарядка</button>
+  </div>`;
+
+  html+=`<div class="seg">${periods.map(p=>`<button class="${PERIOD===p[0]?'on':''}" onclick="PERIOD='${p[0]}';render()">${p[1]}</button>`).join('')}
+    <button class="${PERIOD==='custom'?'on':''}" onclick="openCustomPeriod()">Період</button></div>`;
+
+  if(UPDATE_AVAILABLE){
+    html+=`<div class="group" style="margin-top:0;margin-bottom:14px;background:var(--blue);cursor:pointer" onclick="reloadForUpdate()">
+      <div class="row" style="border:0"><div class="icobadge" style="background:rgba(255,255,255,0.22)">${icon('refresh',16)}</div><div class="rtitle"><b style="color:#fff">Доступна нова версія ${esc(UPDATE_AVAILABLE)}</b><div class="sub" style="color:rgba(255,255,255,0.85)">Натисніть, щоб оновити сторінку</div></div></div>
+    </div>`;
+  }
+
+  html+=`<div class="hero" style="margin-top:14px;cursor:pointer" onclick="openDashProfitDetail()">
+    <button type="button" onclick="event.stopPropagation();openShareBannerSheet()" style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,0.14);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:2" aria-label="Поділитись підсумком">📤</button>
+    <div class="lbl">${icon('cart',15)} Витрати за період</div>
+    <div class="big tnum neg">${money(expTotal)}</div>
+    <div class="sub">Пальне/зарядка ${money(fuelCost)} · Інше ${money(otherExp)}</div>
+  </div>`;
+
+  if(!isDemo() && (DB.expenses.length>0 || DB.cars.length>0)){
+    const bdays=daysSinceBackup();
+    const bThreshold=+DB.settings.autoBackupDays||30;
+    const snoozeUntil=DB.settings.backupReminderSnoozeUntil;
+    const snoozed = snoozeUntil && snoozeUntil>today();
+    if((bdays===null || bdays>=bThreshold) && !snoozed){
+      html+=`<div class="group" style="margin:10px 0 14px;cursor:pointer" onclick="openBackupReminderSheet()">
+        <div class="row"><span class="dot" style="background:var(--orange);margin-top:2px;align-self:flex-start"></span><div class="rtitle"><b>${bdays===null?'Ще не робили резервну копію':'Резервна копія '+bdays+' дн. тому'}</b><div class="sub">Дані лише в цьому браузері — збережіть копію, щоб не втратити</div></div><span class="chev" style="align-self:flex-start;margin-top:1px">›</span></div>
+      </div>`;
+    }
+  }
+
+  html+=`<div class="tilegrid">
+    <div class="tile" style="cursor:pointer" onclick="openDashKmDetail()"><div class="lbl"><span class="icobadge" style="background:var(--orange)">${icon('fuel',13)}</span>Пробіг</div><div class="v tnum">${Math.round(km)} км</div></div>
+    <div class="tile" style="cursor:pointer" onclick="openDashProfitDetail()"><div class="lbl"><span class="icobadge" style="background:var(--purple)">${icon('target',13)}</span>Витрати / км</div><div class="v tnum">${km?(expTotal/km).toFixed(1)+' ₴':'—'}</div></div>
+  </div>`;
+
+  const payments=allPayments();
+  if(payments.length){
+    const upcoming=payments.slice(0,3);
+    html+=`<div class="section-label">Найближчі платежі <button type="button" class="infob" onclick="alertSheet('Найближчі платежі','Дати наступних платежів за кредитом чи лізингом і продовження страхових полісів по всіх авто, відсортовано за терміновістю. Це лише нагадування — нічого не списується автоматично.')">i</button></div>
+    <div class="group">`;
+    upcoming.forEach(p=>{
+      const days=daysUntil(p.date);
+      html+=`<div class="row" onclick="openPaymentsList()" style="cursor:pointer"><div class="rtitle"><b>${esc(p.carName)} · ${esc(p.label)}</b><div class="sub">${dueBadge(days)}</div></div><div class="rval tnum">${p.amountLabel||(p.amount!=null?money(p.amount):'')}</div></div>`;
+    });
+    html+=`</div>
+    <div class="group" style="margin-top:6px"><button class="btn add" style="padding:10px 14px" onclick="openPaymentsList()">Усі платежі${payments.length>upcoming.length?' ('+payments.length+')':''}</button></div>`;
+  }
+
+  const personalReminders=DB.reminders.filter(r=>!r.done).map(r=>({text:esc(r.text), date:r.date, onclick:`openReminderForm('${r.id}')`}));
+  const tireReminders=activeCars().filter(c=>c.tireNextDate).map(c=>({text:`${esc(c.name)} · перевзування шин${c.tireSeason==='winter'?' на літні':' на зимові'}`, date:c.tireNextDate, onclick:`openCarQuickView('${c.id}')`}));
+  const serviceReminders=[];
+  activeCars().forEach(c=>{ (c.service||[]).forEach(it=>{ const left=num(it.last)+num(it.every)-num(c.odo); if(left<=300){ serviceReminders.push({ text:`${esc(c.name)} · ${esc(it.name)}${left<0?' (прострочено на '+Math.abs(Math.round(left))+' км)':' (через '+Math.round(left)+' км)'}`, date: left<0?today():'', onclick:`openCarQuickView('${c.id}')` }); } }); });
+  const allReminders=[...personalReminders, ...tireReminders, ...serviceReminders];
+  if(allReminders.length){
+    const sortedR=[...allReminders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+    const upcomingR=sortedR.slice(0,3);
+    html+=`<div class="section-label">Нагадування <button type="button" class="infob" onclick="alertSheet('Нагадування','Особисті нагадування й нагадування про перевзування шин по авто, разом, за терміновістю.')">i</button></div>
+    <div class="group">`;
+    upcomingR.forEach(r=>{
+      html+=`<div class="row" onclick="${r.onclick}" style="cursor:pointer"><div class="rtitle"><b>${r.text}</b>${r.date?`<div class="sub">${dueBadge(daysUntil(r.date))}</div>`:''}</div><span class="chev">›</span></div>`;
+    });
+    html+=`</div>`;
+    if(sortedR.length>upcomingR.length){
+      html+=`<div class="group" style="margin-top:6px"><button class="btn add" style="padding:10px 14px" onclick="openSettings('reminders')">Усі нагадування (${sortedR.length})</button></div>`;
+    }
+  }
+
+  if(d.totalMonthlyFixed>0){
+    html+=`<div class="section-label">Щомісячні фіксовані витрати <button type="button" class="infob" onclick="alertSheet('Щомісячні фіксовані витрати','Кредит/лізинг і страхування з вкладки «Фінанси» авто — сума на місяць по всіх активних авто.')">i</button></div>
+    <div class="group"><div class="row"><div class="rtitle"><b>Кредит/лізинг + страхування</b></div><div class="rval tnum neg">${money(d.totalMonthlyFixed)}/міс</div></div></div>`;
+  }
+
+  html+=`<div class="section-label">Витрати по авто ${activeCars().length+archivedCars().length>1?`<button type="button" class="infob" onclick="openCarCompareSheet()" style="font-size:11px;width:auto;height:22px;padding:0 8px;border-radius:9px">Порівняти</button>`:''}</div><div class="group">`;
+  const carIds=Object.keys(byCar);
+  if(!carIds.length) html+=`<div class="empty">Немає записів за цей період</div>`;
+  else carIds.forEach(cid=>{
+    const c=carById(cid); const dd=byCar[cid];
+    html+=`<div class="row" onclick="${c?`openCarQuickView('${cid}')`:''}" style="${c?'cursor:pointer':''}"><div class="rtitle"><b>${esc(c?c.name:'Видалене авто')}</b></div>
+      <div class="rval tnum neg">${money(dd.exp)}</div></div>`;
+  });
+  html+=`</div>`;
+
+  html+=renderStatusBlock();
+
+  $('#main').innerHTML=html;
+}
 function renderDash(){
+  if(isPersonalMode()) return renderDashPersonal();
   const d=dashData();
   const { shifts, expenses, income, fuelCost, otherExp, expTotal, profit, hours, km, nShifts, byPlat, platRows, byCar } = d;
   const maxPlat=Math.max(1,...platRows.map(r=>r[1]));
@@ -1292,10 +1403,14 @@ function openDashProfitDetail(){
   const d=dashData();
   const platRows=[...d.platRows].sort((a,b)=>b[1]-a[1]);
   const catRows=Object.entries(d.byCatExp).sort((a,b)=>b[1]-a[1]);
-  let html=`<h3>Деталі прибутку</h3><div class="confirm-msg">Дохід ${money(d.income)} − Витрати ${money(d.expTotal)} = <b>${money(d.profit)}</b></div>`;
-  html+=`<div class="field"><label>Дохід по платформах</label><div class="group">`;
-  html+= platRows.length ? platRows.map(([pid,val])=>{ const p=platById(pid); return `<div class="row"><div class="rtitle"><b>${esc(p?p.name:'Без платформи')}</b></div><div class="rval tnum pos">${money(val)}</div></div>`; }).join('') : `<div class="empty">Немає доходу за період</div>`;
-  html+=`</div></div>`;
+  let html = isPersonalMode()
+    ? `<h3>Деталі витрат</h3><div class="confirm-msg">Витрати за період: <b>${money(d.expTotal)}</b></div>`
+    : `<h3>Деталі прибутку</h3><div class="confirm-msg">Дохід ${money(d.income)} − Витрати ${money(d.expTotal)} = <b>${money(d.profit)}</b></div>`;
+  if(!isPersonalMode()){
+    html+=`<div class="field"><label>Дохід по платформах</label><div class="group">`;
+    html+= platRows.length ? platRows.map(([pid,val])=>{ const p=platById(pid); return `<div class="row"><div class="rtitle"><b>${esc(p?p.name:'Без платформи')}</b></div><div class="rval tnum pos">${money(val)}</div></div>`; }).join('') : `<div class="empty">Немає доходу за період</div>`;
+    html+=`</div></div>`;
+  }
   html+=`<div class="field"><label>Витрати по категоріях</label><div class="group">`;
   const rows2=[...catRows]; if(d.fuelCost>0) rows2.push(['__fuel__', d.fuelCost]);
   html+= rows2.length ? rows2.map(([cid,val])=>{ const name = cid==='__fuel__' ? 'Пальне / зарядка' : catById(cid).name; return `<div class="row"><div class="rtitle"><b>${esc(name)}</b></div><div class="rval tnum neg">${money(val)}</div></div>`; }).join('') : `<div class="empty">Немає витрат за період</div>`;
@@ -3235,6 +3350,34 @@ function nextTaxDueDate(day){
    можуть змінюватись, це не бухгалтерська консультація. Джерело чинних
    значень — tax.gov.ua; звіряйте самостійно. */
 const TAX_DEFAULTS_2026 = { group2Ep:1729.40, group2Vz:864.70, group3EpRate:5, group3VzRate:1, esv:1902.34 };
+// «Особисте авто» — режим без обліку доходу: показуємо лише витрати, авто й нагадування.
+function isPersonalMode(){ return DB.profile && DB.profile.workMode==='personal'; }
+// Особистий ритм відкладання на податки — не офіційний строк, а нагадування собі,
+// щоб готувати суму заздалегідь (щомісяця чи раз на квартал, як зручніше).
+function personalTaxRhythmItems(){
+  const freq=DB.profile.taxReminderFreq||'monthly';
+  const day=Math.min(28,Math.max(1,num(DB.profile.taxReminderDay)||15));
+  const now=today();
+  const items=[];
+  if(freq==='monthly'){
+    const base=new Date();
+    for(let i=0;i<4;i++){
+      const d=shiftToBizDay(toLocalISO(new Date(base.getFullYear(), base.getMonth()+i, day)));
+      if(d>=now) items.push({label:'Відкласти на податки й ЄСВ', sub:'особисте нагадування · щомісяця', date:d, windowDays:30});
+    }
+  }else{
+    allQuarterEnds().forEach(([y,qi,qEnd])=>{
+      const d=shiftToBizDay(addDaysISO(qEnd,10));
+      if(d>=now) items.push({label:'Відкласти на податки й ЄСВ за '+QUARTER_LABELS[qi]+' квартал '+y, sub:'особисте нагадування · щокварталу', date:d, windowDays:40});
+    });
+  }
+  return items.slice(0,3).map(it=>({...it, days:daysUntil(it.date)}));
+}
+function setWorkMode(m){
+  DB.profile.workMode=m;
+  save();
+  setTab(TAB);
+}
 // Заповнює орієнтовні суми на 2026 рік лише для порожніх (ще не заданих) полів —
 // власні цифри користувача ніколи не перезаписуються.
 function applyFopDefaults(){
@@ -4236,7 +4379,7 @@ function settingsBack(){
   }
 }
 function renderSettingsCurrent(){
-  const pages={ profile:renderSettingsProfile, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, notes:renderSettingsNotes, data:renderSettingsData, about:renderSettingsAbout };
+  const pages={ profile:renderSettingsProfile, fop:renderSettingsFop, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, notes:renderSettingsNotes, data:renderSettingsData, about:renderSettingsAbout };
   if(SETTINGS_TAB && pages[SETTINGS_TAB]) pages[SETTINGS_TAB]();
   else renderSettingsRoot();
 }
@@ -4263,13 +4406,14 @@ function renderSettingsRoot(){
         <div class="caravatar-lg" onclick="pickProfilePhoto()" style="cursor:pointer;margin-top:4px">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
         <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="onProfilePhotoChosen(this)">
         <div class="group" style="margin-top:14px">
-          <div class="row" onclick="openSettings('profile')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('person',17)}</div><div class="rtitle"><b>Профіль і податки</b><div class="sub">${esc(WORK_LABELS[DB.profile.workType]||'')} · ФОП: ${esc(FOP_LABELS[DB.profile.fop]||'')}</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="openSettings('profile')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('person',17)}</div><div class="rtitle"><b>Профіль</b><div class="sub">${isPersonalMode()?'Особисте авто':esc(WORK_LABELS[DB.profile.workType]||'')}</div></div><span class="chev">›</span></div>
+          ${!isPersonalMode()?`<div class="row" onclick="openSettings('fop')" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('info',17)}</div><div class="rtitle"><b>ФОП і податки</b><div class="sub">${esc(FOP_LABELS[DB.profile.fop]||'Немає')}${DB.profile.fop!=='none'?' · календар і консультації':''}</div></div><span class="chev">›</span></div>`:''}
           <div class="row" onclick="openSettings('appearance')" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('palette',17)}</div><div class="rtitle"><b>Вигляд</b><div class="sub">Тема, акцентний колір, розмір тексту</div></div><span class="chev">›</span></div>
-          <div class="row" onclick="openSettings('goals')" style="cursor:pointer"><div class="icobadge" style="background:var(--red)">${icon('target',17)}</div><div class="rtitle"><b>Цілі по прибутку</b></div><span class="chev">›</span></div>
+          ${!isPersonalMode()?`<div class="row" onclick="openSettings('goals')" style="cursor:pointer"><div class="icobadge" style="background:var(--red)">${icon('target',17)}</div><div class="rtitle"><b>Цілі по прибутку</b></div><span class="chev">›</span></div>`:''}
           <div class="row" onclick="openSettings('reminders')" style="cursor:pointer"><div class="icobadge" style="background:var(--orange)">${icon('bell',17)}</div><div class="rtitle"><b>Особисті нагадування</b>${DB.reminders.length?`<div class="sub">${DB.reminders.length}</div>`:''}</div><span class="chev">›</span></div>
         </div>
         <div class="group" style="margin-top:10px">
-          <div class="row" onclick="openSettings('platforms')" style="cursor:pointer"><div class="icobadge" style="background:var(--teal)">${icon('bolt',17)}</div><div class="rtitle"><b>Платформи</b><div class="sub">${DB.platforms.length} підключено</div></div><span class="chev">›</span></div>
+          ${!isPersonalMode()?`<div class="row" onclick="openSettings('platforms')" style="cursor:pointer"><div class="icobadge" style="background:var(--teal)">${icon('bolt',17)}</div><div class="rtitle"><b>Платформи</b><div class="sub">${DB.platforms.length} підключено</div></div><span class="chev">›</span></div>`:''}
           <div class="row" onclick="openSettings('referrals')" style="cursor:pointer"><div class="icobadge" style="background:var(--green)">${icon('gift',17)}</div><div class="rtitle"><b>Бонуси за реєстрацію</b></div><span class="chev">›</span></div>
           <div class="row" onclick="openSettings('contacts')" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('wrench',17)}</div><div class="rtitle"><b>Контакти майстрів і СТО</b>${DB.contacts.length?`<div class="sub">${DB.contacts.length}</div>`:''}</div><span class="chev">›</span></div>
           <div class="row" onclick="openSettings('notes')" style="cursor:pointer"><div class="icobadge" style="background:var(--purple)">${icon('clip',17)}</div><div class="rtitle"><b>Нотатки</b><div class="sub">Клієнти, адреси, чорний список — усе своє</div></div>${(DB.notes||[]).length?`<div class="sub">${(DB.notes||[]).length}</div>`:''}<span class="chev">›</span></div>
@@ -4278,8 +4422,13 @@ function renderSettingsRoot(){
           <div class="row" onclick="openSettings('data')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('box',17)}</div><div class="rtitle"><b>Дані й звітність</b><div class="sub">Експорт, резервна копія, демо-режим</div></div><span class="chev">›</span></div>
           <div class="row" onclick="openSettings('about')" style="cursor:pointer"><div class="icobadge" style="background:var(--tx3)">${icon('info',17)}</div><div class="rtitle"><b>Про застосунок</b><div class="sub">Версія ${esc(APP_VERSION)}${UPDATE_AVAILABLE?' · є оновлення 🎉':''}</div></div><span class="chev">›</span></div>
         </div>
+        ${donateCardHtml()}
       </div>
     </div>`;
+}
+function donateCardHtml(){
+  if(!DEV_INFO.donateUrl) return '';
+  return `<div class="group" style="margin-top:10px;background:var(--fill2)"><div class="row" onclick="window.open('${esc(DEV_INFO.donateUrl)}','_blank')" style="cursor:pointer"><div class="icobadge" style="background:var(--orange)">☕</div><div class="rtitle"><b>Підтримати розробника</b><div class="sub">Банка на monobank — якщо застосунок допомагає в роботі</div></div><span class="chev">›</span></div></div>`;
 }
 function renderSettingsProfile(){
   const body=`
@@ -4287,40 +4436,75 @@ function renderSettingsProfile(){
     <div class="caravatar-lg" onclick="pickProfilePhoto()" style="cursor:pointer">${DB.profile.photo?`<img src="${DB.profile.photo}">`:'🙂'}</div>
     <div style="text-align:center;margin-bottom:14px"><button type="button" class="btn add" style="width:auto;display:inline-block;padding:8px 14px" onclick="pickProfilePhoto()">${DB.profile.photo?'Змінити фото':'Додати фото профілю'}</button></div>
     <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="onProfilePhotoChosen(this)">
+    <div class="group"><div class="row"><div class="rtitle"><b>Режим використання <button type="button" class="infob" onclick="alertSheet('Режим використання','«Заробляю на авто» — повний облік доходу, змін, платформ і податків. «Особисте авто» — спрощений інтерфейс лише для витрат, пального й обслуговування, без розділу «Зміни». Перемкнути можна будь-коли, дані нікуди не зникають.')">i</button></b></div></div></div>
+    <div class="seg" style="margin-top:8px;margin-bottom:14px">
+      ${[['driver','Заробляю на авто'],['personal','Особисте авто']].map(w=>`<button class="${DB.profile.workMode===w[0]?'on':''}" onclick="setWorkMode('${w[0]}');openSettings('profile')">${w[1]}</button>`).join('')}
+    </div>
+    ${isPersonalMode()?`<div class="group" style="margin-bottom:14px"><div class="row"><div class="rtitle"><div class="sub">У режимі «Особисте авто» розділи «Де працюєте» й «ФОП і податки» вимкнено — доходу тут не рахуємо. Щоб їх увімкнути, поверніться до режиму «Заробляю на авто» вище.</div></div></div></div>`:`
     <div class="group"><div class="row"><div class="rtitle"><b>Де працюєте <button type="button" class="infob" onclick="alertSheet('Де працюєте','Визначає, які розділи й підказки показувати першими — таксі, доставку чи обидва. Впливає лише на зручність, не обмежує, які платформи можна додати.')">i</button></b></div></div></div>
     <div class="seg" style="margin-top:8px;margin-bottom:14px">
       ${[['taxi','Таксі'],['delivery','Доставка'],['both','Обидва']].map(w=>`<button class="${DB.profile.workType===w[0]?'on':''}" onclick="DB.profile.workType='${w[0]}';save();openSettings('profile')">${w[1]}</button>`).join('')}
     </div>
-    <div class="group"><div class="row"><div class="rtitle"><b>ФОП <button type="button" class="infob" onclick="alertSheet('ФОП','«Немає» — оплата зазвичай надходить на особисту картку. «2 група» — фіксований податок щомісяця незалежно від доходу, є ліміт річного доходу. «3 група» — податок як відсоток від доходу (зазвичай 5%, або 3%+ПДВ), вищий ліміт. За деталями краще звернутись до бухгалтера.')">i</button></b></div></div></div>
-    <div class="seg" style="margin-top:8px">
-      ${[['none','Немає'],['group2','2 група'],['group3','3 група']].map(w=>`<button class="${DB.profile.fop===w[0]?'on':''}" onclick="DB.profile.fop='${w[0]}';applyFopDefaults();save();openSettings('profile')">${w[1]}</button>`).join('')}
+    <div class="group" style="margin-top:14px">
+      <div class="row" onclick="openSettings('fop')" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">${icon('info',17)}</div><div class="rtitle"><b>ФОП і податки</b><div class="sub">${FOP_LABELS[DB.profile.fop]||'Немає'}${DB.profile.fop!=='none'?' · календар і консультації':''}</div></div><span class="chev">›</span></div>
+    </div>`}
+  `;
+  settingsPage('Профіль', body);
+}
+function renderSettingsFop(){
+  if(isPersonalMode()){
+    settingsPage('ФОП і податки', `<div class="group"><div class="empty">Недоступно в режимі «Особисте авто» — тут не рахуємо дохід. Перемкніть режим у Профілі, щоб увімкнути.</div></div>`);
+    return;
+  }
+  const fop=DB.profile.fop||'none';
+  const vchasnoLinks=(DB.referralLinks||[]).filter(r=>r.id==='vchasno_zvit'||r.id==='vchasno_kasa');
+  const rhythm=personalTaxRhythmItems();
+  let advice='';
+  if(fop==='group2') advice='Єдиний податок і військовий збір платите щомісяця, до 20 числа поточного місяця. ЄСВ — щокварталу, до 20 числа місяця після кварталу. Річну декларацію подаєте протягом 60 календарних днів після завершення року (орієнтовно до 1–2 березня).';
+  else if(fop==='group3') advice='Декларацію подаєте щокварталу, протягом 40 календарних днів після завершення кварталу. Єдиний податок і військовий збір сплачуєте протягом 10 календарних днів після граничного строку подання декларації. ЄСВ — щокварталу, до 20 числа місяця після кварталу, як і в 2 групі.';
+  const body=`
+    <div class="section-label">Група ФОП <button type="button" class="infob" onclick="alertSheet('ФОП','«Немає» — оплата зазвичай надходить на особисту картку. «2 група» — фіксований податок щомісяця незалежно від доходу, є ліміт річного доходу. «3 група» — податок як відсоток від доходу (зазвичай 5%, або 3%+ПДВ), вищий ліміт. За деталями краще звернутись до бухгалтера.')">i</button></div>
+    <div class="seg" style="margin-bottom:14px">
+      ${[['none','Немає'],['group2','2 група'],['group3','3 група']].map(w=>`<button class="${fop===w[0]?'on':''}" onclick="DB.profile.fop='${w[0]}';applyFopDefaults();save();openSettings('fop')">${w[1]}</button>`).join('')}
     </div>
-
-    ${DB.profile.fop!=='none'?`<div class="section-label">Податки й ЄСВ <button type="button" class="infob" onclick="alertSheet('Податки й ЄСВ','Вкажіть суми, щоб застосунок міг орієнтовно порахувати податкове навантаження й врахувати його в точці беззбитковості. Значення за замовчуванням — чинні ставки 2026 року для ФОП. Це не бухгалтерська консультація — суми, ставки й строки перевіряйте самостійно на tax.gov.ua.')">i</button></div>
+    ${fop==='none'?`<div class="group"><div class="row"><div class="rtitle"><div class="sub">Не зареєстровані як ФОП — оплата зазвичай надходить на особисту картку. Майте на увазі: дохід від таксі/доставки як фізособи теж може підлягати оподаткуванню за загальними правилами. Якщо плануєте реєстрацію, оберіть групу вище — з'явиться календар і підказки, коли й скільки платити.</div></div></div>`:`
+    <div class="group" style="background:var(--fill2)"><div class="row"><div class="rtitle"><div class="sub" style="color:var(--tx)">📋 ${advice}</div></div></div></div>
+    <div class="section-label" style="margin-top:16px">Суми <button type="button" class="infob" onclick="alertSheet('Суми','Значення за замовчуванням — чинні ставки 2026 року для ФОП. Це не бухгалтерська консультація — суми, ставки й строки перевіряйте самостійно на tax.gov.ua.')">i</button></div>
     <div class="group">
-      ${DB.profile.fop==='group2'?`<div class="row"><div class="rtitle"><b>Єдиний податок</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2Fixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2Fixed=num(this.value)||0;save();openSettings('profile')"></div>
-      <div class="row"><div class="rtitle"><b>Військовий збір</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2VZFixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2VZFixed=num(this.value)||0;save();openSettings('profile')"></div>`:''}
-      ${DB.profile.fop==='group3'?`<div class="row"><div class="rtitle"><b>Ставка єдиного податку</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3Rate||''}" placeholder="5" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3Rate=num(this.value)||5;save();openSettings('profile')"></div>
-      <div class="row"><div class="rtitle"><b>Ставка військового збору</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3VZRate||''}" placeholder="1" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3VZRate=num(this.value)||0;save();openSettings('profile')"></div>`:''}
-      <div class="row"><div class="rtitle"><b>ЄСВ</b><div class="sub">грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.esvMonthly||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.esvMonthly=num(this.value)||0;save();openSettings('profile')"></div>
+      ${fop==='group2'?`<div class="row"><div class="rtitle"><b>Єдиний податок</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2Fixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2Fixed=num(this.value)||0;save();openSettings('fop')"></div>
+      <div class="row"><div class="rtitle"><b>Військовий збір</b><div class="sub">2 група, грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup2VZFixed||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup2VZFixed=num(this.value)||0;save();openSettings('fop')"></div>`:''}
+      ${fop==='group3'?`<div class="row"><div class="rtitle"><b>Ставка єдиного податку</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3Rate||''}" placeholder="5" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3Rate=num(this.value)||5;save();openSettings('fop')"></div>
+      <div class="row"><div class="rtitle"><b>Ставка військового збору</b><div class="sub">3 група, % від доходу</div></div><input type="number" inputmode="decimal" value="${DB.profile.taxGroup3VZRate||''}" placeholder="1" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxGroup3VZRate=num(this.value)||0;save();openSettings('fop')"></div>`:''}
+      <div class="row"><div class="rtitle"><b>ЄСВ</b><div class="sub">грн на місяць</div></div><input type="number" inputmode="decimal" value="${DB.profile.esvMonthly||''}" placeholder="0" style="width:90px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.esvMonthly=num(this.value)||0;save();openSettings('fop')"></div>
       <div class="row" onclick="openTaxCalc()" style="cursor:pointer"><span style="color:var(--blue);font-weight:600">🧮 Порахувати податки за період</span><span class="chev">›</span></div>
     </div>
-    <div class="section-label" style="margin-top:16px">Податковий календар <button type="button" class="infob" onclick="alertSheet('Податковий календар','Дати подання декларацій і сплати податків та ЄСВ, розраховані за чинними у 2026 році строками для вашої групи ФОП. Якщо дата випадає на вихідний — переноситься на найближчий робочий день. Суми — орієнтовні.')">i</button></div>
+    <div class="section-label" style="margin-top:16px">Офіційний податковий календар <button type="button" class="infob" onclick="alertSheet('Податковий календар','Дати подання декларацій і сплати податків та ЄСВ, розраховані за чинними у 2026 році строками для вашої групи ФОП. Якщо дата випадає на вихідний — переноситься на найближчий робочий день. Суми — орієнтовні.')">i</button></div>
     <div class="group">
       ${(()=>{ const items=taxCalendarItems(); return items.length? items.map(it=>deadlineBarRowHtml({...it, sub:(it.sub||'')+(it.amount!=null?' · '+money(it.amount):'')})).join('') : `<div class="empty">Немає найближчих строків — перевірте суми вище</div>`; })()}
     </div>
     <div class="group" style="margin-top:10px">
-      <div class="row"><div class="rtitle"><b>Нагадувати про податки й ЄСВ</b><div class="sub">Пункти зі строками — у нагадуваннях і найближчих платежах на дашборді</div></div>
-        <div class="seg" style="width:auto"><button class="${!DB.profile.taxReminderEnabled?'on':''}" style="padding:6px 12px" onclick="DB.profile.taxReminderEnabled=false;save();openSettings('profile')">Ні</button><button class="${DB.profile.taxReminderEnabled?'on':''}" style="padding:6px 12px" onclick="DB.profile.taxReminderEnabled=true;save();openSettings('profile')">Так</button></div></div>
-    </div>` : ''}
+      <div class="row"><div class="rtitle"><b>Нагадувати про офіційні строки</b><div class="sub">Пункти зі строками — у нагадуваннях і найближчих платежах на дашборді</div></div>
+        <div class="seg" style="width:auto"><button class="${!DB.profile.taxReminderEnabled?'on':''}" style="padding:6px 12px" onclick="DB.profile.taxReminderEnabled=false;save();openSettings('fop')">Ні</button><button class="${DB.profile.taxReminderEnabled?'on':''}" style="padding:6px 12px" onclick="DB.profile.taxReminderEnabled=true;save();openSettings('fop')">Так</button></div></div>
+    </div>
 
-    <div class="section-label">Конверт на податки <button type="button" class="infob" onclick="alertSheet('Конверт на податки','Візуальна копілка: застосунок відкладає вказаний відсоток від кожної гривні доходу «на майбутнє» — податки, ремонт, чорний день. Це не окремий банківський рахунок, просто підрахунок у застосунку.')">i</button></div>
+    <div class="section-label" style="margin-top:16px">Особистий ритм відкладання <button type="button" class="infob" onclick="alertSheet('Особистий ритм відкладання','Не офіційний строк, а особисте нагадування собі — готувати суму на податки заздалегідь, у зручному темпі: щомісяця чи раз на квартал.')">i</button></div>
+    <div class="seg" style="margin-bottom:10px">
+      ${[['monthly','Щомісяця'],['quarterly','Щоквартально']].map(w=>`<button class="${(DB.profile.taxReminderFreq||'monthly')===w[0]?'on':''}" onclick="DB.profile.taxReminderFreq='${w[0]}';save();openSettings('fop')">${w[1]}</button>`).join('')}
+    </div>
+    ${(DB.profile.taxReminderFreq||'monthly')==='monthly'?`<div class="group" style="margin-bottom:10px"><div class="row"><div class="rtitle"><b>День місяця</b></div><input type="number" min="1" max="28" inputmode="numeric" value="${DB.profile.taxReminderDay||15}" style="width:60px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.profile.taxReminderDay=Math.min(28,Math.max(1,num(this.value)||15));save();openSettings('fop')"></div></div>`:''}
     <div class="group">
-      <div class="row"><div class="rtitle"><b>Відкладати</b><div class="sub">% від доходу, 0 — вимкнено</div></div><input type="number" inputmode="decimal" value="${DB.settings.envelopeRate||''}" placeholder="0" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.envelopeRate=num(this.value)||0;save();openSettings('profile')"></div>
+      ${rhythm.length? rhythm.map(it=>deadlineBarRowHtml(it)).join('') : `<div class="empty">Немає найближчих нагадувань</div>`}
+    </div>
+
+    <div class="section-label" style="margin-top:16px">Конверт на податки <button type="button" class="infob" onclick="alertSheet('Конверт на податки','Візуальна копілка: застосунок відкладає вказаний відсоток від кожної гривні доходу «на майбутнє» — податки, ремонт, чорний день. Це не окремий банківський рахунок, просто підрахунок у застосунку.')">i</button></div>
+    <div class="group">
+      <div class="row"><div class="rtitle"><b>Відкладати</b><div class="sub">% від доходу, 0 — вимкнено</div></div><input type="number" inputmode="decimal" value="${DB.settings.envelopeRate||''}" placeholder="0" style="width:70px;text-align:right;padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="DB.settings.envelopeRate=num(this.value)||0;save();openSettings('fop')"></div>
       ${num(DB.settings.envelopeRate)>0?`<div class="row" onclick="openEnvelopeSheet()" style="cursor:pointer"><div class="rtitle"><b>У конверті зараз</b></div><div class="rval tnum" style="color:var(--orange)">${money(envelopeBalance())}</div><span class="chev">›</span></div>`:''}
     </div>
+
+    ${vchasnoLinks.length?`<div class="section-label" style="margin-top:16px">Облік і звітність для ФОП</div><div class="group">${vchasnoLinks.map(r=>refCardHtml(r.name, r.url, r.note, r.code)).join('')}</div>`:''}`}
   `;
-  settingsPage('Профіль і податки', body);
+  settingsPage('ФОП і податки', body);
 }
 function renderSettingsAppearance(){
   const theme=getTheme();
@@ -5237,7 +5421,8 @@ function normalizeDB(DB){
   if(!DB.goals) DB.goals={daily:0, weekly:0, monthly:0};
   if(!DB.reminders) DB.reminders=[];
   if(!DB.referralLinks) DB.referralLinks=REFERRAL_LINKS_DEFAULT.map(r=>({...r}));
-  if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0};
+  if(!DB.profile) DB.profile={workMode:'driver', workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0};
+  if(DB.profile.workMode===undefined) DB.profile.workMode='driver';
   if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
   if(DB.profile.taxGroup2VZFixed===undefined) DB.profile.taxGroup2VZFixed=0;
   if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
@@ -5245,6 +5430,7 @@ function normalizeDB(DB){
   if(DB.profile.esvMonthly===undefined) DB.profile.esvMonthly=0;
   if(DB.profile.taxReminderEnabled===undefined) DB.profile.taxReminderEnabled=false;
   if(DB.profile.taxReminderDay===undefined) DB.profile.taxReminderDay=15;
+  if(DB.profile.taxReminderFreq===undefined) DB.profile.taxReminderFreq='monthly';
   if(DB.profile.name===undefined) DB.profile.name='';
   if(DB.activeShift===undefined) DB.activeShift=null;
   if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1};
@@ -5790,7 +5976,7 @@ function demoDocImg(label){
 function buildDemoDB(){
   const DB2=defaultDB();
   DB2.onboardingDone=true;
-  DB2.profile={workType:'both', fop:'group3', taxGroup2Fixed:1729.40, taxGroup2VZFixed:864.70, taxGroup3Rate:5, taxGroup3VZRate:1, esvMonthly:1902.34, name:'Олексій', taxReminderEnabled:true, taxReminderDay:15};
+  DB2.profile={workMode:'driver', workType:'both', fop:'group3', taxGroup2Fixed:1729.40, taxGroup2VZFixed:864.70, taxGroup3Rate:5, taxGroup3VZRate:1, esvMonthly:1902.34, name:'Олексій', taxReminderEnabled:true, taxReminderDay:15};
   DB2.platforms=PLATFORM_MASTER.map(p=>({...p, commissionPct: p.id==='uklon'?15:p.id==='ontaxi'?12:p.id==='glovo'?20:0}));
   const clio='demo-clio', honda='demo-honda', skoda='demo-skoda';
   DB2.cars=[
@@ -5954,13 +6140,13 @@ function buildDemoDB(){
 /* ============ ONBOARDING WIZARD ============ */
 let WIZ=null;
 function startWizard(){
-  WIZ={ step:0, workType: DB.profile.workType||'both', fop: DB.profile.fop||'none',
+  WIZ={ step:0, workMode: DB.profile.workMode||'driver', workType: DB.profile.workType||'both', fop: DB.profile.fop||'none',
         platformIds: DB.platforms.length? DB.platforms.map(p=>p.id) : [],
         cars: DB.cars.length? DB.cars.map(c=>({name:c.name, fuelType:c.fuelType})) : [{name:'Авто 1', fuelType:'ev'}] };
   renderWizard();
 }
-const WIZ_STEPS=5;
-function wizDots(){ let s=''; for(let i=0;i<WIZ_STEPS;i++) s+=`<span class="${i<=WIZ.step?'on':''}"></span>`; return s; }
+function wizVisibleSteps(){ return WIZ.workMode==='personal' ? [0,1,5] : [0,1,2,3,4,5]; }
+function wizDots(){ const vis=wizVisibleSteps(); const idx=vis.indexOf(WIZ.step); let s=''; vis.forEach((st,i)=>{ s+=`<span class="${i<=idx?'on':''}"></span>`; }); return s; }
 function renderWizard(){
   const step=WIZ.step;
   let body='', foot='';
@@ -5968,27 +6154,32 @@ function renderWizard(){
     body=`
       <div class="mark"><svg viewBox="0 0 24 24"><path d="M4 16.5V12l1.6-4.5A2 2 0 0 1 7.5 6h9a2 2 0 0 1 1.9 1.5L20 12v4.5" stroke-linejoin="round"/><circle cx="7.5" cy="16.5" r="1.7"/><circle cx="16.5" cy="16.5" r="1.7"/></svg></div>
       <h1>Вітаємо у «Водій»</h1>
-      <p class="d">Облік доходу від таксі й доставки, витрат, пального й зарядок. Спершу коротко налаштуємо застосунок під вас — це займе хвилину.</p>`;
+      <p class="d">Облік доходу від таксі й доставки, витрат, пального й зарядок — або просто облік витрат по своєму авто. Спершу коротко налаштуємо застосунок під вас — це займе хвилину.</p>`;
     foot=`<button class="btn primary" onclick="wizNext()">Почати налаштування</button><button class="btn add" onclick="wizPreviewDemo()" style="text-align:center;width:100%;margin-top:4px">Спочатку подивитись демо-режим</button>`;
   }else if(step===1){
+    body=`<h1>Як використовуєте застосунок?</h1><p class="d">Це визначає, які розділи показувати. Будь-коли можна змінити в Налаштуваннях → Профіль.</p>
+      <button class="opt ${WIZ.workMode==='driver'?'on':''}" onclick="WIZ.workMode='driver';renderWizard()"><span class="oi" style="background:var(--blue)"><svg viewBox="0 0 24 24"><path d="M4 16.5V12l1.6-4.5A2 2 0 0 1 7.5 6h9a2 2 0 0 1 1.9 1.5L20 12v4.5" stroke-linejoin="round"/></svg></span><span><b>Заробляю на авто</b><div class="sub" style="font-weight:400;margin-top:2px">Таксі й/чи доставка — дохід, зміни, податки й витрати</div></span></button>
+      <button class="opt ${WIZ.workMode==='personal'?'on':''}" onclick="WIZ.workMode='personal';renderWizard()"><span class="oi" style="background:var(--tx3)"><svg viewBox="0 0 24 24"><path d="M4 16.5V12l1.6-4.5A2 2 0 0 1 7.5 6h9a2 2 0 0 1 1.9 1.5L20 12v4.5" stroke-linejoin="round"/><circle cx="7.5" cy="16.5" r="1.7"/><circle cx="16.5" cy="16.5" r="1.7"/></svg></span><span><b>Особисте авто</b><div class="sub" style="font-weight:400;margin-top:2px">Без заробітку — лише витрати, пальне/зарядка, обслуговування й нагадування</div></span></button>`;
+    foot=`<button class="btn primary" onclick="wizNext()">Далі</button><button class="btn add" onclick="wizBack()" style="text-align:center;width:100%;margin-top:4px">Назад</button>`;
+  }else if(step===2){
     body=`<h1>Де ви працюєте?</h1><p class="d">Це визначить, які платформи й розділи показувати спершу.</p>
       <button class="opt ${WIZ.workType==='taxi'?'on':''}" onclick="WIZ.workType='taxi';renderWizard()"><span class="oi" style="background:var(--blue)"><svg viewBox="0 0 24 24"><path d="M4 16.5V12l1.6-4.5A2 2 0 0 1 7.5 6h9a2 2 0 0 1 1.9 1.5L20 12v4.5" stroke-linejoin="round"/></svg></span><span><b>Тільки таксі</b></span></button>
       <button class="opt ${WIZ.workType==='delivery'?'on':''}" onclick="WIZ.workType='delivery';renderWizard()"><span class="oi" style="background:var(--teal)"><svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 9l2-4h12l2 4"/></svg></span><span><b>Тільки доставка</b></span></button>
       <button class="opt ${WIZ.workType==='both'?'on':''}" onclick="WIZ.workType='both';renderWizard()"><span class="oi" style="background:var(--purple)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span><span><b>І таксі, і доставка</b></span></button>`;
     foot=`<button class="btn primary" onclick="wizNext()">Далі</button><button class="btn add" onclick="wizBack()" style="text-align:center;width:100%;margin-top:4px">Назад</button>`;
-  }else if(step===2){
+  }else if(step===3){
     const relevant=PLATFORM_MASTER.filter(p=> WIZ.workType==='both' || p.group===WIZ.workType || (WIZ.workType==='taxi'&&p.group==='taxi') || (WIZ.workType==='delivery'&&p.group==='delivery'));
     body=`<h1>Ваші платформи</h1><p class="d">Виберіть, з якими працюєте. Пізніше можна додати ще в налаштуваннях.</p>
       <div class="chipwrap" id="wizPlatChips">${relevant.map(p=>`<button type="button" class="chip ${WIZ.platformIds.includes(p.id)?'on':''}" onclick="wizTogglePlat('${p.id}')">${esc(p.name)}</button>`).join('')}</div>
       <p class="d" style="margin-top:14px;font-size:13px">Не бачите потрібну платформу? Напишіть розробнику — він її додасть.</p>`;
     foot=`<button class="btn primary" onclick="wizNext()">Далі</button><button class="btn add" onclick="wizBack()" style="text-align:center;width:100%;margin-top:4px">Назад</button>`;
-  }else if(step===3){
+  }else if(step===4){
     body=`<h1>ФОП і податки</h1><p class="d">Потрібно, щоб рахувати, скільки залишити на податки. Можна змінити пізніше.</p>
       <div class="opt ${WIZ.fop==='none'?'on':''}" tabindex="0" onclick="WIZ.fop='none';renderWizard()"><span class="oi" style="background:var(--fill)"><svg viewBox="0 0 24 24" stroke="var(--tx2)"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg></span><span style="flex:1"><b>Немає ФОП</b></span><button type="button" class="infob" onclick="event.stopPropagation();alertSheet('Немає ФОП','Ви не зареєстровані як підприємець. Оплата зазвичай надходить на особисту картку. Майте на увазі: доходи від таксі/доставки як фізособи можуть підлягати оподаткуванню за загальними правилами — за деталями краще звернутись до бухгалтера.')">i</button></div>
       <div class="opt ${WIZ.fop==='group2'?'on':''}" tabindex="0" onclick="WIZ.fop='group2';renderWizard()"><span class="oi" style="background:var(--blue)"><svg viewBox="0 0 24 24"><text x="12" y="16" font-size="12" text-anchor="middle" fill="#fff" stroke="none">2</text></svg></span><span style="flex:1"><b>ФОП, 2 група</b></span><button type="button" class="infob" onclick="event.stopPropagation();alertSheet('ФОП, 2 група','Спрощена система. Фіксований податок щомісяця незалежно від доходу, є ліміт річного доходу і обмеження, з ким можна працювати (переважно з фізособами й іншими ФОП). Підходить для більшості таксистів і кур\\'єрів.')">i</button></div>
       <div class="opt ${WIZ.fop==='group3'?'on':''}" tabindex="0" onclick="WIZ.fop='group3';renderWizard()"><span class="oi" style="background:var(--green)"><svg viewBox="0 0 24 24"><text x="12" y="16" font-size="12" text-anchor="middle" fill="#fff" stroke="none">3</text></svg></span><span style="flex:1"><b>ФОП, 3 група</b></span><button type="button" class="infob" onclick="event.stopPropagation();alertSheet('ФОП, 3 група','Теж спрощена система, але податок — відсоток від доходу (зазвичай 5%, або 3%+ПДВ), а не фіксована сума. Вищий ліміт річного доходу, менше обмежень щодо контрагентів. Вигідно, якщо дохід нестабільний або великий.')">i</button></div>`;
     foot=`<button class="btn primary" onclick="wizNext()">Далі</button><button class="btn add" onclick="wizBack()" style="text-align:center;width:100%;margin-top:4px">Назад</button>`;
-  }else if(step===4){
+  }else if(step===5){
     body=`<h1>Ваші авто</h1><p class="d">Додайте хоча б одне. Назву й деталі завжди можна змінити пізніше.</p>
       <div id="wizCars">${wizCarsHtml()}</div>
       <button class="btn add" onclick="wizAddCar()">+ Додати ще авто</button>`;
@@ -6012,8 +6203,14 @@ function wizPreviewDemo(){
     onCancel:()=>renderWizard()
   });
 }
-function wizNext(){ WIZ.step++; renderWizard(); }
-function wizBack(){ if(WIZ.step>0){ WIZ.step--; renderWizard(); } }
+function wizNext(){
+  if(WIZ.step===1 && WIZ.workMode==='personal'){ WIZ.step=5; renderWizard(); return; }
+  WIZ.step++; renderWizard();
+}
+function wizBack(){
+  if(WIZ.step===5 && WIZ.workMode==='personal'){ WIZ.step=1; renderWizard(); return; }
+  if(WIZ.step>0){ WIZ.step--; renderWizard(); }
+}
 function wizTogglePlat(id){ WIZ.platformIds=WIZ.platformIds.includes(id)?WIZ.platformIds.filter(x=>x!==id):[...WIZ.platformIds,id]; $('#wizPlatChips').querySelectorAll('.chip').forEach(ch=>{}); renderWizard(); }
 function wizCarsHtml(){
   return WIZ.cars.map((c,i)=>`
@@ -6026,7 +6223,9 @@ function wizCarsHtml(){
 function wizAddCar(){ WIZ.cars.push({name:'Авто '+(WIZ.cars.length+1), fuelType:'petrol'}); renderWizard(); }
 function wizRmCar(i){ WIZ.cars.splice(i,1); renderWizard(); }
 function wizFinish(){
-  DB.profile={ workType:WIZ.workType, fop:WIZ.fop, taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0 };
+  const workType = WIZ.workMode==='personal' ? 'both' : WIZ.workType;
+  const fop = WIZ.workMode==='personal' ? 'none' : WIZ.fop;
+  DB.profile={ workMode:WIZ.workMode, workType, fop, taxGroup2Fixed:0, taxGroup2VZFixed:0, taxGroup3Rate:5, taxGroup3VZRate:0, esvMonthly:0 };
   applyFopDefaults();
   const chosen = PLATFORM_MASTER.filter(p=>WIZ.platformIds.includes(p.id));
   const existingCustom = DB.platforms.filter(p=>!PLATFORM_MASTER.some(m=>m.id===p.id));
