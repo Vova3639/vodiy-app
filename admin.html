@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Водій · Адмінка</title>
+<style>
+  :root{
+    --bg:#f2f2f7; --card:#ffffff; --tx:#111114; --tx2:#6b6b74; --sep:rgba(0,0,0,.08);
+    --blue:#0A84FF; --red:#FF3B30; --green:#2FAE60; --fill2:#f2f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#000000; --card:#1c1c1e; --tx:#f2f2f7; --tx2:#9a9aa1; --sep:rgba(255,255,255,.1); --fill2:#2c2c2e; }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--tx);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);
+    min-height:100vh;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:24px 0 60px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--tx2);font-size:13px;margin:0 0 20px;line-height:1.5}
+  .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .card h2{font-size:15px;margin:0 0 12px;font-weight:700}
+  label{display:block;font-size:12.5px;color:var(--tx2);margin-bottom:6px;font-weight:600}
+  input[type=text], input[type=email], textarea{
+    width:100%;padding:11px 13px;border-radius:11px;border:0.5px solid var(--sep);
+    background:var(--fill2);color:var(--tx);font-size:15px;font-family:inherit;margin-bottom:12px
+  }
+  textarea{min-height:100px;resize:vertical}
+  .btn{
+    display:block;width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:600;
+    cursor:pointer;text-align:center;
+  }
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.danger{background:transparent;color:var(--red);border:0.5px solid var(--sep)}
+  .btn.ghost{background:var(--fill2);color:var(--tx)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--sep)}
+  .row:last-child{border-bottom:none}
+  .chip{background:var(--fill2);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+  .muted{color:var(--tx2);font-size:13px}
+  .stat{font-size:28px;font-weight:800}
+  #gsiBtn{display:flex;justify-content:center;margin-top:8px}
+  #status{font-size:13px;padding:10px 0;text-align:center;color:var(--tx2)}
+  .hidden{display:none}
+  #sendResult{margin-top:10px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Водій · Адмінка</h1>
+  <div class="sub">Надсилання push-сповіщень усім користувачам застосунку. Доступ — лише через Google-акаунти зі списку адміністраторів.</div>
+
+  <div id="signedOut" class="card">
+    <h2>Увійти</h2>
+    <div id="gsiBtn"></div>
+    <div id="status"></div>
+  </div>
+
+  <div id="noAccess" class="card hidden">
+    <h2>Немає доступу</h2>
+    <div class="muted" id="noAccessMsg">Цей акаунт не входить у список адміністраторів.</div>
+    <button class="btn ghost" style="margin-top:12px" onclick="signOut()">Вийти й спробувати інший акаунт</button>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted">Увійшли як</div>
+          <div id="meEmail" style="font-weight:600"></div>
+        </div>
+        <button class="chip" style="color:var(--tx)" onclick="signOut()">Вийти</button>
+      </div>
+      <div class="row" style="border:none;padding-top:14px">
+        <div class="muted">Зареєстрованих пристроїв</div>
+        <div class="stat" id="deviceCount">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Надіслати сповіщення всім</h2>
+      <label>Заголовок</label>
+      <input type="text" id="pushTitle" placeholder="Водій" maxlength="120">
+      <label>Текст</label>
+      <textarea id="pushBody" placeholder="Наприклад: у застосунку зʼявилась нова функція — перевірте налаштування!" maxlength="500"></textarea>
+      <button class="btn primary" id="sendBtn" onclick="sendPush()">📤 Надіслати всім</button>
+      <div id="sendResult"></div>
+    </div>
+
+    <div class="card">
+      <h2>Адміністратори</h2>
+      <div class="muted" style="margin-bottom:10px">Ці пошти можуть заходити в адмінку й надсилати сповіщення.</div>
+      <div id="adminList"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <input type="email" id="newAdminEmail" placeholder="пошта@gmail.com" style="margin-bottom:0;flex:1">
+        <button class="btn primary" style="width:auto;padding:11px 16px" onclick="addAdmin()">Додати</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const CLIENT_ID = '194714840278-n7imdnf3e9bd0knr8hubq170q5t9unsk.apps.googleusercontent.com';
+const WORKER_URL = 'https://vodiy-push.vova3639.workers.dev';
+const TOKEN_KEY = 'vodiy_admin_idtoken';
+
+let idToken = null;
+
+function $(s){ return document.querySelector(s); }
+function setStatus(t){ $('#status').textContent = t || ''; }
+
+function show(id){
+  ['signedOut','noAccess','app'].forEach(x=>$('#'+x).classList.toggle('hidden', x!==id));
+}
+
+async function api(path, extra){
+  const resp = await fetch(WORKER_URL+path, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ idToken, ...(extra||{}) })
+  });
+  return resp.json();
+}
+
+async function onGoogleSignIn(response){
+  idToken = response.credential;
+  try{ sessionStorage.setItem(TOKEN_KEY, idToken); }catch(e){}
+  checkAccess();
+}
+
+async function checkAccess(){
+  if(!idToken){ show('signedOut'); return; }
+  setStatus('Перевіряємо доступ…');
+  let data;
+  try{ data = await api('/admin/whoami'); }
+  catch(e){ setStatus('Не вдалося звʼязатися з сервером. Перевірте інтернет і спробуйте ще раз.'); show('signedOut'); return; }
+  if(!data.ok){
+    idToken=null; try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){}
+    setStatus('Сесія застаріла — увійдіть ще раз.'); show('signedOut'); return;
+  }
+  if(!data.isAdmin){
+    $('#noAccessMsg').textContent = `Акаунт ${data.email} не входить у список адміністраторів. Попросіть іншого адміністратора додати вашу пошту.`;
+    show('noAccess'); return;
+  }
+  $('#meEmail').textContent = data.email;
+  show('app');
+  loadStats();
+  loadAdmins();
+}
+
+function signOut(){
+  idToken=null;
+  try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){}
+  try{ google.accounts.id.disableAutoSelect(); }catch(e){}
+  setStatus('');
+  show('signedOut');
+}
+
+async function loadStats(){
+  const data = await api('/admin/stats').catch(()=>null);
+  $('#deviceCount').textContent = (data && data.ok) ? data.devices : '—';
+}
+
+async function loadAdmins(){
+  const data = await api('/admin/list').catch(()=>null);
+  const box = $('#adminList');
+  if(!data || !data.ok){ box.innerHTML = '<div class="muted">Не вдалося завантажити список.</div>'; return; }
+  box.innerHTML = data.admins.map(email => `
+    <div class="row">
+      <div>${email}</div>
+      <button class="chip" onclick="removeAdmin('${email.replace(/'/g,"\\'")}')" ${data.admins.length<=1?'disabled title="Не можна видалити останнього адміністратора"':''}>Прибрати</button>
+    </div>
+  `).join('') || '<div class="muted">Порожньо</div>';
+}
+
+async function addAdmin(){
+  const input = $('#newAdminEmail');
+  const email = input.value.trim();
+  if(!email || !email.includes('@')){ alert('Вкажіть коректну пошту'); return; }
+  const data = await api('/admin/add', { email }).catch(()=>null);
+  if(!data || !data.ok){ alert('Не вдалося додати: '+(data&&data.error||'помилка мережі')); return; }
+  input.value='';
+  loadAdmins();
+}
+
+async function removeAdmin(email){
+  if(!confirm(`Прибрати доступ для ${email}?`)) return;
+  const data = await api('/admin/remove', { email }).catch(()=>null);
+  if(!data || !data.ok){ alert('Не вдалося прибрати: '+(data&&data.error||'помилка мережі')); return; }
+  loadAdmins();
+}
+
+async function sendPush(){
+  const title = $('#pushTitle').value.trim() || 'Водій';
+  const body = $('#pushBody').value.trim();
+  if(!body){ alert('Напишіть текст сповіщення'); return; }
+  if(!confirm(`Надіслати це сповіщення всім користувачам (${$('#deviceCount').textContent})?`)) return;
+  const btn = $('#sendBtn');
+  btn.disabled=true; btn.textContent='Надсилаємо…';
+  const result = $('#sendResult');
+  result.textContent='';
+  const data = await api('/admin/send', { title, body }).catch(()=>null);
+  btn.disabled=false; btn.textContent='📤 Надіслати всім';
+  if(!data || !data.ok){ result.style.color='var(--red)'; result.textContent='Помилка: '+(data&&data.error||'не вдалося звʼязатися з сервером'); return; }
+  result.style.color='var(--green)';
+  result.textContent = `Готово: надіслано ${data.sent}${data.failed?`, не вдалось ${data.failed}`:''}.`;
+}
+
+window.addEventListener('load', ()=>{
+  const wait = setInterval(()=>{
+    if(!(window.google && google.accounts && google.accounts.id)) return;
+    clearInterval(wait);
+    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onGoogleSignIn });
+    google.accounts.id.renderButton($('#gsiBtn'), { theme:'outline', size:'large', text:'signin_with', width:280 });
+    let saved=null; try{ saved=sessionStorage.getItem(TOKEN_KEY); }catch(e){}
+    if(saved){ idToken=saved; checkAccess(); }
+  }, 100);
+});
+</script>
+</body>
+</html>
