@@ -504,7 +504,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.19';
+const APP_VERSION='0.9.24';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -521,6 +521,11 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.24', date:'29.09.2026 13:33', items:['Виправлено навігацію «Назад»: якщо відкрили якийсь розділ налаштувань чи «Про розробника» напряму ярликом (з Дашборду, зі «Швидких дій» тощо), кнопка «Назад» тепер одразу закриває вікно туди, звідки й зайшли — а не кидає в корінь «Налаштувань», де довелось би тицяти «Назад»/«Готово» ще кілька разів']},
+  {v:'0.9.23', date:'29.09.2026 13:21', items:['У «Огляді» авто — нова секція «Терміни та поліси»: наочна шкала для кожного страхового поліса, платежу за кредит/лізинг і перевзування шин — чим ближче термін, тим повніша й червоніша шкала; для полісів на певний термін шкала показує, скільки його вже минуло']},
+  {v:'0.9.22', date:'29.09.2026 13:18', items:['Свайп вгору/вниз у будь-якому вікні знизу (шторці) тепер працює й якщо почати дотик просто на вмісті — наприклад на картинці підсумку в «Поділитись» — а не тільки за смужку зверху; при цьому звичайний скрол вмісту, якщо він не прокручений догори, не заважає']},
+  {v:'0.9.21', date:'29.09.2026 13:14', items:['У «Поділитись» додано розбивку доходу по платформах (Uklon, OnTaxi, Glovo тощо) — окремий блок з назвою й сумою по кожній, за бажанням','Тепер завжди видно конкретну дату періоду — «Сьогодні» й «Вчора» підписані датою, а тиждень/місяць/рік — діапазоном дат','Додано швидкий вибір «Вчора» серед періодів','Виправлено закінчення слів за числом («1 зміна», «2 зміни», «5 змін», «11 змін» — а не завжди «змін»), те саме для годин і кілометрів']},
+  {v:'0.9.20', date:'29.09.2026 13:08', items:['Підсумок для шерингу перероблено: цифри знизу тепер підписані картки («Дохід», «Витрати», «Змін», «За кермом», «Пробіг», «До попереднього періоду») — одразу зрозуміло, що є що, без здогадок','Додано два нові метрики на вибір: «Зароблено всього» (дохід) і «Витрати», поруч із чистим прибутком','Обраний стиль оформлення й набір метрик тепер запам’ятовуються — наступного разу відкриється саме так, як ви надсилали востаннє']},
   {v:'0.9.19', date:'29.09.2026 12:55', items:['Нова маленька кнопка 📤 на картці «Чистий прибуток» на дашборді — ділитись красивим підсумком (картинкою) з родиною чи друзями за обраний період, без жодних деталей по платформах, авто чи витратах. Три стилі оформлення на вибір, і можна додати кількість змін, годин, пробіг чи порівняння з попереднім періодом']},
   {v:'0.9.18', date:'29.09.2026 12:47', items:['Виправлено рядок «Google Диск» у Даних і звітності — кнопка «Синхр-ти» більше не наїжджає на текст статусу','Виділення й меню «Копіювати» при натисканні й утриманні тепер вимкнено по всьому застосунку (крім полів вводу й розділу «Експорт», де це навпаки потрібно) — це застосунок для перегляду даних, а не для читання тексту','PDF-звіт тепер формується як справжній PDF-файл і одразу відкриває системне меню «Поділитись» (Telegram, Файли, AirDrop, друк) — замість системного друку, який не працював у встановленому на головний екран застосунку на iPhone']},
   {v:'0.9.17', date:'29.09.2026 12:32', items:['Синхронізація з Google Диском тепер розумна: перед відновленням застосунок порівнює дані на телефоні з копією на Диску й показує різницю (скільки нових записів де), а далі на вибір — обʼєднати без втрат і дублів, взяти тільки з Диску, чи тільки з телефону','Кнопка «Синхронізувати» перенесена у верх розділу «Дані й звітність», одразу під «Дані збережено на пристрої»']},
@@ -652,7 +657,8 @@ function defaultDB(){
     activeShift:null,
     expenses:[],
     fuel:[],
-    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true, gdriveClientId:'', gdriveLastSyncAt:null, gdriveLastSyncEmail:''},
+    settings:{yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', themeId:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1, edgeBack:true, autoBackupDays:30, haptics:{master:true, swipe:true, delete:true, actions:true}, customTemplates:[], garageView:'banner', backupReminderSnoozeUntil:'', showWeekCompare:true, gdriveClientId:'', gdriveLastSyncAt:null, gdriveLastSyncEmail:'',
+    shareBannerStyle:'minimal', shareBannerOpts:{income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false}},
     contacts:[],
     notes:[],
     goals:{daily:0, weekly:0, monthly:0},
@@ -690,6 +696,9 @@ function load(){
     if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
     if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
     if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
+    if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
+    if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
+    if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
     if(!DB.notes) DB.notes=[];
     if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
     if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
@@ -2749,7 +2758,7 @@ function renderCarDetail(id){
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
-        <button class="fsbtn" onclick="closeFullscreen()">Назад</button>
+        <button class="fsbtn" onclick="closeFullscreen()">‹ Назад</button>
         <h2>${esc(c.name)}${carDisplayPlate(c)?' · '+esc(carDisplayPlate(c)):''}</h2>
         <button class="fsbtn right" onclick="${c.archived?`requestDeleteCar('${c.id}')`:`toggleCarArchive('${c.id}')`}" style="color:var(--red)">${c.archived?'Видалити':'В архів'}</button>
       </div>
@@ -2823,6 +2832,44 @@ function revertPlateLog(carId, idx){
   c.plateLog.push({ t:Date.now(), text:'Відновлено попередній номер', prev:cur });
   save(); renderCarDetail(carId);
 }
+// Збирає всі терміни/дедлайни по авто (поліси, кредит/лізинг, шини) в один
+// список для наочної шкали на «Огляді» — кожен пункт зі своєю датою й "вікном"
+// (за скільки днів шкала починає заповнюватись; для полісів на певний термін —
+// це весь термін поліса, щоб шкала показувала, скільки його вже минуло).
+function carDeadlineItems(c){
+  const items=[];
+  carInsurances(c).forEach((ins,i)=>{
+    if(!ins.renewDate) return;
+    const t=INSURANCE_TYPES[ins.type]||INSURANCE_TYPES.other;
+    const windowDays = (ins.mode==='period' && num(ins.periodMonths)>0) ? Math.round(num(ins.periodMonths)*30.4) : 30;
+    items.push({ label:t.label+(ins.company?' · '+ins.company:''), date:ins.renewDate, windowDays, onclick:`CARDETAIL_TAB='finance';renderCarDetail('${c.id}')` });
+  });
+  if(c.loan && c.loan.nextDate && (num(c.loan.monthlyPayment)>0 || num(c.loan.weeklyAmount)>0)){
+    items.push({ label:'Платіж за кредит/лізинг', date:c.loan.nextDate, windowDays: (c.loan.scheduleType==='weekly'?7:30), onclick:`CARDETAIL_TAB='finance';renderCarDetail('${c.id}')` });
+  }
+  if(c.tireNextDate){
+    items.push({ label:'Перевзування шин', date:c.tireNextDate, windowDays:30, onclick:null });
+  }
+  return items.map(it=>({...it, days:daysUntil(it.date)})).sort((a,b)=>(a.days??99999)-(b.days??99999));
+}
+// Малює один рядок з датою та наочною шкалою: чим ближче/протерміновано,
+// тим повніша й "тривожніша" за кольором шкала (зелена → жовта → червона).
+function deadlineBarRowHtml(it){
+  const days=it.days;
+  const pct = days===null ? 0 : Math.max(0, Math.min(100, Math.round((1-(days/it.windowDays))*100)));
+  const color = days===null ? 'var(--green)' : days<=3 ? 'var(--red)' : days<=10 ? 'var(--orange)' : 'var(--green)';
+  const clickable = !!it.onclick;
+  return `<div class="barrow" ${clickable?`style="cursor:pointer" onclick="${it.onclick}"`:''}>
+    <div class="bhead"><span>${esc(it.label)}</span><b class="tnum" style="font-weight:500;font-size:12px;color:var(--tx2)">${it.date?fmtDateShort(it.date):''}</b></div>
+    <div class="btrack"><div class="bfill" style="width:${pct}%;background:${color}"></div></div>
+    ${days!==null?`<div class="sub" style="margin-top:4px">${dueBadge(days)}</div>`:''}
+  </div>`;
+}
+function carDeadlineBarsHtml(c){
+  const items=carDeadlineItems(c);
+  if(!items.length) return `<div class="empty">Ще немає термінів — додайте страхування у вкладці «Фінанси» або дату перевзування шин вище.</div>`;
+  return items.map(deadlineBarRowHtml).join('');
+}
 function carOverviewHtml(c){
   const logs=DB.fuel.filter(f=>f.carId===c.id);
   const cons=computeConsumption(c, logs);
@@ -2880,6 +2927,8 @@ function carOverviewHtml(c){
         <input type="date" value="${c.tireNextDate||''}" style="padding:8px;border-radius:9px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx)" onchange="c=carById('${c.id}');c.tireNextDate=this.value;save();renderCarDetail('${c.id}')"></div>
       <div class="row"><div class="field" style="flex:1;margin:0"><label>Нотатка</label><input type="text" value="${esc(c.tireNote||'')}" placeholder="напр. розмір, де зберігаються" onchange="c=carById('${c.id}');c.tireNote=this.value.trim();save()"></div></div>
     </div>
+    <div class="section-label">Терміни та поліси <button type="button" class="infob" onclick="alertSheet('Терміни та поліси','Наочна шкала для страхування, кредиту/лізингу й перевзування шин — чим ближче термін, тим повніша й червоніша шкала. Для полісів на конкретний термін (напр. 12 місяців) шкала показує, скільки цього терміну вже минуло. Керувати страхуванням і кредитом можна у вкладці «Фінанси».')">i</button></div>
+    <div class="group">${carDeadlineBarsHtml(c)}</div>
     <div class="section-label">Нотатки</div>
     <div class="group"><textarea style="border:0;width:100%;padding:12px 14px;background:none;color:var(--tx);min-height:70px" placeholder="Де обслуговується, важливі деталі, поїздки..." onchange="c=carById('${c.id}');c.notes=this.value;save()">${esc(c.notes||'')}</textarea></div>
     <div class="section-label">Архів <button type="button" class="infob" onclick="alertSheet('Архів авто','Активних авто — до 5, для зручності. Авто, на якому вже не працюєте (продали, повернули оренду тощо), можна перенести в архів: воно зникне зі списку активних і вибору при нових записах, але вся історія заробітку й витрат залишиться доступною без обмежень. Видалити авто назавжди можна лише з архіву — це захищає від випадкового видалення.')">i</button></div>
@@ -3777,21 +3826,36 @@ function sheetDragInit(){
   const overlay=wrap.querySelector('.overlay');
   const sheet=wrap.querySelector('.sheet');
   const head=wrap.querySelector('.sheethead');
+  const body=wrap.querySelector('.sheetbody');
   if(!overlay || !sheet || !head || overlay.classList.contains('center')) return;
-  let startY=0, dy=0, dragging=false;
-  const onStart=(e)=>{
-    dragging=true; dy=0;
+  let startY=0, startX=0, dy=0, dragging=false, decided=false, allowClose=false;
+  const onStart=(e, fromBody)=>{
+    dragging=false; decided=false; dy=0;
     startY=(e.touches?e.touches[0].clientY:e.clientY);
+    startX=(e.touches?e.touches[0].clientX:e.clientX);
+    // З ручки шторки тягнути можна завжди; з тіла (наприклад, з картинки, що
+    // генерується) — тільки коли вміст прокручено до самого верху, інакше це
+    // звичайний вертикальний скрол вмісту, а не закриття.
+    allowClose = !fromBody || (body ? body.scrollTop<=0 : true);
     sheet.style.transition='none';
   };
-  const onMove=(e)=>{
-    if(!dragging) return;
+  const onMove=(e, fromBody)=>{
     const y=(e.touches?e.touches[0].clientY:e.clientY);
+    const x=(e.touches?e.touches[0].clientX:e.clientX);
+    const rawDy=y-startY, rawDx=x-startX;
+    if(!decided){
+      if(Math.abs(rawDy)<6 && Math.abs(rawDx)<6) return;
+      decided=true;
+      dragging = allowClose && rawDy>0 && Math.abs(rawDy)>Math.abs(rawDx);
+    }
+    if(!dragging) return;
+    if(fromBody && e.cancelable) e.preventDefault();
     dy=Math.max(0, y-startY);
     sheet.style.transform=`translateY(${dy}px)`;
     overlay.style.background=`rgba(0,0,0,${Math.max(0, 0.4*(1-dy/280))})`;
   };
   const onEnd=()=>{
+    decided=false;
     if(!dragging) return;
     dragging=false;
     sheet.style.transition='';
@@ -3809,10 +3873,16 @@ function sheetDragInit(){
     }
     dy=0;
   };
-  head.addEventListener('touchstart', onStart, {passive:true});
-  head.addEventListener('touchmove', onMove, {passive:true});
+  head.addEventListener('touchstart', e=>onStart(e,false), {passive:true});
+  head.addEventListener('touchmove', e=>onMove(e,false), {passive:true});
   head.addEventListener('touchend', onEnd);
   head.addEventListener('touchcancel', onEnd);
+  if(body){
+    body.addEventListener('touchstart', e=>onStart(e,true), {passive:true});
+    body.addEventListener('touchmove', e=>onMove(e,true), {passive:false});
+    body.addEventListener('touchend', onEnd, {passive:true});
+    body.addEventListener('touchcancel', onEnd, {passive:true});
+  }
 }
 function closeSheet(){
   const el=document.getElementById('sheetLayer'); if(!el) return;
@@ -3956,6 +4026,7 @@ function setTextScale(v){
 function closeFullscreen(){
   const root=$('#modalRoot');
   const el=root.querySelector('.fullscreen');
+  SETTINGS_OPEN=false; SETTINGS_HISTORY=[];
   render();
   if(el && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     el.classList.add('closing');
@@ -4015,9 +4086,34 @@ function openQuickMenu(){
   `);
 }
 let SETTINGS_TAB=null;
+// Чи вже відкрито вікно налаштувань у цій сесії дотиків. Потрібно, аби відрізнити
+// "перше відкриття напряму на певний розділ" (ярлик з Дашборду чи Профілю —
+// «Назад» тоді має одразу закрити вікно, а не кидати в корінь налаштувань,
+// куди людина насправді не заходила) від "переходу всередині вже відкритих
+// налаштувань" (тоді «Назад» повертає на попередній розділ, як і раніше).
+let SETTINGS_OPEN=false;
+let SETTINGS_HISTORY=[];
 function openSettings(tab){
-  SETTINGS_TAB = tab || null;
+  const newTab = tab || null;
+  if(!SETTINGS_OPEN){
+    SETTINGS_HISTORY=[];
+    SETTINGS_OPEN=true;
+  }else if(newTab!==SETTINGS_TAB){
+    SETTINGS_HISTORY.push(SETTINGS_TAB);
+  }
+  SETTINGS_TAB = newTab;
   renderSettingsCurrent();
+}
+// «Назад» з розділу налаштувань: якщо є куди повертатись у межах налаштувань —
+// повертає туди; якщо розділ був відкритий напряму (ярликом), закриває вікно
+// одразу до того екрана, з якого й почали, без зайвих проміжних кроків.
+function settingsBack(){
+  if(SETTINGS_HISTORY.length){
+    SETTINGS_TAB=SETTINGS_HISTORY.pop();
+    renderSettingsCurrent();
+  }else{
+    closeFullscreen();
+  }
 }
 function renderSettingsCurrent(){
   const pages={ profile:renderSettingsProfile, appearance:renderSettingsAppearance, goals:renderSettingsGoals, reminders:renderSettingsReminders, platforms:renderSettingsPlatforms, referrals:renderSettingsReferrals, contacts:renderSettingsContacts, notes:renderSettingsNotes, data:renderSettingsData, about:renderSettingsAbout };
@@ -4028,7 +4124,7 @@ function settingsPage(title, bodyHtml){
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
-        <button class="fsbtn" onclick="openSettings()">‹ Назад</button>
+        <button class="fsbtn" onclick="settingsBack()">‹ Назад</button>
         <h2>${esc(title)}</h2>
         <span style="min-width:56px"></span>
       </div>
@@ -4311,7 +4407,7 @@ function renderSettingsAbout(){
       <div class="row" onclick="openChangelogSheet()" style="cursor:pointer"><div class="rtitle"><b>Версія</b><div class="sub">Історія оновлень</div></div><div class="rval">${APP_VERSION}${UPDATE_AVAILABLE?' <span style="color:var(--blue)">→ '+esc(UPDATE_AVAILABLE)+' є</span>':''}</div><span class="chev">›</span></div>
       <div class="row"><div class="rtitle"><b>Де живуть дані</b><div class="sub">Лише в пам'яті цього браузера. Хмарної синхронізації ще немає — не очищайте дані сайту.</div></div></div>
       <div class="row" onclick="openInstallGuide()" style="cursor:pointer"><div class="rtitle"><b>📲 Встановити на головний екран</b><div class="sub">Щоб відкривався як окремий застосунок</div></div><span class="chev">›</span></div>
-      <div class="row" onclick="openDeveloperPage()" style="cursor:pointer"><div class="rtitle"><b>Про розробника</b><div class="sub">Контакт, ідеї та баги, донат, історія версій</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openDeveloperPage(true)" style="cursor:pointer"><div class="rtitle"><b>Про розробника</b><div class="sub">Контакт, ідеї та баги, донат, історія версій</div></div><span class="chev">›</span></div>
     </div>
     <div class="group" style="margin-top:10px">
       <div class="row" onclick="checkForUpdate(true)" style="cursor:pointer"><div class="rtitle"><b>🔄 Перевірити оновлення</b><div class="sub">Зараз же перевірити, чи є нова версія</div></div><span class="chev">›</span></div>
@@ -4363,11 +4459,11 @@ function installGuideHtml(){
     </div>
     <div class="group" style="margin-top:10px"><div class="row"><div class="rtitle"><div class="sub">Дані зберігаються в браузері цього телефона. Якщо потім заходити на сайт іншим способом (не з іконки) — це той самий браузер, тож дані ті самі. А ось на іншому телефоні чи в іншому браузері дані доведеться вносити заново.</div></div></div></div>`;
 }
-function openDeveloperPage(){
+function openDeveloperPage(fromSettings){
   $('#modalRoot').innerHTML=`
     <div class="fullscreen">
       <div class="fstop">
-        <button class="fsbtn" onclick="openSettings('about')">‹ Назад</button>
+        <button class="fsbtn" onclick="${fromSettings?`openSettings('about')`:`closeFullscreen()`}">‹ Назад</button>
         <h2>Про розробника</h2>
         <span style="min-width:56px"></span>
       </div>
@@ -5044,6 +5140,9 @@ function normalizeDB(DB){
   if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
   if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
   if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
+  if(DB.settings.shareBannerStyle===undefined) DB.settings.shareBannerStyle='minimal';
+  if(!DB.settings.shareBannerOpts) DB.settings.shareBannerOpts={income:false, expenses:false, shifts:true, hours:false, km:false, compare:true, platforms:false};
+  if(DB.settings.shareBannerOpts.platforms===undefined) DB.settings.shareBannerOpts.platforms=false;
   if(!DB.notes) DB.notes=[];
   if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
   if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
@@ -5301,15 +5400,25 @@ function openGDriveSheet(){
 function confirmGDriveRestore(){ gdriveRestoreNow(); }
 
 /* ===== Ділитись гарним підсумком (без деталей) ===== */
+// Правильне українське закінчення за числом: forms=[1 (зміна), 2-4 (зміни), 5+ (змін)].
+function pluralUA(n, forms){
+  const n100=Math.abs(Math.round(n))%100, n10=n100%10;
+  if(n100>=11 && n100<=14) return forms[2];
+  if(n10===1) return forms[0];
+  if(n10>=2 && n10<=4) return forms[1];
+  return forms[2];
+}
 function shareRangeDates(key){
   const now=new Date();
-  if(key==='today') return { from: today(), to: today(), label:'Сьогодні' };
-  if(key==='7d'){ const d=new Date(); d.setDate(d.getDate()-6); return { from: toLocalISO(d), to: today(), label:'За 7 днів' }; }
-  if(key==='month') return { from: toLocalISO(new Date(now.getFullYear(),now.getMonth(),1)), to: today(), label:'За місяць' };
-  if(key==='year') return { from: toLocalISO(new Date(now.getFullYear(),0,1)), to: today(), label:'За '+now.getFullYear()+' рік' };
+  if(key==='today'){ const d=today(); return { from:d, to:d, label:'Сьогодні', dateLine: fmtDate(d) }; }
+  if(key==='yesterday'){ const d=toLocalISO(new Date(Date.now()-86400000)); return { from:d, to:d, label:'Вчора', dateLine: fmtDate(d) }; }
+  if(key==='7d'){ const d=new Date(); d.setDate(d.getDate()-6); const from=toLocalISO(d), to=today(); return { from, to, label:'За 7 днів', dateLine: fmtDateShort(from)+' – '+fmtDateShort(to) }; }
+  if(key==='month'){ const from=toLocalISO(new Date(now.getFullYear(),now.getMonth(),1)), to=today(); return { from, to, label:'За місяць', dateLine: fmtDateShort(from)+' – '+fmtDateShort(to) }; }
+  if(key==='year'){ const from=toLocalISO(new Date(now.getFullYear(),0,1)), to=today(); return { from, to, label:'За '+now.getFullYear()+' рік', dateLine: fmtDateShort(from)+' – '+fmtDateShort(to) }; }
   const allDates=[...DB.shifts.map(s=>s.date), ...DB.expenses.map(e=>e.date)];
   const from = allDates.length ? allDates.reduce((a,b)=>a<b?a:b) : today();
-  return { from, to: today(), label:'За весь час' };
+  const to=today();
+  return { from, to, label:'За весь час', dateLine: fmtDateShort(from)+' – '+fmtDateShort(to) };
 }
 function shareStatsForRange(fromDate, toDate){
   const shifts=DB.shifts.filter(s=>s.date>=fromDate && s.date<=toDate);
@@ -5317,7 +5426,16 @@ function shareStatsForRange(fromDate, toDate){
   const fuel=DB.fuel.filter(f=>f.date>=fromDate && f.date<=toDate);
   const income=shifts.reduce((a,s)=>a+shiftIncome(s),0);
   const expTotal=expenses.reduce((a,e)=>a+num(e.amount),0)+fuel.reduce((a,f)=>a+num(f.cost),0);
-  return { profit: income-expTotal, hours: shifts.reduce((a,s)=>a+num(s.hours),0), km: shifts.reduce((a,s)=>a+num(s.km),0), nShifts: shifts.length };
+  const byPlat={};
+  shifts.forEach(s=>(s.entries||[]).forEach(e=>{
+    const key=e.platformId||'__cash__';
+    byPlat[key]=(byPlat[key]||0)+num(e.amount)+num(e.tips);
+  }));
+  const platforms=Object.entries(byPlat)
+    .map(([pid,amt])=>({ name: pid==='__cash__' ? 'Готівка (без платформи)' : (platById(pid)?.name || 'Інше'), amount: amt }))
+    .filter(p=>p.amount>0)
+    .sort((a,b)=>b.amount-a.amount);
+  return { profit: income-expTotal, income, expTotal, hours: shifts.reduce((a,s)=>a+num(s.hours),0), km: shifts.reduce((a,s)=>a+num(s.km),0), nShifts: shifts.length, platforms };
 }
 function sharePrevCompare(fromDate, toDate){
   const days=Math.round((new Date(toDate+'T00:00:00')-new Date(fromDate+'T00:00:00'))/86400000)+1;
@@ -5333,34 +5451,98 @@ function roundRectPath(ctx,x,y,w,h,r){
   ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r);
   ctx.closePath();
 }
-function drawSharePills(ctx, items, cx, y, textColor, pillBg, font){
-  if(!items.length) return;
-  ctx.font=font;
-  const padX=34, gap=22, ph=64;
-  const widths=items.map(t=>ctx.measureText(t).width+padX*2);
-  const totalW=widths.reduce((a,b)=>a+b,0)+gap*(items.length-1);
-  let x=cx-totalW/2;
-  items.forEach((t,i)=>{
-    const pw=widths[i];
-    ctx.fillStyle=pillBg; roundRectPath(ctx,x,y,pw,ph,ph/2); ctx.fill();
-    ctx.fillStyle=textColor; ctx.textAlign='center'; ctx.fillText(t, x+pw/2, y+ph/2+11);
-    x+=pw+gap;
-  });
+// Формує підписані картки замість "голих" цифр — кожна цифра тепер має
+// коротке пояснення під нею, з правильним українським закінченням за числом.
+function shareMetricItems(data){
+  const items=[];
+  if(data.showIncome) items.push({ value: money(data.income), caption:'Зароблено всього' });
+  if(data.showExpenses) items.push({ value: money(data.expTotal), caption:'Витрати' });
+  if(data.showShifts) items.push({ value: String(data.nShifts), caption: pluralUA(data.nShifts, ['зміна','зміни','змін']) });
+  if(data.showHours) items.push({ value: String(Math.round(data.hours)), caption: pluralUA(data.hours, ['година за кермом','години за кермом','годин за кермом']) });
+  if(data.showKm) items.push({ value: String(Math.round(data.km)), caption: pluralUA(data.km, ['кілометр пробігу','кілометри пробігу','кілометрів пробігу']) });
+  if(data.showCompare && data.comparePct!==null) items.push({ value:(data.comparePct>=0?'+':'')+data.comparePct+'%', caption:'До попереднього періоду' });
+  return items;
 }
-// Три стилі банера для похвалитись результатом — без жодних деталей по платформах,
-// авто чи витратах, лише те, що користувач сам обрав показати.
+// Малює сітку підписаних карток (значення + пояснення знизу) замість колишніх
+// компактних "пігулок" без контексту. Повертає координату Y нижнього краю сітки.
+function drawStatGrid(ctx, items, cx, y, totalW, valueColor, capColor, cardBg, F){
+  if(!items.length) return y;
+  const cols = items.length===1 ? 1 : 2;
+  const gap=24, cardH=152;
+  const cardW=(totalW-gap*(cols-1))/cols;
+  const rows=Math.ceil(items.length/cols);
+  const gridW=cardW*cols+gap*(cols-1);
+  const startX=cx-gridW/2;
+  ctx.textAlign='center';
+  items.forEach((it,i)=>{
+    const col=i%cols, row=Math.floor(i/cols);
+    const x=startX+col*(cardW+gap), yy=y+row*(cardH+gap);
+    ctx.fillStyle=cardBg; roundRectPath(ctx,x,yy,cardW,cardH,22); ctx.fill();
+    ctx.fillStyle=valueColor; ctx.font='800 54px '+F;
+    ctx.fillText(it.value, x+cardW/2, yy+68);
+    ctx.fillStyle=capColor; ctx.font='600 24px '+F;
+    wrapCanvasText(ctx, it.caption, x+cardW/2, yy+106, cardW-32, 28);
+  });
+  return y+rows*cardH+(rows-1)*gap;
+}
+// Проста побудова тексту, що переноситься по словах у межах ширини картки
+// (потрібно для довших підписів на кшталт "годин за кермом").
+function wrapCanvasText(ctx, text, cx, y, maxW, lineH){
+  const words=text.split(' ');
+  let line='', lines=[];
+  words.forEach(w=>{
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW && line){ lines.push(line); line=w; } else line=test;
+  });
+  if(line) lines.push(line);
+  const startY = lines.length>1 ? y-lineH/2 : y;
+  lines.forEach((l,i)=>ctx.fillText(l, cx, startY+i*lineH));
+}
+// Малює перелік доходу по платформах (Uklon, OnTaxi тощо) — рядок з назвою
+// і сумою праворуч, з тонкою лінією між рядками. Повертає Y нижнього краю.
+function drawPlatformBreakdown(ctx, platforms, cx, y, totalW, colors, F){
+  if(!platforms.length) return y;
+  const left=cx-totalW/2, right=cx+totalW/2;
+  const rowH=78, titleGap=52;
+  ctx.textAlign='left';
+  ctx.fillStyle=colors.title; ctx.font='700 30px '+F;
+  ctx.fillText('ДОХІД ЗА ПЛАТФОРМАМИ', left, y);
+  let yy=y+titleGap;
+  platforms.forEach((p,i)=>{
+    ctx.fillStyle=colors.name; ctx.font='600 36px '+F; ctx.textAlign='left';
+    ctx.fillText(p.name, left, yy+rowH/2+13);
+    ctx.fillStyle=colors.value; ctx.font='700 36px '+F; ctx.textAlign='right';
+    ctx.fillText(money(p.amount), right, yy+rowH/2+13);
+    if(i<platforms.length-1){ ctx.strokeStyle=colors.line; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(left,yy+rowH-10); ctx.lineTo(right,yy+rowH-10); ctx.stroke(); }
+    yy+=rowH;
+  });
+  return yy;
+}
+// Три стилі банера для похвалитись результатом — лише те, що користувач сам
+// обрав показати (за бажанням і розбивка по платформах). Висота картинки
+// підлаштовується під кількість обраних метрик, аби все завжди вміщалось.
 function drawShareBanner(canvas, style, data){
-  const w=1080, h=1080; canvas.width=w; canvas.height=h;
+  const w=1080;
+  const F='-apple-system,"Segoe UI",Roboto,sans-serif';
+  const items=shareMetricItems(data);
+  const platforms=data.showPlatforms ? data.platforms : [];
+  const gridTop=635, gap=24, cardH=152;
+  const cols=items.length===1?1:2;
+  const rows=Math.ceil(items.length/cols);
+  let contentBottom = items.length ? gridTop+rows*cardH+(rows-1)*gap : gridTop-40;
+  if(platforms.length) contentBottom += 40 + 52 + platforms.length*78;
+  const h=Math.max(1080, contentBottom+180);
+  canvas.width=w; canvas.height=h;
   const ctx=canvas.getContext('2d');
   ctx.textAlign='center';
   const positive=data.profit>=0;
   const posColor='#5FE08A', negColor='#FF7B70';
-  const F='-apple-system,"Segoe UI",Roboto,sans-serif';
-  const metricTexts=[];
-  if(data.showShifts) metricTexts.push(data.nShifts+' змін');
-  if(data.showHours) metricTexts.push(Math.round(data.hours)+' год');
-  if(data.showKm) metricTexts.push(Math.round(data.km)+' км');
-  if(data.showCompare && data.comparePct!==null) metricTexts.push((data.comparePct>=0?'+':'')+data.comparePct+'%');
+  const gridW=w-140;
+
+  function drawExtras(gridColors, platColors){
+    let by=drawStatGrid(ctx, items, w/2, gridTop, gridW, gridColors.value, gridColors.cap, gridColors.bg, F);
+    if(platforms.length) drawPlatformBreakdown(ctx, platforms, w/2, by+(items.length?60:0), gridW, platColors, F);
+  }
 
   if(style==='bright'){
     const g=ctx.createLinearGradient(0,0,w,h);
@@ -5368,22 +5550,26 @@ function drawShareBanner(canvas, style, data){
     ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
     ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='700 32px '+F;
     ctx.fillText(data.periodLabel.toUpperCase(), w/2, 220);
+    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font='500 28px '+F;
+    ctx.fillText(data.dateLine, w/2, 260);
     ctx.fillStyle='#fff'; ctx.font='800 118px '+F;
     ctx.fillText(money(data.profit), w/2, 400);
     ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='500 34px '+F;
     ctx.fillText('чистий прибуток', w/2, 450);
-    drawSharePills(ctx, metricTexts, w/2, 560, positive?'#0d4a2c':'#4a1414', 'rgba(255,255,255,0.94)', '600 30px '+F);
+    drawExtras({ value: positive?'#0d4a2c':'#4a1414', cap:'rgba(13,74,44,0.7)', bg:'rgba(255,255,255,0.94)' }, { title:'rgba(255,255,255,0.7)', name:'#fff', value:'#fff', line:'rgba(255,255,255,0.18)' });
     ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font='700 28px '+F;
     ctx.fillText('📊  Водій', w/2, h-70);
   } else if(style==='motivate'){
     ctx.fillStyle='#0B0C0F'; ctx.fillRect(0,0,w,h);
     ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.font='700 32px '+F;
     ctx.fillText(data.periodLabel.toUpperCase(), w/2, 300);
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='500 28px '+F;
+    ctx.fillText(data.dateLine, w/2, 338);
     ctx.fillStyle= positive?posColor:negColor; ctx.font='800 126px '+F;
     ctx.fillText(money(data.profit), w/2, 460);
     ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='600 34px '+F;
     ctx.fillText(positive?'💪 Гарний результат':'Продовжуй, буде краще 🚀', w/2, 520);
-    drawSharePills(ctx, metricTexts, w/2, 600, '#fff', 'rgba(255,255,255,0.12)', '600 30px '+F);
+    drawExtras({ value:'#fff', cap:'rgba(255,255,255,0.55)', bg:'rgba(255,255,255,0.1)' }, { title:'rgba(255,255,255,0.5)', name:'#fff', value: positive?posColor:negColor, line:'rgba(255,255,255,0.12)' });
     ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='700 28px '+F;
     ctx.fillText('📊  Водій', w/2, h-70);
   } else {
@@ -5396,43 +5582,55 @@ function drawShareBanner(canvas, style, data){
     ctx.fillText(money(data.profit), w/2, 470);
     ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='500 32px '+F;
     ctx.fillText(data.periodLabel, w/2, 520);
-    drawSharePills(ctx, metricTexts, w/2, 600, '#fff', 'rgba(255,255,255,0.12)', '600 30px '+F);
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='500 26px '+F;
+    ctx.fillText(data.dateLine, w/2, 556);
+    drawExtras({ value:'#fff', cap:'rgba(255,255,255,0.55)', bg:'rgba(255,255,255,0.1)' }, { title:'rgba(255,255,255,0.5)', name:'#fff', value: positive?posColor:negColor, line:'rgba(255,255,255,0.12)' });
     ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='700 28px '+F;
     ctx.fillText('📊  Водій', w/2, h-70);
   }
 }
 function openShareBannerSheet(){
-  let key='7d', style='minimal';
-  const opts={ shifts:true, hours:false, km:false, compare:true };
-  const periods=[['today','Сьогодні'],['7d','7 днів'],['month','Місяць'],['year','Рік'],['all','Весь час']];
+  let key='7d';
+  let style=DB.settings.shareBannerStyle||'minimal';
+  const savedOpts=DB.settings.shareBannerOpts||{};
+  const opts={ income:!!savedOpts.income, expenses:!!savedOpts.expenses, shifts: savedOpts.shifts!==undefined?!!savedOpts.shifts:true, hours:!!savedOpts.hours, km:!!savedOpts.km, compare: savedOpts.compare!==undefined?!!savedOpts.compare:true, platforms:!!savedOpts.platforms };
+  const periods=[['today','Сьогодні'],['yesterday','Вчора'],['7d','7 днів'],['month','Місяць'],['year','Рік'],['all','Весь час']];
   const styles=[['minimal','Мінімалістичний'],['bright','Яскравий'],['motivate','Мотиваційний']];
   function currentData(){
     const r=shareRangeDates(key);
     const s=shareStatsForRange(r.from, r.to);
-    return { profit:s.profit, hours:s.hours, km:s.km, nShifts:s.nShifts, periodLabel:r.label,
-      comparePct:sharePrevCompare(r.from, r.to), showShifts:opts.shifts, showHours:opts.hours, showKm:opts.km, showCompare:opts.compare };
+    return { profit:s.profit, income:s.income, expTotal:s.expTotal, hours:s.hours, km:s.km, nShifts:s.nShifts, platforms:s.platforms, periodLabel:r.label, dateLine:r.dateLine,
+      comparePct:sharePrevCompare(r.from, r.to), showIncome:opts.income, showExpenses:opts.expenses, showShifts:opts.shifts, showHours:opts.hours, showKm:opts.km, showCompare:opts.compare, showPlatforms:opts.platforms };
   }
   function redraw(){ const c=$('#shareCanvas'); if(c) drawShareBanner(c, style, currentData()); }
+  function persistPrefs(){ DB.settings.shareBannerStyle=style; DB.settings.shareBannerOpts={...opts}; save(); }
   function bodyHtml(){
+    const d=currentData();
+    const hasPlatforms=d.platforms.length>0;
     return `
       <div class="seg" style="margin-bottom:10px">${periods.map(p=>`<button class="${key===p[0]?'on':''}" onclick="shareSetKey('${p[0]}')">${p[1]}</button>`).join('')}</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">${styles.map(s=>`<button type="button" class="chip ${style===s[0]?'on':''}" onclick="shareSetStyle('${s[0]}')">${s[1]}</button>`).join('')}</div>
       <canvas id="shareCanvas" style="width:100%;border-radius:16px;display:block;margin-bottom:12px"></canvas>
+      <div style="color:var(--tx2);font-size:12px;margin-bottom:6px">Що показати на картинці:</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <button type="button" class="chip ${opts.income?'on':''}" onclick="shareToggle('income')">Зароблено всього</button>
+        <button type="button" class="chip ${opts.expenses?'on':''}" onclick="shareToggle('expenses')">Витрати</button>
         <button type="button" class="chip ${opts.shifts?'on':''}" onclick="shareToggle('shifts')">Кількість змін</button>
         <button type="button" class="chip ${opts.hours?'on':''}" onclick="shareToggle('hours')">Годин за кермом</button>
         <button type="button" class="chip ${opts.km?'on':''}" onclick="shareToggle('km')">Пробіг (км)</button>
         <button type="button" class="chip ${opts.compare?'on':''}" onclick="shareToggle('compare')">Порівняння з попереднім</button>
+        <button type="button" class="chip ${opts.platforms?'on':''}" ${hasPlatforms?'':'disabled style="opacity:.4"'} onclick="shareToggle('platforms')">Дохід за платформами</button>
       </div>
+      ${!hasPlatforms?'<div style="color:var(--tx2);font-size:12px;margin-top:-8px;margin-bottom:14px">За цей період немає записаних платформ — розбивку показати нема з чого.</div>':''}
       <button class="btn primary" id="shareSendBtn" onclick="shareBannerSend()">📤 Поділитись</button>
-      <div style="text-align:center;margin-top:8px;color:var(--tx2);font-size:12px;line-height:1.4">Жодних деталей по платформах, авто чи витратах на картинці немає — лише те, що обрано вище.</div>
+      <div style="text-align:center;margin-top:8px;color:var(--tx2);font-size:12px;line-height:1.4">На картинці — лише те, що обрано вище (з датою періоду). Вибір стилю й метрик запам'ятовується.</div>
     `;
   }
   showSheet(`<h3>Поділитись підсумком</h3><div id="shareWrap">${bodyHtml()}</div>`);
   redraw();
   window.shareSetKey=(k)=>{ key=k; $('#shareWrap').innerHTML=bodyHtml(); redraw(); };
-  window.shareSetStyle=(s)=>{ style=s; $('#shareWrap').innerHTML=bodyHtml(); redraw(); };
-  window.shareToggle=(k)=>{ opts[k]=!opts[k]; $('#shareWrap').innerHTML=bodyHtml(); redraw(); };
+  window.shareSetStyle=(s)=>{ style=s; persistPrefs(); $('#shareWrap').innerHTML=bodyHtml(); redraw(); };
+  window.shareToggle=(k)=>{ opts[k]=!opts[k]; persistPrefs(); $('#shareWrap').innerHTML=bodyHtml(); redraw(); };
   window.shareBannerSend=async ()=>{
     const btn=$('#shareSendBtn');
     if(btn){ btn.textContent='Готуємо…'; btn.disabled=true; }
