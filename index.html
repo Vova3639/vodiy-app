@@ -497,7 +497,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.14';
+const APP_VERSION='0.9.15';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -514,6 +514,7 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.15', date:'29.09.2026 11:51', items:['Синхронізація з Google Диском тепер не питає Client ID — достатньо просто увійти своїм Google-акаунтом і натиснути «Синхронізувати», все налаштовано наперед']},
   {v:'0.9.14', date:'29.09.2026 11:32', items:['Автоматична синхронізація резервної копії з вашим власним Google Диском: Налаштування → Дані й звітність → «Синхронізація з Google Диском» (потрібен один раз створити безкоштовний Client ID у Google Cloud Console — інструкція прямо в застосунку); копія лежить у прихованій службовій папці саме вашого Диску, розробник до неї доступу не має']},
   {v:'0.9.13', date:'29.09.2026 11:24', items:['Демо-режим оновлено під усі нові функції: приклади документів і полісів з номером/компанією у Clio й Honda, три різні схеми кредиту/лізингу (щомісячно з прогресом, щотижневий викуп у доларах, свій графік), приклади нотаток (чорний список, адреса, клієнт, ідея), ім’я в профілі']},
   {v:'0.9.12', date:'29.09.2026 11:19', items:['Після завершення зміни показує, наскільки цей дохід кращий чи гірший за вашу середню зміну','Порівняння «цей тиждень vs минулий» на дашборді тепер із наочними смужками, і його можна вимкнути в Налаштування → Вигляд','Кілька нових пресетів у швидких шаблонах витрат (мийка самообслуговування, незамерзайка, шиномонтаж)','Документи авто: при фотографуванні одразу обираєте тип (техпаспорт, права, ОСЦПВ, КАСКО тощо) замість автоназви','Страхування: додано поля «Страхова компанія» і «Номер полісу», можна прикріпити фото поліса','Кредит/лізинг: три схеми платежів на вибір — щомісячно (як було, тепер ще й з прогресом «виплачено X з Y»), щотижневий викуп (у гривнях чи доларах, з вказаним курсом), або свій довільний графік платежів — усе враховується в точці беззбитковості','«Поділитись застосунком» — у «Профілі» та в «Про розробника», з подякою й пропозицією підтримати донатом після поширення','Нові «Нотатки» в налаштуваннях — клієнти, адреси, чорний список чи будь-що своє, з тегами','Початок зміни тепер підказує платформу за часом доби, якщо є історія змін у цей час']},
@@ -4272,7 +4273,7 @@ function renderSettingsData(){
       <div class="row" onclick="openPdfReportSheet()" style="cursor:pointer"><div class="rtitle"><b>PDF-звіт</b><div class="sub">Друк або збереження як PDF за період</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openYearSummary()" style="cursor:pointer"><div class="rtitle"><b>Річний підсумок</b><div class="sub">Скільки заробили за ${new Date().getFullYear()} рік</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openBackupSheet()" style="cursor:pointer"><div class="rtitle"><b>Резервна копія даних</b><div class="sub">Зберегти всі дані в файл або текст, і відновити пізніше</div></div><span class="chev">›</span></div>
-      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">☁️</div><div class="rtitle"><b>Синхронізація з Google Диском</b><div class="sub">${DB.settings.gdriveClientId?(DB.settings.gdriveLastSyncAt?'Востаннє: '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA'):'Ще не синхронізовано'):'Налаштувати автозбереження на ваш Диск'}</div></div><span class="chev">›</span></div>
+      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">☁️</div><div class="rtitle"><b>Синхронізація з Google Диском</b><div class="sub">${DB.settings.gdriveLastSyncAt?'Востаннє: '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA'):'Увійдіть — і застосунок сам зберігатиме копії'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openCustomTemplatesSheet()" style="cursor:pointer"><div class="rtitle"><b>Мої шаблони витрат</b><div class="sub">${(DB.settings.customTemplates||[]).length} збережено — додаються у формі витрати</div></div><span class="chev">›</span></div>
       <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
@@ -4864,7 +4865,7 @@ function openBackupSheet(){
     return `
       <div class="seg" style="margin-bottom:12px"><button onclick="bkSetMode('export')">Зберегти</button><button class="on" onclick="bkSetMode('import')">Відновити</button></div>
       <div class="confirm-msg">Оберіть раніше збережений файл (.json), або вставте текст резервної копії. Це замінить усі поточні дані в застосунку.</div>
-      ${DB.settings.gdriveClientId?`<button class="btn primary" style="margin-bottom:10px" onclick="closeSheet();confirmGDriveRestore()">☁️ Відновити з Google Диску</button>`:''}
+      <button class="btn primary" style="margin-bottom:10px" onclick="closeSheet();confirmGDriveRestore()">☁️ Відновити з Google Диску</button>
       <div class="field"><label>Файл (.json)</label><input type="file" id="bkFile" accept="application/json,.json"></div>
       <div class="field" style="margin-top:8px"><label>Або текст резервної копії</label><textarea id="bkImportText" placeholder="Встав сюди текст резервної копії..." style="width:100%;min-height:130px;padding:10px;border-radius:11px;border:0.5px solid var(--sep);background:var(--fill2);color:var(--tx);font-family:monospace;font-size:11px"></textarea></div>
       <button class="btn primary" style="margin-top:12px" onclick="importBackup()">Відновити з резервної копії</button>`;
@@ -4978,6 +4979,10 @@ function tryApplyBackup(text){
   });
 }
 /* ===== Google Drive sync (backup to the user's own Google account) ===== */
+// One shared OAuth Client ID for the whole app (not a secret — safe to embed).
+// Each user signs in to their OWN Google account through it; the backup goes only
+// to that user's own hidden appDataFolder, never through the developer.
+const GDRIVE_CLIENT_ID='194714840278-n7imdnf3e9bd0knr8hubq170q5t9unsk.apps.googleusercontent.com';
 const GDRIVE_SCOPE='https://www.googleapis.com/auth/drive.appdata';
 const GDRIVE_FILE_NAME='vodiy-backup.json';
 let gdriveAccessToken=null, gdriveTokenExpiry=0, gdriveTokenClient=null, gsiLoadPromise=null;
@@ -4998,8 +5003,7 @@ function loadGSI(){
 function gdriveHasToken(){ return !!gdriveAccessToken && Date.now()<gdriveTokenExpiry-5000; }
 function gdriveEnsureToken(cb, errCb){
   if(gdriveHasToken()){ cb(gdriveAccessToken); return; }
-  const clientId=(DB.settings.gdriveClientId||'').trim();
-  if(!clientId){ errCb('no-client-id'); return; }
+  const clientId=GDRIVE_CLIENT_ID;
   loadGSI().then(()=>{
     try{
       gdriveTokenClient=google.accounts.oauth2.initTokenClient({
@@ -5062,61 +5066,30 @@ function gdriveRestoreNow(){
   }, err=>gdriveAuthErrorSheet(err));
 }
 function gdriveAuthErrorSheet(err){
-  if(err==='no-client-id'){ openGDriveClientIdSheet(); return; }
   if(err==='script-blocked' || err==='gsi-timeout' || err==='gsi-load-failed'){
     alertSheet('Google недоступний тут','Схоже, цей перегляд (наприклад, попередній перегляд у Claude) блокує сервіс Google. Відкрийте застосунок за посиланням '+APP_SHARE_URL+' у звичайному браузері на телефоні чи комп’ютері — там синхронізація працює.');
     return;
   }
-  alertSheet('Не вдалося увійти в Google','Спробуйте ще раз. Якщо не виходить — перевірте, що Client ID вказано правильно і що ваша Google-пошта додана як тестувальник у Google Cloud Console (OAuth consent screen → Test users).');
+  if(err==='access_denied' || err==='popup_closed' || err==='popup_failed_to_open'){
+    alertSheet('Вхід не завершено','Ви закрили вікно входу Google, або доступ поки обмежено на тестування (звʼяжіться з розробником, щоб вас додали). Спробуйте ще раз.');
+    return;
+  }
+  alertSheet('Не вдалося увійти в Google','Спробуйте ще раз через кілька секунд.');
 }
 function gdriveErrorSheet(err){
   alertSheet('Помилка синхронізації','Не вдалося з’єднатися з Google Диском. Перевірте інтернет і спробуйте ще раз.');
 }
-function openGDriveClientIdSheet(){
-  showSheet(`
-    <h3>Google Диск — налаштування</h3>
-    <div class="confirm-msg">Щоб застосунок сам зберігав копії на ваш Google Диск, потрібно один раз створити безкоштовний OAuth Client ID у Google Cloud Console і вставити його сюди. Дані йдуть напряму з телефону на ваш власний Диск — розробник до них доступу не має.</div>
-    <div class="field" style="margin-top:10px"><label>OAuth Client ID</label><input id="gdClientId" placeholder="xxxxxxxx.apps.googleusercontent.com" value="${esc(DB.settings.gdriveClientId||'')}"></div>
-    <button class="btn primary" style="margin-top:12px" onclick="saveGDriveClientId()">Зберегти</button>
-    <button class="btn ghost" style="margin-top:8px" onclick="openGDriveHelpSheet()">Як створити Client ID? (5 хв)</button>
-  `);
-}
-function saveGDriveClientId(){
-  const v=$('#gdClientId').value.trim();
-  if(!v){ alertSheet('Введіть Client ID','Поле не може бути порожнім.'); return; }
-  DB.settings.gdriveClientId=v; save();
-  closeSheet(); openGDriveSheet();
-}
-function openGDriveHelpSheet(){
-  showSheet(`
-    <h3>Як створити Client ID</h3>
-    <ol style="padding-left:18px;line-height:1.75;font-size:13.5px;margin:0">
-      <li>Відкрийте <b>console.cloud.google.com</b> і увійдіть своїм Google-акаунтом.</li>
-      <li>Створіть новий проєкт (будь-яка назва, наприклад «Водій»).</li>
-      <li><b>APIs & Services → OAuth consent screen</b>. Тип — External. Заповніть назву застосунку й свою пошту. На кроці Test users додайте свою ж Google-пошту.</li>
-      <li><b>APIs & Services → Library</b> → знайдіть «Google Drive API» → Enable.</li>
-      <li><b>APIs & Services → Credentials → Create Credentials → OAuth client ID</b>. Тип застосунку — <b>Web application</b>.</li>
-      <li>У полі <b>Authorized JavaScript origins</b> додайте: <code>https://vova3639.github.io</code></li>
-      <li>Натисніть Create — з’явиться Client ID виду <code>xxxx.apps.googleusercontent.com</code>. Скопіюйте й вставте його в поле.</li>
-    </ol>
-    <div class="confirm-msg" style="margin-top:12px">Це робите один раз. Далі — просто кнопка «Синхронізувати».</div>
-    <button class="btn ghost" style="margin-top:12px" onclick="openGDriveClientIdSheet()">Назад</button>
-  `);
-}
 function openGDriveSheet(){
-  const clientId=(DB.settings.gdriveClientId||'').trim();
-  if(!clientId){ openGDriveClientIdSheet(); return; }
   const last=DB.settings.gdriveLastSyncAt;
   const lastLabel=last?new Date(last).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'ще не синхронізовано';
   showSheet(`
     <h3>Синхронізація з Google Диском</h3>
-    <div class="confirm-msg">Копія зберігається у прихованій службовій папці вашого власного Google Диску — вона не видна у звичайному списку файлів, і розробник до неї доступу не має.</div>
+    <div class="confirm-msg">Копія зберігається у прихованій службовій папці вашого власного Google Диску — вона не видна у звичайному списку файлів, і розробник до неї доступу не має. Просто увійдіть своїм Google-акаунтом і натисніть «Синхронізувати».</div>
     <div class="group" style="margin-top:12px">
       <div class="row"><div class="rtitle"><b>Останнє синхронізування</b><div class="sub">${esc(lastLabel)}</div></div></div>
     </div>
     <button class="btn primary" style="margin-top:12px" onclick="gdriveSyncNow(false)">☁️ Синхронізувати зараз (зберегти)</button>
     <button class="btn ghost" style="margin-top:8px" onclick="confirmGDriveRestore()">⬇️ Відновити з Google Диску</button>
-    <button class="btn add" style="margin-top:8px;text-align:center;width:100%" onclick="openGDriveClientIdSheet()">Змінити Client ID</button>
     <div style="text-align:center;margin-top:10px;color:var(--tx2);font-size:12px;line-height:1.4">Якщо перше натискання «Синхронізувати» нічого не відкрило — натисніть ще раз (перший раз лише завантажує сервіс Google).</div>
   `);
 }
