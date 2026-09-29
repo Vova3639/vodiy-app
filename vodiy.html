@@ -477,7 +477,7 @@ const REFERRAL_LINKS_DEFAULT=[
   {id:'monobank_fop', name:'monobank ФОП', url:'https://monobank.ua/r/GKMbyX', note:'Бізнес-рахунок ФОП — 150 ₴ за відкриття'},
   {id:'tg_channel', name:'Телеграм-канал застосунку', url:'https://t.me/+Cm7sx7py8BViZjAy', note:'Новини, ідеї, обговорення'}
 ];
-const APP_VERSION='0.9.16';
+const APP_VERSION='0.9.17';
 const DEV_INFO={
   name:'Розробник «Водій»',
   blurb:'Роблю цей застосунок сам, для себе й для інших водіїв таксі та служб доставки в Україні — щоб було зручно рахувати реальний прибуток, а не лише «брудний» дохід. Ідеї, які тут з’являються, — переважно з власного досвіду за кермом.',
@@ -494,6 +494,7 @@ const APP_SHARE_URL='https://vova3639.github.io/vodiy-app/';
    Нумерація на етапі розробки: 0.9 → 0.9.1 → 0.9.2 ... (третя цифра = черговий нормальний
    реліз). 1.0 навмисно зарезервована під перший повноцінний реліз, не чіпати її раніше часу. */
 const CHANGELOG=[
+  {v:'0.9.17', date:'29.09.2026 12:32', items:['Синхронізація з Google Диском тепер розумна: перед відновленням застосунок порівнює дані на телефоні з копією на Диску й показує різницю (скільки нових записів де), а далі на вибір — обʼєднати без втрат і дублів, взяти тільки з Диску, чи тільки з телефону','Кнопка «Синхронізувати» перенесена у верх розділу «Дані й звітність», одразу під «Дані збережено на пристрої»']},
   {v:'0.9.16', date:'29.09.2026 12:04', items:['Вхід у Google Диск тепер завжди показує вибір акаунта (щоб не переплутати, якщо на пристрої авторизовано кілька Google-акаунтів) і показує пошту акаунта, з яким синхронізовано — плюс кнопка «Змінити акаунт» у налаштуваннях синхронізації']},
   {v:'0.9.15', date:'29.09.2026 11:51', items:['Синхронізація з Google Диском тепер не питає Client ID — достатньо просто увійти своїм Google-акаунтом і натиснути «Синхронізувати», все налаштовано наперед']},
   {v:'0.9.14', date:'29.09.2026 11:32', items:['Автоматична синхронізація резервної копії з вашим власним Google Диском: Налаштування → Дані й звітність → «Синхронізація з Google Диском» (потрібен один раз створити безкоштовний Client ID у Google Cloud Console — інструкція прямо в застосунку); копія лежить у прихованій службовій папці саме вашого Диску, розробник до неї доступу не має']},
@@ -4244,7 +4245,10 @@ function renderSettingsData(){
   const body=`
     <div class="section-label">Дані й звітність <button type="button" class="infob" onclick="alertSheet('Дані й звітність','Експорт готує текст для бухгалтера чи Telegram. Демо-режим показує приклад заповненого застосунку, не чіпаючи ваші справжні записи. Скидання налаштувань не видаляє дані — лише запускає майстер заново.')">i</button></div>
     <div class="group">
-      <div class="row"><div class="icobadge" style="background:var(--green)">${icon('box',17)}</div><div class="rtitle"><b>Дані збережено на пристрої</b><div class="sub">Займають ${storageInfoLabel()} · синхронізації з хмарою немає</div></div></div>
+      <div class="row"><div class="icobadge" style="background:var(--green)">${icon('box',17)}</div><div class="rtitle"><b>Дані збережено на пристрої</b><div class="sub">Займають ${storageInfoLabel()}</div></div></div>
+      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">☁️</div><div class="rtitle"><b>Google Диск</b><div class="sub">${DB.settings.gdriveLastSyncAt?'Синхронізовано '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA')+(DB.settings.gdriveLastSyncEmail?' · '+esc(DB.settings.gdriveLastSyncEmail):''):'Не синхронізовано — натисніть, щоб увімкнути'}</div></div>
+        <button type="button" class="infob" style="background:var(--blue);color:#fff" onclick="event.stopPropagation();gdriveSyncNow(false)">Синхронізувати</button>
+      </div>
       <div class="row"><div class="rtitle"><b>Нагадувати про резервну копію</b><div class="sub">Якщо давно не зберігали — нагадаємо на дашборді</div></div>
         <select style="max-width:110px" onchange="DB.settings.autoBackupDays=+this.value;save()">${[7,14,30,60].map(d=>`<option value="${d}" ${+DB.settings.autoBackupDays===d?'selected':''}>${d} дн.</option>`).join('')}</select>
       </div>
@@ -4255,7 +4259,6 @@ function renderSettingsData(){
       <div class="row" onclick="openPdfReportSheet()" style="cursor:pointer"><div class="rtitle"><b>PDF-звіт</b><div class="sub">Друк або збереження як PDF за період</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openYearSummary()" style="cursor:pointer"><div class="rtitle"><b>Річний підсумок</b><div class="sub">Скільки заробили за ${new Date().getFullYear()} рік</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openBackupSheet()" style="cursor:pointer"><div class="rtitle"><b>Резервна копія даних</b><div class="sub">Зберегти всі дані в файл або текст, і відновити пізніше</div></div><span class="chev">›</span></div>
-      <div class="row" onclick="openGDriveSheet()" style="cursor:pointer"><div class="icobadge" style="background:var(--blue)">☁️</div><div class="rtitle"><b>Синхронізація з Google Диском</b><div class="sub">${DB.settings.gdriveLastSyncAt?'Востаннє: '+new Date(DB.settings.gdriveLastSyncAt).toLocaleDateString('uk-UA')+(DB.settings.gdriveLastSyncEmail?' · '+esc(DB.settings.gdriveLastSyncEmail):''):'Увійдіть — і застосунок сам зберігатиме копії'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="openCustomTemplatesSheet()" style="cursor:pointer"><div class="rtitle"><b>Мої шаблони витрат</b><div class="sub">${(DB.settings.customTemplates||[]).length} збережено — додаються у формі витрати</div></div><span class="chev">›</span></div>
       <div class="row" onclick="toggleDemo()" style="cursor:pointer"><div class="rtitle"><b>${isDemo()?'Вийти з демо-режиму':'Переглянути демо-режим'}</b><div class="sub">${isDemo()?'Повернутись до ваших справжніх даних':'Приклад заповнення, ваші дані лишаться недоторканими'}</div></div><span class="chev">›</span></div>
       <div class="row" onclick="requestResetOnboarding()" style="cursor:pointer"><div class="rtitle"><b>Пройти налаштування знову</b></div><span class="chev">›</span></div>
@@ -4906,6 +4909,47 @@ function openBackupSheet(){
     tryApplyBackup(text);
   };
 }
+// Fills in every field a DB loaded from an older backup might be missing — the
+// same migrations load() applies, kept here so restore/merge paths reuse one place.
+function normalizeDB(DB){
+  if(!DB.contacts) DB.contacts=[];
+  if(!DB.goals) DB.goals={daily:0, weekly:0, monthly:0};
+  if(!DB.reminders) DB.reminders=[];
+  if(!DB.referralLinks) DB.referralLinks=REFERRAL_LINKS_DEFAULT.map(r=>({...r}));
+  if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
+  if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
+  if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
+  if(DB.profile.esvMonthly===undefined) DB.profile.esvMonthly=0;
+  if(DB.profile.taxReminderEnabled===undefined) DB.profile.taxReminderEnabled=false;
+  if(DB.profile.taxReminderDay===undefined) DB.profile.taxReminderDay=15;
+  if(DB.profile.name===undefined) DB.profile.name='';
+  if(DB.activeShift===undefined) DB.activeShift=null;
+  if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1};
+  if(DB.settings.accentColor===undefined) DB.settings.accentColor='';
+  if(DB.settings.envelopeRate===undefined) DB.settings.envelopeRate=0;
+  if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
+  if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
+  if(DB.settings.textScale===undefined) DB.settings.textScale=1;
+  if(DB.settings.edgeBack===undefined) DB.settings.edgeBack=true;
+  if(!DB.settings.haptics) DB.settings.haptics={master:true, swipe:true, delete:true, actions:true};
+  if(DB.settings.haptics.master===undefined) DB.settings.haptics.master=true;
+  if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
+  if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
+  if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
+  if(DB.settings.themeId===undefined) DB.settings.themeId='';
+  if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
+  if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
+  if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
+  if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
+  if(DB.settings.showWeekCompare===undefined) DB.settings.showWeekCompare=true;
+  if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
+  if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
+  if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
+  if(!DB.notes) DB.notes=[];
+  if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
+  if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
+  return DB;
+}
 function tryApplyBackup(text){
   let data;
   try{ data=JSON.parse(text); }
@@ -4918,43 +4962,7 @@ function tryApplyBackup(text){
     msg:`Це замінить усі поточні дані застосунку: ${data.cars.length} авто, ${data.shifts.length} змін, ${(data.expenses||[]).length} витрат. Поточні дані буде втрачено, якщо їх не збережено окремо. Продовжити?`,
     actionLabel:'Відновити', danger:true,
     onConfirm:()=>{
-      DB=data;
-      if(!DB.contacts) DB.contacts=[];
-      if(!DB.goals) DB.goals={daily:0, weekly:0, monthly:0};
-      if(!DB.reminders) DB.reminders=[];
-      if(!DB.referralLinks) DB.referralLinks=REFERRAL_LINKS_DEFAULT.map(r=>({...r}));
-      if(!DB.profile) DB.profile={workType:'both', fop:'none', taxGroup2Fixed:0, taxGroup3Rate:5, esvMonthly:0};
-      if(DB.profile.taxGroup2Fixed===undefined) DB.profile.taxGroup2Fixed=0;
-      if(DB.profile.taxGroup3Rate===undefined) DB.profile.taxGroup3Rate=5;
-      if(DB.profile.esvMonthly===undefined) DB.profile.esvMonthly=0;
-      if(DB.profile.taxReminderEnabled===undefined) DB.profile.taxReminderEnabled=false;
-      if(DB.profile.taxReminderDay===undefined) DB.profile.taxReminderDay=15;
-      if(DB.profile.name===undefined) DB.profile.name='';
-      if(DB.activeShift===undefined) DB.activeShift=null;
-      if(!DB.settings) DB.settings={yellowDays:3, redDays:7, doubleConfirm:false, showKopecks:false, accentColor:'', envelopeRate:0, envelopeWithdrawn:0, updateCheckMinutes:60, textScale:1};
-      if(DB.settings.accentColor===undefined) DB.settings.accentColor='';
-      if(DB.settings.envelopeRate===undefined) DB.settings.envelopeRate=0;
-      if(DB.settings.envelopeWithdrawn===undefined) DB.settings.envelopeWithdrawn=0;
-      if(DB.settings.updateCheckMinutes===undefined) DB.settings.updateCheckMinutes=60;
-      if(DB.settings.textScale===undefined) DB.settings.textScale=1;
-      if(DB.settings.edgeBack===undefined) DB.settings.edgeBack=true;
-      if(!DB.settings.haptics) DB.settings.haptics={master:true, swipe:true, delete:true, actions:true};
-      if(DB.settings.haptics.master===undefined) DB.settings.haptics.master=true;
-      if(DB.settings.haptics.swipe===undefined) DB.settings.haptics.swipe=true;
-      if(DB.settings.haptics.delete===undefined) DB.settings.haptics.delete=true;
-      if(DB.settings.haptics.actions===undefined) DB.settings.haptics.actions=true;
-      if(DB.settings.themeId===undefined) DB.settings.themeId='';
-      if(DB.settings.autoBackupDays===undefined) DB.settings.autoBackupDays=30;
-      if(!DB.settings.customTemplates) DB.settings.customTemplates=[];
-      if(DB.settings.garageView===undefined) DB.settings.garageView='banner';
-      if(DB.settings.backupReminderSnoozeUntil===undefined) DB.settings.backupReminderSnoozeUntil='';
-      if(DB.settings.showWeekCompare===undefined) DB.settings.showWeekCompare=true;
-      if(DB.settings.gdriveClientId===undefined) DB.settings.gdriveClientId='';
-      if(DB.settings.gdriveLastSyncAt===undefined) DB.settings.gdriveLastSyncAt=null;
-      if(DB.settings.gdriveLastSyncEmail===undefined) DB.settings.gdriveLastSyncEmail='';
-      if(!DB.notes) DB.notes=[];
-      if(DB.lastBackupAt===undefined) DB.lastBackupAt=null;
-      if(!DB.lastUsed) DB.lastUsed={ carId:'', platformIds:[], expCategory:'', expCarId:'' };
+      DB=normalizeDB(data);
       save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
       alertSheet('Відновлено','Дані успішно відновлено з резервної копії.');
     },
@@ -5052,13 +5060,98 @@ function gdriveSyncNow(silent, forceChooser){
     }).catch(err=>{ if(!silent) gdriveErrorSheet(err); });
   }, err=>{ if(!silent) gdriveAuthErrorSheet(err); }, forceChooser);
 }
+// Кожен запис (зміна, витрата, авто, контакт, нагадування, нотатка) має свій унікальний id
+// (uid() кодує час створення), тож дані з телефону й Диску можна об'єднувати без дублів —
+// просто за набором id, а не переписувати одне поверх іншого наосліп.
+const GDRIVE_MERGE_KEYS=[['cars','авто'],['shifts','змін'],['expenses','витрат'],['contacts','контактів'],['reminders','нагадувань'],['notes','нотаток']];
+function diffDBCounts(localDB, remoteDB){
+  return GDRIVE_MERGE_KEYS.map(([key,label])=>{
+    const localIds=new Set((localDB[key]||[]).filter(x=>x&&x.id).map(x=>x.id));
+    const remoteIds=new Set((remoteDB[key]||[]).filter(x=>x&&x.id).map(x=>x.id));
+    let onlyLocal=0, common=0;
+    localIds.forEach(id=>{ if(remoteIds.has(id)) common++; else onlyLocal++; });
+    let onlyRemote=0;
+    remoteIds.forEach(id=>{ if(!localIds.has(id)) onlyRemote++; });
+    return {key, label, onlyLocal, onlyRemote, common};
+  });
+}
+function mergeDBs(localDB, remoteDB){
+  const merged=JSON.parse(JSON.stringify(localDB));
+  GDRIVE_MERGE_KEYS.forEach(([key])=>{
+    const localArr=merged[key]||(merged[key]=[]);
+    const remoteArr=remoteDB[key]||[];
+    const ids=new Set(localArr.filter(x=>x&&x.id).map(x=>x.id));
+    remoteArr.forEach(item=>{
+      if(item && item.id && !ids.has(item.id)){ localArr.push(item); ids.add(item.id); }
+    });
+  });
+  return merged;
+}
+let gdrivePendingRemoteText=null;
 function gdriveRestoreNow(){
   gdriveEnsureToken(token=>{
     gdriveFindFileId(token).then(f=>{
       if(!f){ alertSheet('Немає копії на Диску','У акаунті'+(gdriveAccountEmail?' '+esc(gdriveAccountEmail):'')+' ще немає збереженої копії «Водій». Якщо на телефоні кілька Google-акаунтів — переконайтесь, що при вході вибрали саме той, яким раніше синхронізували. Або спершу натисніть «Синхронізувати зараз».'); return; }
-      gdriveDownload(token, f.id).then(text=>{ closeSheet(); tryApplyBackup(text); });
+      gdriveDownload(token, f.id).then(text=>{ openGDriveCompareSheet(text); });
     });
   }, err=>gdriveAuthErrorSheet(err));
+}
+function openGDriveCompareSheet(text){
+  let remoteDB;
+  try{ remoteDB=JSON.parse(text); }catch(e){ alertSheet('Помилка','Не вдалося прочитати копію з Google Диску.'); return; }
+  if(!remoteDB || !Array.isArray(remoteDB.cars) || !Array.isArray(remoteDB.shifts)){
+    alertSheet('Помилка','Копія на Диску пошкоджена або не схожа на дані «Водій».'); return;
+  }
+  gdrivePendingRemoteText=text;
+  const diffs=diffDBCounts(DB, remoteDB);
+  const changed=diffs.filter(d=>d.onlyLocal||d.onlyRemote);
+  const rows=changed.map(d=>`<div class="row"><div class="rtitle"><b>${esc(d.label[0].toUpperCase()+d.label.slice(1))}</b><div class="sub">${d.onlyLocal?'На телефоні нових: '+d.onlyLocal+'. ':''}${d.onlyRemote?'На Диску нових: '+d.onlyRemote+'. ':''}Спільних: ${d.common}</div></div></div>`).join('');
+  showSheet(`
+    <h3>Порівняння з Google Диском</h3>
+    ${changed.length?`
+      <div class="confirm-msg">Різниця між тим, що зараз на телефоні, і останньою копією на Диску:</div>
+      <div class="group" style="margin:10px 0 4px">${rows}</div>
+    `:`<div class="confirm-msg">Дані на телефоні й на Диску повністю збігаються — можна просто продовжувати працювати.</div>`}
+    <button class="btn primary" style="margin-top:10px" onclick="gdriveResolve('merge')">🔗 Обʼєднати — нічого не втратити</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="gdriveResolve('remote')">⬇️ Тільки з Диску (замінити телефон)</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="gdriveResolve('local')">📱 Тільки з телефону (перезаписати Диск)</button>
+    <div style="text-align:center;margin-top:10px;color:var(--tx2);font-size:12px;line-height:1.4">Рекомендуємо «Обʼєднати» — записи не дублюються, кожен запис має свій унікальний ідентифікатор.</div>
+  `);
+}
+function gdriveResolve(mode){
+  if(mode==='local'){
+    confirmAction({
+      title:'Перезаписати копію на Диску?',
+      msg:'На Google Диску буде замінено збережену копію поточними даними з телефону. Те, що є лише на Диску, буде втрачено.',
+      actionLabel:'Перезаписати', danger:true,
+      onConfirm:()=>{ closeSheet(); gdrivePendingRemoteText=null; gdriveSyncNow(false); },
+      onCancel:()=>{}
+    });
+    return;
+  }
+  let remoteDB=null;
+  try{ remoteDB=JSON.parse(gdrivePendingRemoteText); }catch(e){}
+  if(!remoteDB){ alertSheet('Помилка','Копію з Диску втрачено, спробуйте ще раз.'); return; }
+  if(mode==='remote'){
+    confirmAction({
+      title:'Замінити дані на телефоні?',
+      msg:'Поточні дані на телефоні буде повністю замінено копією з Google Диску. Те, що є лише на телефоні, буде втрачено.',
+      actionLabel:'Замінити', danger:true,
+      onConfirm:()=>{
+        DB=normalizeDB(remoteDB); save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
+        alertSheet('Готово','Дані на телефоні замінено копією з Google Диску.');
+      },
+      onCancel:()=>{}
+    });
+    return;
+  }
+  if(mode==='merge'){
+    DB=normalizeDB(mergeDBs(DB, remoteDB));
+    save(); closeSheet(); closeFullscreen(); TAB='dash'; init();
+    gdrivePendingRemoteText=null;
+    gdriveSyncNow(true);
+    alertSheet('Обʼєднано','Дані з телефону та Google Диску об’єднано без дублів і збережено. Оновлену копію також відправлено назад на Диск.');
+  }
 }
 function gdriveChangeAccount(){
   gdriveSignOut();
@@ -5090,20 +5183,12 @@ function openGDriveSheet(){
       <div class="row"><div class="rtitle"><b>Останнє синхронізування</b><div class="sub">${esc(lastLabel)}</div></div></div>
     </div>
     <button class="btn primary" style="margin-top:12px" onclick="gdriveSyncNow(false)">☁️ Синхронізувати зараз (зберегти)</button>
-    <button class="btn ghost" style="margin-top:8px" onclick="confirmGDriveRestore()">⬇️ Відновити з Google Диску</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="confirmGDriveRestore()">🔄 Порівняти й відновити з Диску</button>
     <button class="btn add" style="margin-top:8px;text-align:center;width:100%" onclick="closeSheet();gdriveChangeAccount()">Змінити акаунт</button>
     <div style="text-align:center;margin-top:10px;color:var(--tx2);font-size:12px;line-height:1.4">Якщо перше натискання «Синхронізувати» нічого не відкрило — натисніть ще раз (перший раз лише завантажує сервіс Google).</div>
   `);
 }
-function confirmGDriveRestore(){
-  confirmAction({
-    title:'Відновити з Google Диску?',
-    msg:'Це завантажить останню копію з вашого Диску і замінить поточні дані в застосунку.',
-    actionLabel:'Відновити', danger:true,
-    onConfirm:()=>gdriveRestoreNow(),
-    onCancel:()=>openGDriveSheet()
-  });
-}
+function confirmGDriveRestore(){ gdriveRestoreNow(); }
 
 /* ============ DEMO DATA ============ */
 function demoDocImg(label){
