@@ -1,4 +1,8 @@
-const CACHE = 'vodiy-v39';
+const CACHE = 'vodiy-v41';
+// Той самий публічний секрет застосунку (не таємниця — лише щоб чужі скрипти не
+// спамили Worker), потрібен тут тільки для трекінгу кліків по адмінських пушах.
+const PUSH_APP_SECRET = '-Ir0ChVhJ90OTvNo6wrdbiTzsJNxkCMR';
+const PUSH_WORKER_URL = 'https://vodiy-push.vova3639.workers.dev';
 const ASSETS = [
   './',
   './index.html',
@@ -74,7 +78,14 @@ self.addEventListener('push', (e) => {
     icon: './icon-192.png',
     badge: './icon-32.png',
     tag: data.tag || 'vodiy',
-    data: { url: data.url || './' }
+    // Явно вимикаємо "тихий" режим і додаємо вібрацію — на деяких Android-пристроях
+    // канал сповіщень браузера інакше може йти без звуку/вібрації за замовчуванням.
+    // Кастомний звук (як "пілінь" на iPhone) поставити з боку сайту технічно неможливо —
+    // це системне обмеження Web Push на всіх платформах, не наше.
+    silent: false,
+    vibrate: [200, 80, 200],
+    renotify: !!data.tag,
+    data: { url: data.url || './', hid: data.hid || null }
   };
   e.waitUntil(self.registration.showNotification(data.title || 'Водій', opts));
 });
@@ -84,16 +95,24 @@ self.addEventListener('push', (e) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   const rel = (e.notification.data && e.notification.data.url) || './';
+  const hid = e.notification.data && e.notification.data.hid;
   const targetUrl = new URL(rel, self.registration.scope).href;
-  e.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const c of list) {
-        if ('focus' in c) {
-          if ('navigate' in c) { c.navigate(targetUrl).catch(() => {}); }
-          return c.focus();
-        }
+  const focusTask = self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+    for (const c of list) {
+      if ('focus' in c) {
+        if ('navigate' in c) { c.navigate(targetUrl).catch(() => {}); }
+        return c.focus();
       }
-      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
-    })
-  );
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
+  });
+  // Трекінг кліку для CTR в адмінці — не блокує й не зриває навігацію, якщо мережа підведе.
+  const trackTask = hid
+    ? fetch(PUSH_WORKER_URL + '/track/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-App-Secret': PUSH_APP_SECRET },
+        body: JSON.stringify({ hid }),
+      }).catch(() => {})
+    : Promise.resolve();
+  e.waitUntil(Promise.all([focusTask, trackTask]));
 });
